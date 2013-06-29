@@ -1,0 +1,4 @@
+kconf hardware x86vm.cfg
+
+kconf hardware x86vm-user-config.cfg
+include x86vm-user-patches.scc

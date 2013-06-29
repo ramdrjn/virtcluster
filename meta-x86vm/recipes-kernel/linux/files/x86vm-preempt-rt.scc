@@ -1,0 +1,7 @@
+define KMACHINE x86vm
+define KTYPE preempt-rt
+define KARCH i386
+
+include ktypes/preempt-rt/preempt-rt.scc
+
+include x86vm.scc
