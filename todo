@@ -1,0 +1,66 @@
+HP:
+Bugs:
+
+LP:
+Bugs:
+
+Enhancement:
+
+1. Remove a node in a tree based on the key. Current is to remove the node using the node reference.
+
+3. Priority fields in the packet container. This can be used to implement the
+priority queue.
+
+5. signal and process object interfaces to be defined more cleary.
+
+1. Realtime extensions for signal handling.
+
+2. Check posix real time extensions for timer creation and handling.
+
+4. Assert usage to be reduced. More graceful handling.
+
+6. Replace valid flag with some pattern. Easy debugging.
+
+7. parseOpts to be enabled.
+
+Socket pending options:
+
+2. EINTR to be handled in the socket interfaces.
+5. EAGAIN error code needs to be supported for sockets.
+6. Similarly the EWOULDBLOCK also needs tobe handled. This is essential for case where there is more data than the transmit buffer.
+
+1. TODO changes for GNU coding style.
+
+2. Allow for memory allocation for objects from outside the class. This might
+require the class definition to be moved into the include file from the private
+include file.
+        2.1 In case memory allocation outside then we might have to reset
+        the parameters.
+        2.2 Init userdata to 0 for timer and signal mod.
+        2.3 Check wheteher the omod requires initialization.
+        2.4 Checklog module. Init 0 for flags.
+        2.5 Reset fd and FP in the file object.
+        2.6 Points 4,5,6,7 not required since calloc is called.
+        2.7 The usefullness of each function to be checked. If freq used then move outside as #define. Also since the structure is exposed, we can move some of single line functions as #defines. Most changes would be in packet container.
+        2.8 Object oriented design changes.
+
+LP:
+
+1. Check and update the namespace for the function names.
+3. Auto generate the test file for the base lib ft.
+
+Pending test cases:
+1. Binary file test cases.
+2. Ascii file read and write mode and append mode.
+3. file lock option.
+4. Getfd function.
+5. variable read and write.
+6. vector read and write
+7. non blocking IO
+8. msg_shut for sockets.
+9. mq_receive ??
+10. Add FT and ST test cases for tree. Both AVL and BST trees.
+11. traversal on left side.
+12. test cases for polling.
+13. Complete IT.
+14. parseOpts test cases.

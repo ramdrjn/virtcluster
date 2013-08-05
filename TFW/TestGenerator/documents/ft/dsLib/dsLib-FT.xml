@@ -1,0 +1,1545 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<testType type="FT">
+  <testSUT lib="dsLib" version="1.0">
+
+    <testMod mod="_proto.h">
+
+      <include>"main.h"</include>
+      <include>"utLib/inc/_dsbase.h"</include>
+
+      <codeMod>
+        <statement>void test_dsLib_FT(void);</statement>
+        <statement>void pktcntr_test(void);</statement>
+        <statement>void dbase_test(void);</statement>
+        <statement>ds_packetContainer * travCB(void *, ds_packetContainer *);</statement>
+      </codeMod>
+
+    </testMod>
+
+    <testMod mod="main">
+
+      <include>"_proto.h"</include>
+
+      <codeMod func="int main(void)">
+        <statement>
+          init();
+          hdr("Starting to run the test cases.");
+
+          test_dsLib_FT();
+
+          hdr("Test case run finished execution.");
+          fin();
+          return(0);
+        </statement>
+      </codeMod>
+
+    </testMod>
+
+    <testMod mod="dsLib_FT">
+
+      <include>"_proto.h"</include>
+
+      <codeMod func="void pktcntr_test(void)">
+
+        <lvariable>ds_packetContainer mainPtr</lvariable>
+        <lvariable>ds_packetContainer prevPtr</lvariable>
+        <lvariable>ds_packetContainer nextPtr</lvariable>
+        <lvariable>ds_packetContainer tmrPtr</lvariable>
+        <lvariable>ds_packetContainer *tmpPtr = NULL</lvariable>
+        <lvariable>void *userDataPtr = NULL</lvariable>
+        <lvariable>void *tmpVoidPtr = NULL</lvariable>
+
+        <testCase typ="FUN">
+          <cmd> memset(&amp;mainPtr, 0, sizeof(ds_packetContainer));retVal = ds_packetContainerInit (&amp;mainPtr) </cmd>
+          <desc>" Initialize a packet container module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tmpPtr =  ds_getNextPtr (&amp;mainPtr) </cmd>
+          <desc>" Check null pointer for next node "</desc>
+          <cond> (!tmpPtr) </cond>
+          <err> 0 </err>
+          <errStr> "Non-Null pointer" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tmpPtr =  ds_getPrevPtr (&amp;mainPtr) </cmd>
+          <desc>" Check null pointer for previous node "</desc>
+          <cond> (!tmpPtr) </cond>
+          <err> 0 </err>
+          <errStr> "Non-Null pointer" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tmpPtr =  ds_getTimerData (&amp;mainPtr) </cmd>
+          <desc>" Check null pointer for timer data "</desc>
+          <cond> (!tmpPtr) </cond>
+          <err> 0 </err>
+          <errStr> "Non-Null pointer" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tmpVoidPtr =  ds_getPayLoadData (&amp;mainPtr) </cmd>
+          <desc>" Check null pointer for payload data "</desc>
+          <cond> (!tmpVoidPtr) </cond>
+          <err> 0 </err>
+          <errStr> "Non-Null pointer" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tmpVoidPtr =  ds_getQueueData (&amp;mainPtr) </cmd>
+          <desc>" Check null pointer for queue data "</desc>
+          <cond> (!tmpVoidPtr) </cond>
+          <err> 0 </err>
+          <errStr> "Non-Null pointer" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal =  ds_packetContainerInit (&amp;prevPtr) </cmd>
+          <desc>" Initialize previous packet container module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal =  ds_setPrevPtr (&amp;mainPtr, &amp;prevPtr) </cmd>
+          <desc>" Set previous packet container module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tmpPtr =  ds_getPrevPtr (&amp;mainPtr) </cmd>
+          <desc>" Check null pointer for previous node "</desc>
+          <cond> (tmpPtr==&amp;prevPtr) </cond>
+          <err> 0 </err>
+          <errStr> "Non-Null pointer" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal =  ds_packetContainerInit (&amp;nextPtr) </cmd>
+          <desc>" Initialize next packet container module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal =  ds_setNextPtr (&amp;mainPtr, &amp;nextPtr) </cmd>
+          <desc>" Set Next packet container module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tmpPtr =  ds_getNextPtr (&amp;mainPtr) </cmd>
+          <desc>" Check null pointer for next node "</desc>
+          <cond> (tmpPtr==&amp;nextPtr) </cond>
+          <err> 0 </err>
+          <errStr> "Non-Null pointer" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal =  ds_packetContainerInit (&amp;tmrPtr) </cmd>
+          <desc>" Initialize timer packet container module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal =  ds_setTimerData (&amp;mainPtr, &amp;tmrPtr) </cmd>
+          <desc>" Set timer node "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tmpPtr =  ds_getTimerData (&amp;mainPtr) </cmd>
+          <desc>" Check null pointer for timer data "</desc>
+          <cond> (tmpPtr==&amp;tmrPtr) </cond>
+          <err> 0 </err>
+          <errStr> "Non-Null pointer" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal =  bs_allocMem (iMObj, 10, &amp;tmpVoidPtr);userDataPtr = tmpVoidPtr </cmd>
+          <desc>" Allocate userdata "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal =  ds_setPayLoadData (&amp;mainPtr, userDataPtr) </cmd>
+          <desc>" Set user data "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tmpVoidPtr = ds_getPayLoadData (&amp;mainPtr) </cmd>
+          <desc>" Get and check user data "</desc>
+          <cond> (tmpVoidPtr==userDataPtr) </cond>
+          <err> 0 </err>
+          <errStr> "Non-Null pointer" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal =  ds_setQueueData (&amp;mainPtr, userDataPtr) </cmd>
+          <desc>" Set queue data "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tmpVoidPtr =  ds_getQueueData (&amp;mainPtr) </cmd>
+          <desc>" Get and check queue data "</desc>
+          <cond> (tmpVoidPtr==userDataPtr) </cond>
+          <err> 0 </err>
+          <errStr> "Non-Null pointer" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal =  ds_packetContainerFin (&amp;prevPtr) </cmd>
+          <desc>" Finalise the previous packet container module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal =  ds_packetContainerFin (&amp;nextPtr) </cmd>
+          <desc>" Finalise the next packet container module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal =  ds_packetContainerFin (&amp;tmrPtr) </cmd>
+          <desc>" Finalise the timer packet container module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal =  bs_freeMem (iMObj, &amp;userDataPtr) </cmd>
+          <desc>" Free the userdata "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal =  ds_packetContainerFin (&amp;mainPtr) </cmd>
+          <desc>" Finalise a packet container module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+      </codeMod>
+
+      <codeMod func="ds_packetContainer* travCB(void *arg, ds_packetContainer* node)">
+        <statement>
+          (void)arg;
+          (void)node;
+          return NULL;
+        </statement>
+      </codeMod>
+
+      <codeMod func="void dbase_test(void)">
+        <lvariable>ds_dsBase dsBasePtr</lvariable>
+        <lvariable>unsigned int cnt = 0</lvariable>
+        <lvariable>unsigned int key = 0</lvariable>
+        <lvariable>t_bool eflag = false</lvariable>
+        <lvariable>ds_packetContainer pktctr[5]</lvariable>
+        <lvariable>ds_packetContainer *tpptr = NULL</lvariable>
+
+        <testCase typ="FUN">
+          <cmd> memset(&amp;dsBasePtr, 0, sizeof(ds_dsBase)); retVal = ds_dsBaseInit(&amp;dsBasePtr, DS_QUEUE) </cmd>
+          <desc>" Initialize a database and register as queue. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check registered type. "</desc>
+          <cond> (dsBasePtr.type == DS_QUEUE) </cond>
+          <err> dsBasePtr.type </err>
+          <errStr> "Invalid type" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check non-circular flag "</desc>
+          <cond> (dsBasePtr.circular == false) </cond>
+          <err> dsBasePtr.circular </err>
+          <errStr> "Invalid circular flag" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check head ptr "</desc>
+          <cond> (dsBasePtr.headPtr == NULL) </cond>
+          <err> 0 </err>
+          <errStr> "Invalid head pointer" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check tail ptr "</desc>
+          <cond> (dsBasePtr.tailPtr == NULL) </cond>
+          <err> 0 </err>
+          <errStr> "Invalid tail pointer" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> cnt = ds_getCount(&amp;dsBasePtr) </cmd>
+          <desc>" Check count value "</desc>
+          <cond> (cnt == 0) </cond>
+          <err> cnt </err>
+          <errStr> "Invalid count value" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> eflag = ds_isEmpty(&amp;dsBasePtr) </cmd>
+          <desc>" Check if empty. "</desc>
+          <cond> (eflag == true) </cond>
+          <err> eflag </err>
+          <errStr> "Non-empty flag" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_dsBaseFin(&amp;dsBasePtr) </cmd>
+          <desc>" Finalise the dbase "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> memset(&amp;dsBasePtr, 0, sizeof(ds_dsBase)); retVal = ds_dsBaseInit(&amp;dsBasePtr, DS_CLIST) </cmd>
+          <desc>" Initialize a database and register as C list. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check registered type. "</desc>
+          <cond> (dsBasePtr.type == DS_CLIST) </cond>
+          <err> dsBasePtr.type </err>
+          <errStr> "Invalid type" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check circular flag "</desc>
+          <cond> (dsBasePtr.circular == true) </cond>
+          <err> dsBasePtr.circular </err>
+          <errStr> "Invalid circular flag" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check head ptr "</desc>
+          <cond> (dsBasePtr.headPtr == NULL) </cond>
+          <err> 0 </err>
+          <errStr> "Invalid head pointer" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check tail ptr "</desc>
+          <cond> (dsBasePtr.tailPtr == NULL) </cond>
+          <err> 0 </err>
+          <errStr> "Invalid tail pointer" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> cnt = ds_getCount(&amp;dsBasePtr) </cmd>
+          <desc>" Check count value "</desc>
+          <cond> (cnt == 0) </cond>
+          <err> cnt </err>
+          <errStr> "Invalid count value" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> eflag = ds_isEmpty(&amp;dsBasePtr) </cmd>
+          <desc>" Check if empty. "</desc>
+          <cond> (eflag == true) </cond>
+          <err> eflag </err>
+          <errStr> "Non-empty flag" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_dsBaseFin(&amp;dsBasePtr) </cmd>
+          <desc>" Finalise the dbase "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> memset(&amp;dsBasePtr, 0, sizeof(ds_dsBase)); retVal = ds_dsBaseInit(&amp;dsBasePtr, DS_DLIST) </cmd>
+          <desc>" init dlist. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_setElementLimit(&amp;dsBasePtr, 4) </cmd>
+          <desc>" EL Set element limit to 4 "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_packetContainerInit(&amp;pktctr[0]) </cmd>
+          <desc>" init a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_setKey(&amp;pktctr[0], 0) </cmd>
+          <desc>" Set key 0. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_insert(&amp;dsBasePtr, &amp;pktctr[0], 0, DS_RIGHT) </cmd>
+          <desc>" Insert a packet container in the right side node 0. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> cnt = ds_getCount(&amp;dsBasePtr) </cmd>
+          <desc>" Check count. "</desc>
+          <cond> (cnt == 1) </cond>
+          <err> cnt </err>
+          <errStr> "Count not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check head pointer. "</desc>
+          <cond> (dsBasePtr.headPtr == &amp;pktctr[0]) </cond>
+          <err> 0 </err>
+          <errStr> "head pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check tail pointer. "</desc>
+          <cond> (dsBasePtr.tailPtr == &amp;pktctr[0]) </cond>
+          <err> 0 </err>
+          <errStr> "tail pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check circular flag. "</desc>
+          <cond> (dsBasePtr.circular == 0) </cond>
+          <err> dsBasePtr.circular </err>
+          <errStr> "circular flag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check type. "</desc>
+          <cond> (dsBasePtr.type == DS_DLIST) </cond>
+          <err> dsBasePtr.type </err>
+          <errStr> "type not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> eflag = ds_isEmpty(&amp;dsBasePtr) </cmd>
+          <desc>" Check empty flag. "</desc>
+          <cond> (eflag == false) </cond>
+          <err> eflag </err>
+          <errStr> "eflag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tpptr = ds_getPrevPtr(&amp;pktctr[0]) </cmd>
+          <desc>" Check pkt cntr's prev ptr. "</desc>
+          <cond> (tpptr == NULL) </cond>
+          <err> 0 </err>
+          <errStr> "prev pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tpptr = ds_getNextPtr(&amp;pktctr[0]) </cmd>
+          <desc>" Check pkt cntr's next ptr. "</desc>
+          <cond> (tpptr == NULL) </cond>
+          <err> 0 </err>
+          <errStr> "next pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> key = ds_getKey(&amp;pktctr[0]) </cmd>
+          <desc>" check key. "</desc>
+          <cond> (key == 0) </cond>
+          <err> key </err>
+          <errStr> "Key value wrong" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_packetContainerInit(&amp;pktctr[1]) </cmd>
+          <desc>" init a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_setKey(&amp;pktctr[1], 1) </cmd>
+          <desc>" Set key 1. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_insert(&amp;dsBasePtr, &amp;pktctr[1], dsBasePtr.headPtr, DS_RIGHT) </cmd>
+          <desc>" Insert a packet container in the right side node head. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> cnt = ds_getCount(&amp;dsBasePtr) </cmd>
+          <desc>" Check count. "</desc>
+          <cond> (cnt == 2) </cond>
+          <err> cnt </err>
+          <errStr> "Count not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check head pointer. "</desc>
+          <cond> (dsBasePtr.headPtr == &amp;pktctr[0]) </cond>
+          <err> 0 </err>
+          <errStr> "head pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check tail pointer. "</desc>
+          <cond> (dsBasePtr.tailPtr == &amp;pktctr[1]) </cond>
+          <err> 0 </err>
+          <errStr> "tail pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check circular flag. "</desc>
+          <cond> (dsBasePtr.circular == false) </cond>
+          <err> dsBasePtr.circular </err>
+          <errStr> "circular flag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check type. "</desc>
+          <cond> (dsBasePtr.type == DS_DLIST) </cond>
+          <err> dsBasePtr.type </err>
+          <errStr> "type not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> eflag = ds_isEmpty(&amp;dsBasePtr) </cmd>
+          <desc>" Check empty flag. "</desc>
+          <cond> (eflag == false) </cond>
+          <err> eflag </err>
+          <errStr> "eflag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tpptr = ds_getPrevPtr(&amp;pktctr[1]) </cmd>
+          <desc>" Check pkt cntr's prev ptr. "</desc>
+          <cond> (tpptr == &amp;pktctr[0]) </cond>
+          <err> 0 </err>
+          <errStr> "prev pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tpptr = ds_getNextPtr(&amp;pktctr[1]) </cmd>
+          <desc>" Check pkt cntr's next ptr. "</desc>
+          <cond> (tpptr == NULL) </cond>
+          <err> 0 </err>
+          <errStr> "next pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> key = ds_getKey(&amp;pktctr[1]) </cmd>
+          <desc>" check key. "</desc>
+          <cond> (key == 1) </cond>
+          <err> key </err>
+          <errStr> "Key value wrong" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_packetContainerInit(&amp;pktctr[2]) </cmd>
+          <desc>" init a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_setKey(&amp;pktctr[2], 2) </cmd>
+          <desc>" Set key 2. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_insert(&amp;dsBasePtr, &amp;pktctr[2], 0, DS_LEFT) </cmd>
+          <desc>" Insert a packet container in the left side node 0. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> cnt = ds_getCount(&amp;dsBasePtr) </cmd>
+          <desc>" Check count. "</desc>
+          <cond> (cnt == 3) </cond>
+          <err> cnt </err>
+          <errStr> "Count not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check head pointer. "</desc>
+          <cond> (dsBasePtr.headPtr == &amp;pktctr[0]) </cond>
+          <err> 0 </err>
+          <errStr> "head pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check tail pointer. "</desc>
+          <cond> (dsBasePtr.tailPtr == &amp;pktctr[1]) </cond>
+          <err> 0 </err>
+          <errStr> "tail pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check circular flag. "</desc>
+          <cond> (dsBasePtr.circular == false) </cond>
+          <err> dsBasePtr.circular </err>
+          <errStr> "circular flag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check type. "</desc>
+          <cond> (dsBasePtr.type == DS_DLIST) </cond>
+          <err> dsBasePtr.type </err>
+          <errStr> "type not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> eflag = ds_isEmpty(&amp;dsBasePtr) </cmd>
+          <desc>" Check empty flag. "</desc>
+          <cond> (eflag == false) </cond>
+          <err> eflag </err>
+          <errStr> "eflag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tpptr = ds_getPrevPtr(&amp;pktctr[2]) </cmd>
+          <desc>" Check pkt cntr's prev ptr. "</desc>
+          <cond> (tpptr == &amp;pktctr[0]) </cond>
+          <err> 0 </err>
+          <errStr> "prev pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tpptr = ds_getNextPtr(&amp;pktctr[2]) </cmd>
+          <desc>" Check pkt cntr's next ptr. "</desc>
+          <cond> (tpptr == &amp;pktctr[1]) </cond>
+          <err> 0 </err>
+          <errStr> "next pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> key = ds_getKey(&amp;pktctr[2]) </cmd>
+          <desc>" check key. "</desc>
+          <cond> (key == 2) </cond>
+          <err> key </err>
+          <errStr> "Key value wrong" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_packetContainerInit(&amp;pktctr[3]) </cmd>
+          <desc>" init a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_setKey(&amp;pktctr[3], 3) </cmd>
+          <desc>" Set key 3. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_insert(&amp;dsBasePtr, &amp;pktctr[3], dsBasePtr.tailPtr, DS_LEFT) </cmd>
+          <desc>" Insert a packet container in the left side node tail. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> cnt = ds_getCount(&amp;dsBasePtr) </cmd>
+          <desc>" Check count. "</desc>
+          <cond> (cnt == 4) </cond>
+          <err> cnt </err>
+          <errStr> "Count not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check head pointer. "</desc>
+          <cond> (dsBasePtr.headPtr == &amp;pktctr[0]) </cond>
+          <err> 0 </err>
+          <errStr> "head pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check tail pointer. "</desc>
+          <cond> (dsBasePtr.tailPtr == &amp;pktctr[1]) </cond>
+          <err> 0 </err>
+          <errStr> "tail pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check circular flag. "</desc>
+          <cond> (dsBasePtr.circular == false) </cond>
+          <err> dsBasePtr.circular </err>
+          <errStr> "circular flag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check type. "</desc>
+          <cond> (dsBasePtr.type == DS_DLIST) </cond>
+          <err> dsBasePtr.type </err>
+          <errStr> "type not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> eflag = ds_isEmpty(&amp;dsBasePtr) </cmd>
+          <desc>" Check empty flag. "</desc>
+          <cond> (eflag == false) </cond>
+          <err> eflag </err>
+          <errStr> "eflag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tpptr = ds_getPrevPtr(&amp;pktctr[3]) </cmd>
+          <desc>" Check pkt cntr's prev ptr. "</desc>
+          <cond> (tpptr == &amp;pktctr[2]) </cond>
+          <err> 0 </err>
+          <errStr> "prev pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tpptr = ds_getNextPtr(&amp;pktctr[3]) </cmd>
+          <desc>" Check pkt cntr's next ptr. "</desc>
+          <cond> (tpptr == &amp;pktctr[1]) </cond>
+          <err> 0 </err>
+          <errStr> "next pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> key = ds_getKey(&amp;pktctr[3]) </cmd>
+          <desc>" check key. "</desc>
+          <cond> (key == 3) </cond>
+          <err> key </err>
+          <errStr> "Key value wrong" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_packetContainerInit(&amp;pktctr[4]) </cmd>
+          <desc>" EL init a packet container over NC limit. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_setKey(&amp;pktctr[4], 4) </cmd>
+          <desc>" EL Set key 4. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_insert(&amp;dsBasePtr, &amp;pktctr[4], dsBasePtr.tailPtr, DS_LEFT) </cmd>
+          <desc>" EL Insert a packet container over limit. "</desc>
+          <cond> (retVal == DATASTRUCT_FULL) </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> cnt = ds_getCount(&amp;dsBasePtr) </cmd>
+          <desc>" EL Check count. "</desc>
+          <cond> (cnt == 4) </cond>
+          <err> cnt </err>
+          <errStr> "Count not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" EL Check head pointer. "</desc>
+          <cond> (dsBasePtr.headPtr == &amp;pktctr[0]) </cond>
+          <err> 0 </err>
+          <errStr> "head pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" EL Check tail pointer. "</desc>
+          <cond> (dsBasePtr.tailPtr == &amp;pktctr[1]) </cond>
+          <err> 0 </err>
+          <errStr> "tail pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" EL Check circular flag. "</desc>
+          <cond> (dsBasePtr.circular == false) </cond>
+          <err> dsBasePtr.circular </err>
+          <errStr> "circular flag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" EL Check type. "</desc>
+          <cond> (dsBasePtr.type == DS_DLIST) </cond>
+          <err> dsBasePtr.type </err>
+          <errStr> "type not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> eflag = ds_isEmpty(&amp;dsBasePtr) </cmd>
+          <desc>" EL Check empty flag. "</desc>
+          <cond> (eflag == false) </cond>
+          <err> eflag </err>
+          <errStr> "eflag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tpptr = ds_getPrevPtr(&amp;pktctr[3]) </cmd>
+          <desc>" EL Check pkt cntr's prev ptr. "</desc>
+          <cond> (tpptr == &amp;pktctr[2]) </cond>
+          <err> 0 </err>
+          <errStr> "prev pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tpptr = ds_getNextPtr(&amp;pktctr[3]) </cmd>
+          <desc>" EL Check pkt cntr's next ptr. "</desc>
+          <cond> (tpptr == &amp;pktctr[1]) </cond>
+          <err> 0 </err>
+          <errStr> "next pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> key = ds_getKey(&amp;pktctr[3]) </cmd>
+          <desc>" EL check key. "</desc>
+          <cond> (key == 3) </cond>
+          <err> key </err>
+          <errStr> "Key value wrong" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tpptr = ds_search(&amp;dsBasePtr, 2, 0) </cmd>
+          <desc>" Search for a key. "</desc>
+          <cond> (tpptr != NULL) </cond>
+          <err> 0 </err>
+          <errStr> "Node not matched." </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> key = ds_getKey(tpptr) </cmd>
+          <desc>" check key. "</desc>
+          <cond> (key == 2) </cond>
+          <err> key </err>
+          <errStr> "Key value wrong" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_clear(&amp;dsBasePtr, 0) </cmd>
+          <desc>" Clear the DS. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> cnt = ds_getCount(&amp;dsBasePtr) </cmd>
+          <desc>" Check count. "</desc>
+          <cond> (cnt == 0) </cond>
+          <err> cnt </err>
+          <errStr> "Count not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check head pointer. "</desc>
+          <cond> (dsBasePtr.headPtr == NULL) </cond>
+          <err> 0 </err>
+          <errStr> "head pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check tail pointer. "</desc>
+          <cond> (dsBasePtr.tailPtr == NULL) </cond>
+          <err> 0 </err>
+          <errStr> "tail pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check circular flag. "</desc>
+          <cond> (dsBasePtr.circular == false) </cond>
+          <err> dsBasePtr.circular </err>
+          <errStr> "circular flag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check type. "</desc>
+          <cond> (dsBasePtr.type == DS_DLIST) </cond>
+          <err> dsBasePtr.type </err>
+          <errStr> "type not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> eflag = ds_isEmpty(&amp;dsBasePtr) </cmd>
+          <desc>" Check empty flag. "</desc>
+          <cond> (eflag == true) </cond>
+          <err> eflag </err>
+          <errStr> "eflag not matched (Should be set)" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_dsBaseFin(&amp;dsBasePtr) </cmd>
+          <desc>" fin dlist. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> memset(&amp;dsBasePtr, 0, sizeof(ds_dsBase)); retVal = ds_dsBaseInit(&amp;dsBasePtr, DS_CQUEUE) </cmd>
+          <desc>" init cqueue. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_packetContainerInit(&amp;pktctr[0]) </cmd>
+          <desc>" init a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_setKey(&amp;pktctr[0], 0) </cmd>
+          <desc>" Set key 0."</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_insert(&amp;dsBasePtr, &amp;pktctr[0], 0, DS_RIGHT) </cmd>
+          <desc>" Insert a packet container in the right side node 0. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> cnt = ds_getCount(&amp;dsBasePtr) </cmd>
+          <desc>" Check count. "</desc>
+          <cond> (cnt == 1) </cond>
+          <err> cnt </err>
+          <errStr> "Count not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check head pointer. "</desc>
+          <cond> (dsBasePtr.headPtr == &amp;pktctr[0]) </cond>
+          <err> 0 </err>
+          <errStr> "head pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check tail pointer. "</desc>
+          <cond> (dsBasePtr.tailPtr == &amp;pktctr[0]) </cond>
+          <err> 0 </err>
+          <errStr> "tail pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check circular flag. "</desc>
+          <cond> (dsBasePtr.circular == true) </cond>
+          <err> dsBasePtr.circular </err>
+          <errStr> "circular flag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check type. "</desc>
+          <cond> (dsBasePtr.type == DS_CQUEUE) </cond>
+          <err> dsBasePtr.type </err>
+          <errStr> "type not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> eflag = ds_isEmpty(&amp;dsBasePtr) </cmd>
+          <desc>" Check empty flag. "</desc>
+          <cond> (eflag == false) </cond>
+          <err> eflag </err>
+          <errStr> "eflag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tpptr = ds_getPrevPtr(&amp;pktctr[0]) </cmd>
+          <desc>" Check pkt cntr's prev ptr. "</desc>
+          <cond> (tpptr == &amp;pktctr[0]) </cond>
+          <err> 0 </err>
+          <errStr> "prev pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tpptr = ds_getNextPtr(&amp;pktctr[0]) </cmd>
+          <desc>" Check pkt cntr's next ptr. "</desc>
+          <cond> (tpptr == &amp;pktctr[0]) </cond>
+          <err> 0 </err>
+          <errStr> "next pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> key = ds_getKey(&amp;pktctr[0]) </cmd>
+          <desc>" check key. "</desc>
+          <cond> (key == 0) </cond>
+          <err> key </err>
+          <errStr> "Key value wrong" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_packetContainerInit(&amp;pktctr[1]) </cmd>
+          <desc>" init a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_setKey(&amp;pktctr[1], 1) </cmd>
+          <desc>" Set key 1. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_insert(&amp;dsBasePtr, &amp;pktctr[1], 0, DS_RIGHT) </cmd>
+          <desc>" Insert a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> cnt = ds_getCount(&amp;dsBasePtr) </cmd>
+          <desc>" Check count. "</desc>
+          <cond> (cnt == 2) </cond>
+          <err> cnt </err>
+          <errStr> "Count not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check head pointer. "</desc>
+          <cond> (dsBasePtr.headPtr == &amp;pktctr[0]) </cond>
+          <err> 0 </err>
+          <errStr> "head pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check tail pointer. "</desc>
+          <cond> (dsBasePtr.tailPtr == &amp;pktctr[1]) </cond>
+          <err> 0 </err>
+          <errStr> "tail pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check circular flag. "</desc>
+          <cond> (dsBasePtr.circular == true) </cond>
+          <err> dsBasePtr.circular </err>
+          <errStr> "circular flag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check type. "</desc>
+          <cond> (dsBasePtr.type == DS_CQUEUE) </cond>
+          <err> dsBasePtr.type </err>
+          <errStr> "type not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> eflag = ds_isEmpty(&amp;dsBasePtr) </cmd>
+          <desc>" Check empty flag. "</desc>
+          <cond> (eflag == false) </cond>
+          <err> eflag </err>
+          <errStr> "eflag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tpptr = ds_getPrevPtr(&amp;pktctr[1]) </cmd>
+          <desc>" Check pkt cntr's prev ptr. "</desc>
+          <cond> (tpptr == &amp;pktctr[0]) </cond>
+          <err> 0 </err>
+          <errStr> "prev pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tpptr = ds_getNextPtr(&amp;pktctr[1]) </cmd>
+          <desc>" Check pkt cntr's next ptr. "</desc>
+          <cond> (tpptr == &amp;pktctr[0]) </cond>
+          <err> 0 </err>
+          <errStr> "next pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> key = ds_getKey(&amp;pktctr[1]) </cmd>
+          <desc>" check key. "</desc>
+          <cond> (key == 1) </cond>
+          <err> key </err>
+          <errStr> "Key value wrong" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_packetContainerInit(&amp;pktctr[2]) </cmd>
+          <desc>" init a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_setKey(&amp;pktctr[2], 2) </cmd>
+          <desc>" Set key 2. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_insert(&amp;dsBasePtr, &amp;pktctr[2], 0, DS_RIGHT) </cmd>
+          <desc>" Insert a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> cnt = ds_getCount(&amp;dsBasePtr) </cmd>
+          <desc>" Check count. "</desc>
+          <cond> (cnt == 3) </cond>
+          <err> cnt </err>
+          <errStr> "Count not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check head pointer. "</desc>
+          <cond> (dsBasePtr.headPtr == &amp;pktctr[0]) </cond>
+          <err> 0 </err>
+          <errStr> "head pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check tail pointer. "</desc>
+          <cond> (dsBasePtr.tailPtr == &amp;pktctr[2]) </cond>
+          <err> 0 </err>
+          <errStr> "tail pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check circular flag. "</desc>
+          <cond> (dsBasePtr.circular == true) </cond>
+          <err> dsBasePtr.circular </err>
+          <errStr> "circular flag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check type. "</desc>
+          <cond> (dsBasePtr.type == DS_CQUEUE) </cond>
+          <err> dsBasePtr.type </err>
+          <errStr> "type not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> eflag = ds_isEmpty(&amp;dsBasePtr) </cmd>
+          <desc>" Check empty flag. "</desc>
+          <cond> (eflag == false) </cond>
+          <err> eflag </err>
+          <errStr> "eflag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tpptr = ds_getPrevPtr(&amp;pktctr[2]) </cmd>
+          <desc>" Check pkt cntr's prev ptr. "</desc>
+          <cond> (tpptr == &amp;pktctr[1]) </cond>
+          <err> 0 </err>
+          <errStr> "prev pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tpptr = ds_getNextPtr(&amp;pktctr[2]) </cmd>
+          <desc>" Check pkt cntr's next ptr. "</desc>
+          <cond> (tpptr == &amp;pktctr[0]) </cond>
+          <err> 0 </err>
+          <errStr> "next pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> key = ds_getKey(&amp;pktctr[2]) </cmd>
+          <desc>" check key. "</desc>
+          <cond> (key == 2) </cond>
+          <err> key </err>
+          <errStr> "Key value wrong" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tpptr = ds_traverse(&amp;dsBasePtr, travCB, 0, 0, DS_RIGHT) </cmd>
+          <desc>" Traverse. "</desc>
+          <cond> (tpptr == NULL) </cond>
+          <err> 0 </err>
+          <errStr> "Node not matched." </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tpptr = ds_remove(&amp;dsBasePtr, &amp;pktctr[1], DS_TAIL) </cmd>
+          <desc>" Remove a packet container. "</desc>
+          <cond> (tpptr != NULL) </cond>
+          <err> 0 </err>
+          <errStr> "Null returned on remove" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> key = ds_getKey(tpptr) </cmd>
+          <desc>" check key. "</desc>
+          <cond> (key == 1) </cond>
+          <err> key </err>
+          <errStr> "Key value wrong" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_packetContainerFin(tpptr) </cmd>
+          <desc>" Fin a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> cnt = ds_getCount(&amp;dsBasePtr) </cmd>
+          <desc>" Check count. "</desc>
+          <cond> (cnt == 2) </cond>
+          <err> cnt </err>
+          <errStr> "Count not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check head pointer. "</desc>
+          <cond> (dsBasePtr.headPtr == &amp;pktctr[0]) </cond>
+          <err> 0 </err>
+          <errStr> "head pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check tail pointer. "</desc>
+          <cond> (dsBasePtr.tailPtr == &amp;pktctr[2]) </cond>
+          <err> 0 </err>
+          <errStr> "tail pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check circular flag. "</desc>
+          <cond> (dsBasePtr.circular == true) </cond>
+          <err> dsBasePtr.circular </err>
+          <errStr> "circular flag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check type. "</desc>
+          <cond> (dsBasePtr.type == DS_CQUEUE) </cond>
+          <err> dsBasePtr.type </err>
+          <errStr> "type not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> eflag = ds_isEmpty(&amp;dsBasePtr) </cmd>
+          <desc>" Check empty flag. "</desc>
+          <cond> (eflag == false) </cond>
+          <err> eflag </err>
+          <errStr> "eflag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tpptr = ds_getPrevPtr(&amp;pktctr[0]) </cmd>
+          <desc>" Check pkt cntr's prev ptr. "</desc>
+          <cond> (tpptr == &amp;pktctr[2]) </cond>
+          <err> 0 </err>
+          <errStr> "prev pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tpptr = ds_getNextPtr(&amp;pktctr[0]) </cmd>
+          <desc>" Check pkt cntr's next ptr. "</desc>
+          <cond> (tpptr == &amp;pktctr[2]) </cond>
+          <err> 0 </err>
+          <errStr> "next pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tpptr = ds_remove(&amp;dsBasePtr, 0, DS_TAIL) </cmd>
+          <desc>" Remove a packet container. "</desc>
+          <cond> (tpptr != NULL) </cond>
+          <err> 0 </err>
+          <errStr> "Null returned on remove" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> key = ds_getKey(tpptr) </cmd>
+          <desc>" check key. "</desc>
+          <cond> (key == 2) </cond>
+          <err> key </err>
+          <errStr> "Key value wrong" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_packetContainerFin(tpptr) </cmd>
+          <desc>" Fin a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> cnt = ds_getCount(&amp;dsBasePtr) </cmd>
+          <desc>" Check count. "</desc>
+          <cond> (cnt == 1) </cond>
+          <err> cnt </err>
+          <errStr> "Count not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check head pointer. "</desc>
+          <cond> (dsBasePtr.headPtr == &amp;pktctr[0]) </cond>
+          <err> 0 </err>
+          <errStr> "head pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check tail pointer. "</desc>
+          <cond> (dsBasePtr.tailPtr == &amp;pktctr[0]) </cond>
+          <err> 0 </err>
+          <errStr> "tail pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check circular flag. "</desc>
+          <cond> (dsBasePtr.circular == true) </cond>
+          <err> dsBasePtr.circular </err>
+          <errStr> "circular flag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check type. "</desc>
+          <cond> (dsBasePtr.type == DS_CQUEUE) </cond>
+          <err> dsBasePtr.type </err>
+          <errStr> "type not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> eflag = ds_isEmpty(&amp;dsBasePtr) </cmd>
+          <desc>" Check empty flag. "</desc>
+          <cond> (eflag == false) </cond>
+          <err> eflag </err>
+          <errStr> "eflag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tpptr = ds_getPrevPtr(&amp;pktctr[0]) </cmd>
+          <desc>" Check pkt cntr's prev ptr. "</desc>
+          <cond> (tpptr == &amp;pktctr[0]) </cond>
+          <err> 0 </err>
+          <errStr> "prev pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tpptr = ds_getNextPtr(&amp;pktctr[0]) </cmd>
+          <desc>" Check pkt cntr's next ptr. "</desc>
+          <cond> (tpptr == &amp;pktctr[0]) </cond>
+          <err> 0 </err>
+          <errStr> "next pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> tpptr = ds_remove(&amp;dsBasePtr, 0, DS_TAIL) </cmd>
+          <desc>" Remove a packet container. "</desc>
+          <cond> (tpptr != NULL) </cond>
+          <err> 0 </err>
+          <errStr> "Null returned on remove" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> key = ds_getKey(tpptr) </cmd>
+          <desc>" check key. "</desc>
+          <cond> (key == 0) </cond>
+          <err> key </err>
+          <errStr> "Key value wrong" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_packetContainerFin(tpptr) </cmd>
+          <desc>" Fin a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> cnt = ds_getCount(&amp;dsBasePtr) </cmd>
+          <desc>" Check count. "</desc>
+          <cond> (cnt == 0) </cond>
+          <err> cnt </err>
+          <errStr> "Count not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check head pointer. "</desc>
+          <cond> (dsBasePtr.headPtr == NULL) </cond>
+          <err> 0 </err>
+          <errStr> "head pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check tail pointer. "</desc>
+          <cond> (dsBasePtr.tailPtr == NULL) </cond>
+          <err> 0 </err>
+          <errStr> "tail pointer not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check circular flag. "</desc>
+          <cond> (dsBasePtr.circular == true) </cond>
+          <err> dsBasePtr.circular </err>
+          <errStr> "circular flag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> ; </cmd>
+          <desc>" Check type. "</desc>
+          <cond> (dsBasePtr.type == DS_CQUEUE) </cond>
+          <err> dsBasePtr.type </err>
+          <errStr> "type not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> eflag = ds_isEmpty(&amp;dsBasePtr) </cmd>
+          <desc>" Check empty flag. "</desc>
+          <cond> (eflag == true) </cond>
+          <err> eflag </err>
+          <errStr> "eflag not matched (Should be empty)" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="FUN">
+          <cmd> retVal = ds_dsBaseFin(&amp;dsBasePtr) </cmd>
+          <desc>" fin cqueue. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+      </codeMod>
+
+      <currMod>
+        <statement>pktcntr_test();</statement>
+        <statement>dbase_test();</statement>
+      </currMod>
+
+    </testMod>
+
+  </testSUT>
+</testType>

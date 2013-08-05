@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<testType type="FT">
+  <testSUT lib="baseLib" version="1.0">
+
+    <testMod mod="tmod">
+
+      <include>"_proto.h"</include>
+      <include>"../../../../Src/baseLib/inc/_tmod.h"</include>
+
+      <code>
+        int state = 0;
+        void tstTmrHndlr(int signum)
+        {
+        state = 1;
+        }
+        genErr_t testTimer(void)
+        {
+        sleep(1);
+        if(state)
+        return SUCCESS;
+        return FAILURE;
+        }
+      </code>
+
+      <variable>bs_tmodCls tObj = NULL</variable>
+
+      <testCase typ="FUN">
+        <cmd> retVal = bs_tmodInit(&amp;tObj, iMObj) </cmd>
+        <desc>" Initialize the timer module "</desc>
+        <cond> retVal </cond>
+        <err> retVal </err>
+        <errStr> ec2ES(retVal) </errStr>
+        <flags> 0 </flags>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> retVal = bs_registerTimerHandler(tObj, 999999, &amp;tstTmrHndlr, 0) </cmd>
+        <desc>" Register a timer handler."</desc>
+        <cond> retVal </cond>
+        <err> retVal </err>
+        <errStr> ec2ES(retVal) </errStr>
+        <flags> 0 </flags>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> retVal = testTimer() </cmd>
+        <desc>" Check the periodicty of the timer (Not Proper)"</desc>
+        <cond> retVal </cond>
+        <err> retVal </err>
+        <errStr> ec2ES(retVal) </errStr>
+        <flags> 0 </flags>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> retVal = bs_tmodFin(&amp;tObj, iMObj) </cmd>
+        <desc>" Finalise the timer module "</desc>
+        <cond> retVal </cond>
+        <err> retVal </err>
+        <errStr> ec2ES(retVal) </errStr>
+        <flags> 0 </flags>
+      </testCase>
+
+    </testMod>
+
+  </testSUT>
+</testType>

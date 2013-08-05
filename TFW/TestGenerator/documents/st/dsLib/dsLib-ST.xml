@@ -1,0 +1,723 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<testType type="ST">
+  <testSUT lib="dsLib" version="1.0">
+
+    <testMod mod="_proto.h">
+
+      <include>"main.h"</include>
+      <include>"utLib/packet_container.h"</include>
+      <include>"utLib/dsbase.h"</include>
+
+      <codeMod>
+        <statement>void test_dsLib_ST(void);</statement>
+        <statement>ds_packetContainer* travCB(void *arg, ds_packetContainer* node);</statement>
+      </codeMod>
+
+    </testMod>
+
+    <testMod mod="main">
+
+      <include>"_proto.h"</include>
+
+      <codeMod func="int main(void)">
+        <statement>
+          init();
+          hdr("Starting to run the test cases.");
+
+          test_dsLib_ST();
+
+          hdr("Test case run finished execution.");
+          fin();
+          return(0);
+        </statement>
+      </codeMod>
+
+    </testMod>
+
+    <testMod mod="dsLib_ST">
+
+      <include>"_proto.h"</include>
+
+      <codeMod func="ds_packetContainer* travCB(void *arg, ds_packetContainer* node)">
+        <statement>
+          (void)arg;
+          if (node)
+          data("%d", ds_getKey(node));
+          return NULL;
+        </statement>
+      </codeMod>
+
+      <currMod>
+
+        <lvariable>unsigned int cnt = 0</lvariable>
+        <lvariable>unsigned int key = 0</lvariable>
+        <lvariable>t_bool eflag = false</lvariable>
+        <lvariable>ds_packetContainer pktctr[5]</lvariable>
+        <lvariable>ds_packetContainer *tpptr = NULL</lvariable>
+
+        <lvariable>ds_stack sPtr = NULL</lvariable>
+        <lvariable>ds_slist slPtr = NULL</lvariable>
+
+        <testCase typ="ST">
+          <cmd> retVal = ds_st_init(&amp;sPtr, iMObj) </cmd>
+          <desc>" init stack. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> cnt = ds_st_get_count(sPtr) </cmd>
+          <desc>" Check count. "</desc>
+          <cond> (cnt == 0) </cond>
+          <err> cnt </err>
+          <errStr> "Count not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> eflag = ds_st_is_empty(sPtr) </cmd>
+          <desc>" Check empty flag. "</desc>
+          <cond> (eflag == true) </cond>
+          <err> eflag </err>
+          <errStr> "eflag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_st_limit(sPtr, 3) </cmd>
+          <desc>" Set element limit to 3 "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_packetContainerInit(&amp;pktctr[0]) </cmd>
+          <desc>" init a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_setKey(&amp;pktctr[0], 0) </cmd>
+          <desc>" Set key 0."</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_st_insert(sPtr, &amp;pktctr[0]) </cmd>
+          <desc>" Insert a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> cnt = ds_st_get_count(sPtr) </cmd>
+          <desc>" Check count. "</desc>
+          <cond> (cnt == 1) </cond>
+          <err> cnt </err>
+          <errStr> "Count not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> eflag = ds_st_is_empty(sPtr) </cmd>
+          <desc>" Check empty flag. "</desc>
+          <cond> (eflag == false) </cond>
+          <err> eflag </err>
+          <errStr> "eflag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_packetContainerInit(&amp;pktctr[1]) </cmd>
+          <desc>" init a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_setKey(&amp;pktctr[1], 1) </cmd>
+          <desc>" Set key 1."</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_st_insert(sPtr, &amp;pktctr[1]) </cmd>
+          <desc>" Insert a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> cnt = ds_st_get_count(sPtr) </cmd>
+          <desc>" Check count. "</desc>
+          <cond> (cnt == 2) </cond>
+          <err> cnt </err>
+          <errStr> "Count not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> eflag = ds_st_is_empty(sPtr) </cmd>
+          <desc>" Check empty flag. "</desc>
+          <cond> (eflag == false) </cond>
+          <err> eflag </err>
+          <errStr> "eflag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_packetContainerInit(&amp;pktctr[2]) </cmd>
+          <desc>" init a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_setKey(&amp;pktctr[2], 2) </cmd>
+          <desc>" Set key 2."</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_st_insert(sPtr, &amp;pktctr[2]) </cmd>
+          <desc>" Insert a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> cnt = ds_st_get_count(sPtr) </cmd>
+          <desc>" Check count. "</desc>
+          <cond> (cnt == 3) </cond>
+          <err> cnt </err>
+          <errStr> "Count not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> eflag = ds_st_is_empty(sPtr) </cmd>
+          <desc>" Check empty flag. "</desc>
+          <cond> (eflag == false) </cond>
+          <err> eflag </err>
+          <errStr> "eflag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_packetContainerInit(&amp;pktctr[3]) </cmd>
+          <desc>" init a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_setKey(&amp;pktctr[3], 3) </cmd>
+          <desc>" Set key 3."</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_st_insert(sPtr, &amp;pktctr[3]) </cmd>
+          <desc>" Insert a packet container. "</desc>
+          <cond> (retVal == DATASTRUCT_FULL) </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> cnt = ds_st_get_count(sPtr) </cmd>
+          <desc>" Check count. "</desc>
+          <cond> (cnt == 3) </cond>
+          <err> cnt </err>
+          <errStr> "Count not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> eflag = ds_st_is_empty(sPtr) </cmd>
+          <desc>" Check empty flag. "</desc>
+          <cond> (eflag == false) </cond>
+          <err> eflag </err>
+          <errStr> "eflag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> tpptr = ds_st_traverse(sPtr, travCB, 0) </cmd>
+          <desc>" Traverse. "</desc>
+          <cond> (tpptr == NULL) </cond>
+          <err> 0 </err>
+          <errStr> "Node not matched." </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> tpptr = ds_st_remove(sPtr) </cmd>
+          <desc>" Remove a packet container. "</desc>
+          <cond> (tpptr != NULL) </cond>
+          <err> 0 </err>
+          <errStr> "Null returned on remove" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> key = ds_getKey(tpptr) </cmd>
+          <desc>" verify key."</desc>
+          <cond> (key == 2) </cond>
+          <err> key </err>
+          <errStr> "Invalid key" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_packetContainerFin(tpptr) </cmd>
+          <desc>" Fin a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> cnt = ds_st_get_count(sPtr) </cmd>
+          <desc>" Check count. "</desc>
+          <cond> (cnt == 2) </cond>
+          <err> cnt </err>
+          <errStr> "Count not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> eflag = ds_st_is_empty(sPtr) </cmd>
+          <desc>" Check empty flag. "</desc>
+          <cond> (eflag == false) </cond>
+          <err> eflag </err>
+          <errStr> "eflag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> tpptr = ds_st_remove(sPtr) </cmd>
+          <desc>" Remove a packet container. "</desc>
+          <cond> (tpptr != NULL) </cond>
+          <err> 0 </err>
+          <errStr> "Null returned on remove" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> key = ds_getKey(tpptr) </cmd>
+          <desc>" verify key."</desc>
+          <cond> (key == 1) </cond>
+          <err> key </err>
+          <errStr> "Invalid key" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_packetContainerFin(tpptr) </cmd>
+          <desc>" Fin a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> cnt = ds_st_get_count(sPtr) </cmd>
+          <desc>" Check count. "</desc>
+          <cond> (cnt == 1) </cond>
+          <err> cnt </err>
+          <errStr> "Count not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> eflag = ds_st_is_empty(sPtr) </cmd>
+          <desc>" Check empty flag. "</desc>
+          <cond> (eflag == false) </cond>
+          <err> eflag </err>
+          <errStr> "eflag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> tpptr = ds_st_remove(sPtr) </cmd>
+          <desc>" Remove a packet container. "</desc>
+          <cond> (tpptr != NULL) </cond>
+          <err> 0 </err>
+          <errStr> "Null returned on remove" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> key = ds_getKey(tpptr) </cmd>
+          <desc>" verify key."</desc>
+          <cond> (key == 0) </cond>
+          <err> key </err>
+          <errStr> "Invalid key" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_packetContainerFin(tpptr) </cmd>
+          <desc>" Fin a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> cnt = ds_st_get_count(sPtr) </cmd>
+          <desc>" Check count. "</desc>
+          <cond> (cnt == 0) </cond>
+          <err> cnt </err>
+          <errStr> "Count not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> eflag = ds_st_is_empty(sPtr) </cmd>
+          <desc>" Check empty flag. "</desc>
+          <cond> (eflag == true) </cond>
+          <err> eflag </err>
+          <errStr> "eflag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_st_fin(&amp;sPtr, iMObj) </cmd>
+          <desc>" fin stack. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_sl_init(&amp;slPtr, iMObj) </cmd>
+          <desc>" init slack. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> cnt = ds_sl_get_count(slPtr) </cmd>
+          <desc>" Check count. "</desc>
+          <cond> (cnt == 0) </cond>
+          <err> cnt </err>
+          <errStr> "Count not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> eflag = ds_sl_is_empty(slPtr) </cmd>
+          <desc>" Check empty flag. "</desc>
+          <cond> (eflag == true) </cond>
+          <err> eflag </err>
+          <errStr> "eflag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_sl_limit(slPtr, 3) </cmd>
+          <desc>" Set element limit to 3 "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_packetContainerInit(&amp;pktctr[0]) </cmd>
+          <desc>" init a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_setKey(&amp;pktctr[0], 0) </cmd>
+          <desc>" Set key 0."</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_sl_insert(slPtr, &amp;pktctr[0], NULL) </cmd>
+          <desc>" Insert a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> cnt = ds_sl_get_count(slPtr) </cmd>
+          <desc>" Check count. "</desc>
+          <cond> (cnt == 1) </cond>
+          <err> cnt </err>
+          <errStr> "Count not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> eflag = ds_sl_is_empty(slPtr) </cmd>
+          <desc>" Check empty flag. "</desc>
+          <cond> (eflag == false) </cond>
+          <err> eflag </err>
+          <errStr> "eflag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_packetContainerInit(&amp;pktctr[1]) </cmd>
+          <desc>" init a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_setKey(&amp;pktctr[1], 1) </cmd>
+          <desc>" Set key 1."</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_sl_insert(slPtr, &amp;pktctr[1], NULL) </cmd>
+          <desc>" Insert a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> cnt = ds_sl_get_count(slPtr) </cmd>
+          <desc>" Check count. "</desc>
+          <cond> (cnt == 2) </cond>
+          <err> cnt </err>
+          <errStr> "Count not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> eflag = ds_sl_is_empty(slPtr) </cmd>
+          <desc>" Check empty flag. "</desc>
+          <cond> (eflag == false) </cond>
+          <err> eflag </err>
+          <errStr> "eflag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_packetContainerInit(&amp;pktctr[2]) </cmd>
+          <desc>" init a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_setKey(&amp;pktctr[2], 2) </cmd>
+          <desc>" Set key 2."</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_sl_insert(slPtr, &amp;pktctr[2], &amp;pktctr[0]) </cmd>
+          <desc>" Insert a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> cnt = ds_sl_get_count(slPtr) </cmd>
+          <desc>" Check count. "</desc>
+          <cond> (cnt == 3) </cond>
+          <err> cnt </err>
+          <errStr> "Count not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> eflag = ds_sl_is_empty(slPtr) </cmd>
+          <desc>" Check empty flag. "</desc>
+          <cond> (eflag == false) </cond>
+          <err> eflag </err>
+          <errStr> "eflag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_packetContainerInit(&amp;pktctr[3]) </cmd>
+          <desc>" init a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_setKey(&amp;pktctr[3], 3) </cmd>
+          <desc>" Set key 3."</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_sl_insert(slPtr, &amp;pktctr[3], 0) </cmd>
+          <desc>" Insert a packet container. "</desc>
+          <cond> (retVal == DATASTRUCT_FULL) </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> cnt = ds_sl_get_count(slPtr) </cmd>
+          <desc>" Check count. "</desc>
+          <cond> (cnt == 3) </cond>
+          <err> cnt </err>
+          <errStr> "Count not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> eflag = ds_sl_is_empty(slPtr) </cmd>
+          <desc>" Check empty flag. "</desc>
+          <cond> (eflag == false) </cond>
+          <err> eflag </err>
+          <errStr> "eflag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> tpptr = ds_sl_traverse(slPtr, travCB, 0, 0) </cmd>
+          <desc>" Traverse. "</desc>
+          <cond> (tpptr == NULL) </cond>
+          <err> 0 </err>
+          <errStr> "Node not matched." </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> tpptr = ds_sl_remove(slPtr, &amp;pktctr[2], DS_HEAD) </cmd>
+          <desc>" Remove a packet container. "</desc>
+          <cond> (tpptr != NULL) </cond>
+          <err> 0 </err>
+          <errStr> "Null returned on remove" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> key = ds_getKey(tpptr) </cmd>
+          <desc>" verify key."</desc>
+          <cond> (key == 2) </cond>
+          <err> key </err>
+          <errStr> "Invalid key" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_packetContainerFin(tpptr) </cmd>
+          <desc>" Fin a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> cnt = ds_sl_get_count(slPtr) </cmd>
+          <desc>" Check count. "</desc>
+          <cond> (cnt == 2) </cond>
+          <err> cnt </err>
+          <errStr> "Count not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> eflag = ds_sl_is_empty(slPtr) </cmd>
+          <desc>" Check empty flag. "</desc>
+          <cond> (eflag == false) </cond>
+          <err> eflag </err>
+          <errStr> "eflag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> tpptr = ds_sl_remove(slPtr, 0, DS_HEAD) </cmd>
+          <desc>" Remove a packet container. "</desc>
+          <cond> (tpptr != NULL) </cond>
+          <err> 0 </err>
+          <errStr> "Null returned on remove" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> key = ds_getKey(tpptr) </cmd>
+          <desc>" verify key."</desc>
+          <cond> (key == 0) </cond>
+          <err> key </err>
+          <errStr> "Invalid key" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_packetContainerFin(tpptr) </cmd>
+          <desc>" Fin a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> cnt = ds_sl_get_count(slPtr) </cmd>
+          <desc>" Check count. "</desc>
+          <cond> (cnt == 1) </cond>
+          <err> cnt </err>
+          <errStr> "Count not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> eflag = ds_sl_is_empty(slPtr) </cmd>
+          <desc>" Check empty flag. "</desc>
+          <cond> (eflag == false) </cond>
+          <err> eflag </err>
+          <errStr> "eflag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> tpptr = ds_sl_remove(slPtr, 0, DS_TAIL) </cmd>
+          <desc>" Remove a packet container. "</desc>
+          <cond> (tpptr != NULL) </cond>
+          <err> 0 </err>
+          <errStr> "Null returned on remove" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> key = ds_getKey(tpptr) </cmd>
+          <desc>" verify key."</desc>
+          <cond> (key == 1) </cond>
+          <err> key </err>
+          <errStr> "Invalid key" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_packetContainerFin(tpptr) </cmd>
+          <desc>" Fin a packet container. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> cnt = ds_sl_get_count(slPtr) </cmd>
+          <desc>" Check count. "</desc>
+          <cond> (cnt == 0) </cond>
+          <err> cnt </err>
+          <errStr> "Count not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> eflag = ds_sl_is_empty(slPtr) </cmd>
+          <desc>" Check empty flag. "</desc>
+          <cond> (eflag == true) </cond>
+          <err> eflag </err>
+          <errStr> "eflag not matched" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = ds_sl_fin(&amp;slPtr, iMObj) </cmd>
+          <desc>" fin slack. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+      </currMod>
+
+    </testMod>
+
+  </testSUT>
+</testType>

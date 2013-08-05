@@ -1,0 +1,6 @@
+TAGS
+tags
+cscope*
+__pycache__
+*.pyc
+*.pyo

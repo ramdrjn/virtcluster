@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<testType type="ST">
+  <testSUT lib="msgLib" version="1.0">
+
+    <testMod mod="_proto_Cli.h">
+
+      <include>"main.h"</include>
+      <include>"utLib/msg.h"</include>
+
+      <codeMod>
+        <statement>void test_msgLib_Cli(void);</statement>
+        <statement>void sock_cli(void);</statement>
+        <statement>void mq_cli(void);</statement>
+      </codeMod>
+
+    </testMod>
+
+    <testMod mod="main_Cli">
+
+      <include>"_proto_Cli.h"</include>
+
+      <codeMod func="int main(void)">
+        <statement>
+          init();
+          hdr("Starting to run the test cases.");
+
+          test_msgLib_Cli();
+
+          hdr("Test case run finished execution.");
+          fin();
+          return(0);
+        </statement>
+      </codeMod>
+
+    </testMod>
+
+    <testMod mod="msgLib_Cli">
+
+      <include>"_proto_Cli.h"</include>
+
+      <codeMod func="void sock_cli(void)">
+        <lvariable>msg_base msg = 0</lvariable>
+        <lvariable>struct msg_addrType self, peer</lvariable>
+        <lvariable>int cnt = 0</lvariable>
+        <lvariable>char buf1[]="Hello"</lvariable>
+        <lvariable>char buf2[]=",World"</lvariable>
+        <lvariable>struct vec_ioType vec</lvariable>
+        <lvariable>struct iovec iov[2]</lvariable>
+        <statement>
+          SET_ZERO(self);
+          SET_ZERO(peer);
+          strcpy(peer.nodeID, "localhost");
+          strcpy(peer.appID, "5000");
+          iov[0].iov_base =  buf1;
+          iov[0].iov_len = sizeof(buf1);
+          iov[1].iov_base =  buf2;
+          iov[1].iov_len = sizeof(buf2);
+          vec.ioVecPtr = iov;
+          vec.vecCount = 2;
+        </statement>
+        <testCase typ="ST">
+          <cmd> retVal = msg_baseInit(&amp;msg, iMObj) </cmd>
+          <desc> "Initializing the message base" </desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = msg_setAddr(msg, MSG_STREAM, NULL, &amp;peer) </cmd>
+          <desc> "Setting address (peer)" </desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = msg_connect(msg) </cmd>
+          <desc> "Connecting to address (peer)" </desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = msg_sendVec(msg, &amp;cnt, &amp;vec) </cmd>
+          <desc> "Sending message" </desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = msg_baseFin(&amp;msg, iMObj) </cmd>
+          <desc> "Finalizing the message base" </desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+      </codeMod>
+
+      <codeMod func="void mq_cli(void)">
+        <lvariable>msg_base msg = 0</lvariable>
+        <lvariable>struct msg_addrType self, peer</lvariable>
+        <lvariable>int cnt = 0</lvariable>
+        <lvariable>priority_t priority = 2</lvariable>
+        <lvariable>char buf[]="Hello"</lvariable>
+        <statement>
+          SET_ZERO(self);
+          SET_ZERO(peer);
+          strcpy(peer.nodeID, "localhost");
+          strcpy(peer.appID, "6000");
+        </statement>
+        <testCase typ="ST">
+          <cmd> retVal = msg_baseInit(&amp;msg, iMObj) </cmd>
+          <desc> "Initializing the message base" </desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = msg_setAddr(msg, MSG_PMSGQ, NULL, &amp;peer) </cmd>
+          <desc> "Setting address (peer)" </desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = msg_sendBuf(msg, &amp;cnt, buf,
+          sizeof(buf), priority) </cmd>
+          <desc> "Sending new message" </desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = msg_baseFin(&amp;msg, iMObj) </cmd>
+          <desc> "Finalizing the message base" </desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+      </codeMod>
+
+      <currMod>
+        <statement>
+          sock_cli();
+          mq_cli();
+        </statement>
+      </currMod>
+
+    </testMod>
+
+  </testSUT>
+</testType>

@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<testType type="FT">
+  <testSUT lib="baseLib" version="1.0">
+
+    <testMod mod="emod">
+
+      <include>"_proto.h"</include>
+      <include>"baseLib/inc/_emod.h"</include>
+
+      <variable>int err</variable>
+
+      <testCase typ="ST">
+        <cmd>err=10</cmd>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>retVal=errno2EC(err)</cmd>
+        <desc>"Err = 10 in errno2EC"</desc>
+        <cond>(retVal == -10)</cond>
+        <err>retVal</err>
+        <errStr>"Errno not proper"</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>retVal = strcmp(strerror(err), ec2ES(errno2EC(err)))</cmd>
+        <desc>"Error msg from strerror and ec2ES compare"</desc>
+        <cond>(!retVal)</cond>
+        <err>retVal</err>
+        <errStr>strerror(err)</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>//</cmd>
+        <desc>"Error msg for 0"</desc>
+        <cond>(ec2ES(0) == NULL)</cond>
+        <err>0</err>
+        <errStr>ec2ES(0)</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>//</cmd>
+        <desc>"Error msg for 1"</desc>
+        <cond>(ec2ES(1) == NULL)</cond>
+        <err>0</err>
+        <errStr>ec2ES(1)</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>//</cmd>
+        <desc>"Error msg for ERR_BASE_VALUE"</desc>
+        <cond>(ec2ES(-ERR_BASE_VALUE) == NULL)</cond>
+        <err>0</err>
+        <errStr>ec2ES(-ERR_BASE_VALUE)</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>//</cmd>
+        <desc>"Error msg for ERR_BASE_VALUE+MAX_ERR_STRING_SIZE"</desc>
+        <cond>(ec2ES(-ERR_BASE_VALUE-MAX_ERR_STRING_SIZE) == NULL)</cond>
+        <err>0</err>
+        <errStr>ec2ES(-ERR_BASE_VALUE-MAX_ERR_STRING_SIZE)</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>retVal = strcmp(ec2ES(-ERR_BASE_VALUE-MAX_ERR_STRING_SIZE+1), "Invalid error code value")</cmd>
+        <desc>"Error msg for ERR_BASE_VALUE+MAX_ERR_STRING_SIZE-1"</desc>
+        <cond>(!retVal)</cond>
+        <err>retVal</err>
+        <errStr>ec2ES(-ERR_BASE_VALUE-MAX_ERR_STRING_SIZE+1)</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>//</cmd>
+        <desc>"Error msg for SUCCESS"</desc>
+        <cond>(ec2ES(SUCCESS) == NULL)</cond>
+        <err>0</err>
+        <errStr>ec2ES(SUCCESS)</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>//</cmd>
+        <cmd>retVal = strcmp(ec2ES(FAILURE), "Failed")</cmd>
+        <desc>"Error msg for FAILURE"</desc>
+        <cond>(!retVal)</cond>
+        <err>retVal</err>
+        <errStr>ec2ES(FAILURE)</errStr>
+        <flags>0</flags>
+      </testCase>
+
+    </testMod>
+
+    <testMod mod="mmod">
+
+      <include>"_proto.h"</include>
+      <include>"../../../../Src/baseLib/inc/_mmod.h"</include>
+
+      <variable>char *testBuffer = NULL</variable>
+      <variable>bs_mmodCls validMemLoc = NULL</variable>
+
+      <testCase typ="FUN">
+        <cmd>retVal = bs_mmodInit(&amp;validMemLoc)</cmd>
+        <desc>"Check for initization of a memory object."</desc>
+        <cond>retVal</cond>
+        <err>retVal</err>
+        <errStr>ec2ES(retVal)</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>retVal = bs_allocMem(validMemLoc,10, (void*)&amp;testBuffer)</cmd>
+        <desc>"Check for Memory allocations."</desc>
+        <cond>retVal</cond>
+        <err>retVal</err>
+        <errStr>ec2ES(retVal)</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>retVal = bs_freeMem(validMemLoc, (void *)&amp;testBuffer)</cmd>
+        <desc>"Check for Memory Freeing."</desc>
+        <cond>retVal</cond>
+        <err>retVal</err>
+        <errStr>ec2ES(retVal)</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>retVal = bs_mmodFin (&amp;validMemLoc)</cmd>
+        <desc>"Check for finalization of a memory object."</desc>
+        <cond>retVal</cond>
+        <err>retVal</err>
+        <errStr>ec2ES(retVal)</errStr>
+        <flags>0</flags>
+      </testCase>
+
+    </testMod>
+
+    <testMod mod="fmod">
+
+      <include>"_proto.h"</include>
+      <include>"../../../../Src/baseLib/inc/_fmod.h"</include>
+
+      <define>TEST_STRING "Test message for write"</define>
+      <define>TEST_STRING_SIZE 22</define>
+      <define>TEST_FILE "/tmp/test"</define>
+
+      <variable>bs_fmodCls rdF = NULL</variable>
+      <variable>bs_fmodCls rdwrF = NULL</variable>
+      <variable>int retCount=0</variable>
+      <variable>char testBuffer[50]</variable>
+
+      <testCase typ="FUN">
+        <cmd>retVal = bs_fmodInit(&amp;rdF, iMObj)</cmd>
+        <desc>"Check for initization of the read file object."</desc>
+        <cond>retVal</cond>
+        <err>retVal</err>
+        <errStr>ec2ES(retVal)</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>retVal = bs_fmodInit(&amp;rdwrF, iMObj)</cmd>
+        <desc>"Check for initization of the read/write file object."</desc>
+        <cond>retVal</cond>
+        <err>retVal</err>
+        <errStr>ec2ES(retVal)</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>retVal = bs_fCreate(rdF, TEST_FILE, 0755)</cmd>
+        <desc>"Check for the creation of a file."</desc>
+        <cond>retVal</cond>
+        <err>retVal</err>
+        <errStr>ec2ES(retVal)</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="SH">
+        <cmd>test -e /tmp/test</cmd>
+        <desc>"Checking if file exists."</desc>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>retVal = bs_fOpen(rdF, "/tmp/test", F_ASCII, FA_RD)</cmd>
+        <desc>"RD: Open the newly created file."</desc>
+        <cond>retVal</cond>
+        <err>retVal</err>
+        <errStr>ec2ES(retVal)</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="ST">
+        <cmd>memset(testBuffer, 0, sizeof(testBuffer))</cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd>retVal = bs_fRead(rdF, &amp;testBuffer, 10, &amp;retCount)</cmd>
+        <desc>"RD: Check read for a 0 size file and check EOF handling."</desc>
+        <cond>retVal</cond>
+        <err>retCount</err>
+        <errStr>ec2ES(retVal)</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>retVal=strlen(testBuffer)</cmd>
+        <desc>"RD: Check the returned buffer content size."</desc>
+        <cond>(retVal==0)</cond>
+        <err>retVal</err>
+        <errStr>"Buffer not empty for a read from file size 0"</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="ST">
+        <cmd>memcpy(testBuffer, TEST_STRING, TEST_STRING_SIZE)</cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd>retVal = bs_fWrite(rdF, &amp;testBuffer, TEST_STRING_SIZE, &amp;retCount)</cmd>
+        <desc>"RD: Write on a file opened in Read only mode."</desc>
+        <cond>(retVal &lt; 0)</cond>
+        <err>retVal</err>
+        <errStr>ec2ES(retVal)</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="ST">
+        <cmd>memset(testBuffer, 0, sizeof(testBuffer))</cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd>retVal = bs_fRead(rdF, &amp;testBuffer, 10, &amp;retCount)</cmd>
+        <desc>"RD: Check read for a 0 size file and check EOF handling."</desc>
+        <cond>retVal</cond>
+        <err>retCount</err>
+        <errStr>ec2ES(retVal)</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>//</cmd>
+        <desc>"RD: Check the returned count value."</desc>
+        <cond>(retCount==0)</cond>
+        <err>retCount</err>
+        <errStr>"retCount not 0"</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>retVal=strlen(testBuffer)</cmd>
+        <desc>"RD: Check the returned buffer content size."</desc>
+        <cond>(retVal==0)</cond>
+        <err>retVal</err>
+        <errStr>"Buffer not empty for a read from file size 0"</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>retVal = bs_fOpen(rdwrF, "/tmp/test", F_ASCII, FA_WR)</cmd>
+        <desc>"WR: Open the test file in WR only mode."</desc>
+        <cond>retVal</cond>
+        <err>retVal</err>
+        <errStr>ec2ES(retVal)</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="ST">
+        <cmd>memcpy(testBuffer, TEST_STRING, TEST_STRING_SIZE)</cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd>retVal = bs_fWrite(rdwrF, &amp;testBuffer, TEST_STRING_SIZE, &amp;retCount)</cmd>
+        <desc>"WR: Write on a file opened in Write only mode."</desc>
+        <cond>retVal</cond>
+        <err>retVal</err>
+        <errStr>ec2ES(retVal)</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>//</cmd>
+        <desc>"WR: Check the return count size."</desc>
+        <cond>(retCount==TEST_STRING_SIZE)</cond>
+        <err>retCount</err>
+        <errStr>"retCount value mismatches with the value written"</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="SH">
+        <cmd>printf 'Test message for write'|diff - /tmp/test >/dev/null</cmd>
+        <desc>"Checking file contents for the written message."</desc>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="ST">
+        <cmd>memset(testBuffer, 0, sizeof(testBuffer))</cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd>retVal=bs_fRead(rdwrF, &amp;testBuffer, TEST_STRING_SIZE, &amp;retCount)</cmd>
+        <desc>"WR: Check read for a file opened in WR only mode."</desc>
+        <cond>(retVal&amp;lt;0)</cond>
+        <err>retVal</err>
+        <errStr>ec2ES(retVal)</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>retVal=strlen(testBuffer)</cmd>
+        <desc>"WR: Check the returned buffer content size."</desc>
+        <cond>(retVal==0)</cond>
+        <err>retVal</err>
+        <errStr>"Buffer not empty for a failed read from file."</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <desc>"WR: Check the returned buffer count size."</desc>
+        <cond>(retCount==0)</cond>
+        <err>retCount</err>
+        <errStr>"retCount not 0."</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="ST">
+        <cmd>memset(testBuffer, 0, sizeof(testBuffer))</cmd>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>retVal=bs_fRead(rdF, &amp;testBuffer, TEST_STRING_SIZE, &amp;retCount)</cmd>
+        <desc>"RD: Check read for a written file."</desc>
+        <cond>retVal</cond>
+        <err>retCount</err>
+        <errStr>ec2ES(retVal)</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <desc>"RD: Check the returned buffer count size."</desc>
+        <cond>(retCount==TEST_STRING_SIZE)</cond>
+        <err>retCount</err>
+        <errStr>"retCount not matching."</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>retVal=strlen(testBuffer)</cmd>
+        <desc>"RD: Check the returned buffer content size."</desc>
+        <cond>(retVal==TEST_STRING_SIZE)</cond>
+        <err>retVal</err>
+        <errStr>"Buffer size not valid."</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>retVal=strcmp(testBuffer, TEST_STRING)</cmd>
+        <desc>"Check the returned buffer contents."</desc>
+        <cond>(retVal==0)</cond>
+        <err>retVal</err>
+        <errStr>"Buffer not valid."</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>retVal = bs_fClose(rdwrF)</cmd>
+        <desc>"Close the opened file."</desc>
+        <cond>retVal</cond>
+        <err>retVal</err>
+        <errStr>ec2ES(retVal)</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>retVal = bs_fClose(rdF)</cmd>
+        <desc>"Close the opened file."</desc>
+        <cond>retVal</cond>
+        <err>retVal</err>
+        <errStr>ec2ES(retVal)</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>retVal = bs_fClose(rdF)</cmd>
+        <desc>"Close the file again."</desc>
+        <cond>retVal</cond>
+        <err>retVal</err>
+        <errStr>ec2ES(retVal)</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>retVal = bs_fmodFin(&amp;rdF, iMObj)</cmd>
+        <desc>"Check for Finalization of the read file object."</desc>
+        <cond>retVal</cond>
+        <err>retVal</err>
+        <errStr>ec2ES(retVal)</errStr>
+        <flags>0</flags>
+      </testCase>
+
+      <testCase typ="FUN">
+        <cmd>retVal = bs_fmodFin(&amp;rdwrF, iMObj)</cmd>
+        <desc>"Check for Finalization of the read/write file object."</desc>
+        <cond>retVal</cond>
+        <err>retVal</err>
+        <errStr>ec2ES(retVal)</errStr>
+        <flags>0</flags>
+      </testCase>
+
+    </testMod>
+
+  </testSUT>
+</testType>

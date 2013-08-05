@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<testType type="ST">
+  <testSUT lib="baseLib" version="1.0">
+
+    <testMod mod="_proto.h">
+
+      <include>"main.h"</include>
+      <include>"utLib/omod.h"</include>
+      <include>"utLib/smod.h"</include>
+      <include>"utLib/tmod.h"</include>
+      <include>"utLib/tskmod.h"</include>
+
+      <codeMod>
+        <statement>void test_baseLib_ST(void);</statement>
+        <statement>void hndlr(bs_mmodCls mObj);</statement>
+        <statement>void hndlr_tsk(bs_mmodCls mObj);</statement>
+        <statement>genErr_t userParse(bs_e_optionsType optType, char a, char *b, void *userdata);</statement>
+        <statement>void sighndlr(int signum);</statement>
+        <statement>void timerhndlr(int signum);</statement>
+        <statement>genErr_t exechndlr(bs_tskmodCls tskObjPtr, char *argv[]);</statement>
+        <statement>genErr_t execThndlr(bs_tskmodCls tskObjPtr, char *argv[]);</statement>
+      </codeMod>
+
+    </testMod>
+
+    <testMod mod="main">
+
+      <include>"_proto.h"</include>
+
+      <codeMod func="int main(void)">
+        <statement>
+          init();
+          hdr("Starting to run the test cases.");
+
+          test_baseLib_ST();
+
+          hdr("Test case run finished execution.");
+          fin();
+          return(0);
+        </statement>
+      </codeMod>
+
+    </testMod>
+
+    <testMod mod="baseLib_ST">
+
+      <include>"_proto.h"</include>
+
+      <gvariable>int counter = 5 </gvariable>
+      <gvariable>int quitFlag = 0 </gvariable>
+      <gvariable>char *userData = NULL </gvariable>
+      <gvariable>static char filename[50] </gvariable>
+
+      <codeMod func="void timerhndlr(int signum)">
+        <statement>
+          (void)signum;
+          counter--;
+        </statement>
+      </codeMod>
+
+      <codeMod func="void sighndlr(int signum)">
+        <statement>
+          (void)signum;
+          quitFlag = 1;
+        </statement>
+      </codeMod>
+
+      <codeMod func="genErr_t userParse(bs_e_optionsType optType, char a, char *b, void *userdata)">
+        <statement>
+          (void)userdata;
+          switch(optType)
+          {
+          case OPTIONS:
+          switch(a)
+          {
+          case 'f':
+          strcpy(filename, b);
+          return SUCCESS;
+          case 'u':
+          strcpy(userData, b);
+          return SUCCESS;
+          }
+          case ARGS:
+          case SUB_COMMANDS:
+          default:
+          return INVALID_OPTIONS;
+          }
+          return INVALID_OPTIONS;
+        </statement>
+      </codeMod>
+
+      <codeMod func="void hndlr(bs_mmodCls mObj)">
+
+        <lvariable>bs_fmodCls fObj = NULL</lvariable>
+        <lvariable>bs_lmodCls lObj = NULL</lvariable>
+
+        <testCase typ="ST">
+          <cmd> retVal = bs_fmodInit(&amp;fObj, mObj) </cmd>
+          <desc>" Initialize the file module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd>retVal = bs_fOpen(fObj, filename, F_ASCII, FA_WR)</cmd>
+          <desc>" Open the test file in WR only mode."</desc>
+          <cond>retVal</cond>
+          <err>retVal</err>
+          <errStr>ec2ES(retVal)</errStr>
+          <flags>0</flags>
+        </testCase>
+
+        <testCase typ="ST">
+          <cmd> retVal = bs_lmodInit(&amp;lObj, 1, 0, 1, fObj, mObj) </cmd>
+          <desc>" Initialize the log module."</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+
+        <statement>
+          while(!quitFlag)
+          {
+          sleep(1);
+          bs_log(lObj, LVL_INFO, PF_LOG, "%s", userData);
+          if(!counter)
+          raise(SIGUSR1);
+          }
+        </statement>
+
+        <testCase typ="ST">
+          <cmd> retVal = bs_lmodFin(&amp;lObj, mObj) </cmd>
+          <desc>" Finalise the log module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = bs_fmodFin(&amp;fObj, mObj) </cmd>
+          <desc>" Finalise the file module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+
+      </codeMod>
+
+      <codeMod func="genErr_t exechndlr(bs_tskmodCls tskObjPtr, char *argv[])">
+        <testCase typ="ST">
+          <cmd> retVal = bs_exec(tskObjPtr, argv[0], argv, NULL)</cmd>
+          <desc>"Exec ls process."</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <statement>
+          return SUCCESS;
+        </statement>
+      </codeMod>
+
+      <codeMod func="genErr_t execThndlr(bs_tskmodCls tskObjPtr, char*argv[])">
+        <statement>
+          (void)tskObjPtr;
+          (void)argv;
+          sleep(1);
+          return SUCCESS;
+        </statement>
+      </codeMod>
+
+      <codeMod func="void hndlr_tsk(bs_mmodCls mObj)">
+
+        <lvariable>bs_tskmodCls tskObj = NULL</lvariable>
+        <lvariable>bs_tskmodCls tskNewObj = NULL</lvariable>
+        <lvariable>genErr_t ret = SUCCESS</lvariable>
+        <lvariable>char *args[] = {"sleep", "2", NULL}</lvariable>
+
+        <testCase typ="ST">
+          <cmd> retVal = bs_tskmodInit(&amp;tskObj, mObj) </cmd>
+          <desc>" Initialize the task module."</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+
+        <testCase typ="ST">
+          <cmd> tskNewObj = bs_spawn(tskObj, mObj, &amp;exechndlr, args) </cmd>
+          <desc>" Spawn a new process"</desc>
+          <cond>(tskNewObj != NULL)</cond>
+          <err>(tskNewObj == NULL)</err>
+          <errStr> 0 </errStr>
+          <flags> 0 </flags>
+        </testCase>
+
+        <testCase typ="ST">
+          <cmd> retVal = bs_wait(tskNewObj, &amp;ret) </cmd>
+          <desc>" Wait for the new process"</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+
+        <testCase typ="ST">
+          <cmd> retVal = bs_tskmodFin(&amp;tskNewObj, mObj) </cmd>
+          <desc>" Finalise the New task module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+
+        <testCase typ="ST">
+          <cmd>tskNewObj = bs_spawnLW(tskObj,mObj, &amp;execThndlr,args)</cmd>
+          <desc>" Spawn a new LW process"</desc>
+          <cond>(tskNewObj != NULL)</cond>
+          <err>(tskNewObj == NULL)</err>
+          <errStr> 0</errStr>
+          <flags> 0 </flags>
+        </testCase>
+
+        <testCase typ="ST">
+          <cmd> retVal = bs_wait(tskNewObj, &amp;ret) </cmd>
+          <desc>" Wait for the new process"</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+
+        <testCase typ="ST">
+          <cmd> retVal = bs_tskmodFin(&amp;tskNewObj, mObj) </cmd>
+          <desc>" Finalise the New task module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+
+        <testCase typ="ST">
+          <cmd> retVal = bs_tskmodFin(&amp;tskObj, mObj) </cmd>
+          <desc>" Finalise the task module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+
+      </codeMod>
+
+      <currMod>
+
+        <lvariable>bs_mmodCls mObj = NULL</lvariable>
+        <lvariable>bs_omodCls oObj = NULL</lvariable>
+        <lvariable>bs_smodCls sObj = NULL</lvariable>
+        <lvariable>bs_tmodCls tObj = NULL</lvariable>
+        <lvariable>void *ptr=NULL</lvariable>
+        <lvariable>bs_opts opts[]={{MANDATORY, "file name", "fname", 'f'}, {MANDATORY, "Userdata", 0, 'u'}}</lvariable>
+        <lvariable>char *args[]={"ST-EXE", "--fname", "/tmp/baseLib-ST.tst", "-u", "Base Library User Data"}</lvariable>
+
+        <testCase typ="ST">
+          <cmd> retVal = bs_mmodInit(&amp;mObj) </cmd>
+          <desc>" Initialize the memory module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = bs_omodInit(&amp;oObj, "ST for baseLib", "ST help", opts, &amp;userParse, mObj) </cmd>
+          <desc>" Initialize the options module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = bs_smodInit(&amp;sObj, mObj) </cmd>
+          <desc>" Initialize the signal module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = bs_tmodInit(&amp;tObj, mObj) </cmd>
+          <desc>" Initialize the timer module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+
+        <testCase typ="ST">
+          <cmd> retVal = bs_allocMem(mObj, 20, &amp;ptr) </cmd>
+          <desc>" Allocate the memory for the user data "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <statement>
+          userData = (char *)ptr;
+        </statement>
+
+        <testCase typ="ST">
+          <cmd> retVal = 1;(void)args;strcpy(filename, "/tmp/baseLib-ST.tst");strcpy(userData, "hello");//bs_parseOpts(oObj, 5, args, NULL) </cmd>
+          <desc>" Start parsing the options "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+
+        <testCase typ="ST">
+          <cmd> retVal = bs_registerTimerHandler(tObj, 100000, &amp;timerhndlr, 0) </cmd>
+          <desc>" Register timer handler "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+
+        <testCase typ="ST">
+          <cmd> retVal = bs_registerHandler(sObj, SIGUSR1, &amp;sighndlr, 0) </cmd>
+          <desc>" Register signal handler "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+
+        <statement>hndlr(mObj);</statement>
+
+        <testCase typ="ST">
+          <cmd> retVal = bs_tmodFin(&amp;tObj, mObj) </cmd>
+          <desc>" Finalise the timer module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = bs_smodFin(&amp;sObj, mObj) </cmd>
+          <desc>" Finalise the signal module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="ST">
+          <cmd> retVal = bs_omodFin(&amp;oObj, mObj) </cmd>
+          <desc>" Finalise the options module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+
+        <statement>hndlr_tsk(mObj);</statement>
+
+        <testCase typ="ST">
+          <cmd> retVal = bs_mmodFin(&amp;mObj) </cmd>
+          <desc>" Finalise the memory module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+
+      </currMod>
+
+    </testMod>
+
+  </testSUT>
+</testType>
