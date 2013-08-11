@@ -25,6 +25,9 @@ VIRTUAL-RUNTIME_init_manager ?= "sysvinit"
 VIRTUAL-RUNTIME_initscripts ?= "initscripts"
 VIRTUAL-RUNTIME_keymaps ?= "keymaps"
 
+#Virtcluster packages-essential
+VIRTCLUSTER_ESSEN_PACKAGES =
+
 RDEPENDS_${PN} = "\
     base-files \
     base-passwd \
@@ -34,6 +37,7 @@ RDEPENDS_${PN} = "\
     modutils-initscripts \
     netbase \
     init-ifupdown \
+    ${VIRTCLUSTER_ESSEN_PACKAGES} \
     ${VIRTUAL-RUNTIME_login_manager} \
     ${VIRTUAL-RUNTIME_init_manager} \
     ${VIRTUAL-RUNTIME_initscripts} \

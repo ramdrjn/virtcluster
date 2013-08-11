@@ -1,6 +1,6 @@
 DESCRIPTION = "virtcluster image"
 
-IMAGE_INSTALL = "packagegroup-virtcluster ${ROOTFS_PKGMANAGE_BOOTSTRAP} ${CORE_IMAGE_EXTRA_INSTALL}"
+IMAGE_INSTALL = "packagegroup-virtcluster packagegroup-core-ssh-openssh ${ROOTFS_PKGMANAGE_BOOTSTRAP} ${CORE_IMAGE_EXTRA_INSTALL}"
 
 IMAGE_LINGUAS = " "
 
