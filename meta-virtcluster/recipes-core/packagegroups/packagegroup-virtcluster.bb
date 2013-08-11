@@ -26,7 +26,7 @@ VIRTUAL-RUNTIME_initscripts ?= "initscripts"
 VIRTUAL-RUNTIME_keymaps ?= "keymaps"
 
 #Virtcluster packages-essential
-VIRTCLUSTER_ESSEN_PACKAGES =
+VIRTCLUSTER_ESSEN_PACKAGES = ""
 
 RDEPENDS_${PN} = "\
     base-files \
