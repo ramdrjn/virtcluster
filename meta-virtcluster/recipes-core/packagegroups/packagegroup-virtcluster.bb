@@ -18,32 +18,33 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 MACHINE_ESSENTIAL_EXTRA_RDEPENDS ?= ""
 MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS ?= ""
 
-# Distro can override the following VIRTUAL-RUNTIME providers:
-VIRTUAL-RUNTIME_dev_manager ?= "udev"
-VIRTUAL-RUNTIME_login_manager ?= "tinylogin"
-VIRTUAL-RUNTIME_init_manager ?= "sysvinit"
-VIRTUAL-RUNTIME_initscripts ?= "initscripts"
-VIRTUAL-RUNTIME_keymaps ?= "keymaps"
+PACKAGES = "\
+    packagegroup-virtcluster-os \
+    packagegroup-virtcluster-connectivity \
+    packagegroup-virtcluster-tools \
+    packagegroup-virtcluster-apps \
+    "
 
-#Virtcluster packages-essential
-VIRTCLUSTER_ESSEN_PACKAGES = ""
-
-RDEPENDS_${PN} = "\
+RDEPENDS_packagegroup-virtcluster-os = "\
     base-files \
     base-passwd \
     busybox \
-    ${@base_contains("MACHINE_FEATURES", "rtc", "busybox-hwclock", "", d)} \
-    ${@base_contains("MACHINE_FEATURES", "keyboard", "${VIRTUAL-RUNTIME_keymaps}", "", d)} \
+    initscripts \
     modutils-initscripts \
     netbase \
     init-ifupdown \
-    ${VIRTCLUSTER_ESSEN_PACKAGES} \
-    ${VIRTUAL-RUNTIME_login_manager} \
-    ${VIRTUAL-RUNTIME_init_manager} \
-    ${VIRTUAL-RUNTIME_initscripts} \
-    ${VIRTUAL-RUNTIME_dev_manager} \
-    ${VIRTUAL-RUNTIME_update-alternatives} \
+    tinylogin \
     ${MACHINE_ESSENTIAL_EXTRA_RDEPENDS}"
 
-RRECOMMENDS_${PN} = "\
+RDEPENDS_packagegroup-virtcluster-connectivity = "\
+    openssh\
+    "
+
+RDEPENDS_packagegroup-virtcluster-tools = ""
+
+RDEPENDS_packagegroup-virtcluster-apps = ""
+
+RRECOMMENDS_packagegroup-virtcluster-apps = ""
+
+RRECOMMENDS_packagegroup-virtcluster-os = "\
     ${MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS}"
