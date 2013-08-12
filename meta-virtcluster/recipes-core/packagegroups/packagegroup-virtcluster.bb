@@ -28,19 +28,27 @@ PACKAGES = "\
 RDEPENDS_packagegroup-virtcluster-os = "\
     base-files \
     base-passwd \
+    eglibc \
     busybox \
     initscripts \
     modutils-initscripts \
-    netbase \
-    init-ifupdown \
     tinylogin \
     ${MACHINE_ESSENTIAL_EXTRA_RDEPENDS}"
 
 RDEPENDS_packagegroup-virtcluster-connectivity = "\
-    openssh\
+    netbase \
+    init-ifupdown \
+    openssl \
+    openssh \
+    iputils \
     "
 
-RDEPENDS_packagegroup-virtcluster-tools = ""
+RDEPENDS_packagegroup-virtcluster-tools = "\
+    bash \
+    python \
+    rpm \
+    sqlite3 \
+    "
 
 RDEPENDS_packagegroup-virtcluster-apps = ""
 

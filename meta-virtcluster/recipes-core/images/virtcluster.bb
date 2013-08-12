@@ -1,5 +1,7 @@
 DESCRIPTION = "virtcluster image"
 
+IMAGE_FEATURES = "package-management"
+
 IMAGE_INSTALL = "\
                packagegroup-virtcluster-os \
                packagegroup-virtcluster-connectivity \
@@ -7,7 +9,7 @@ IMAGE_INSTALL = "\
                packagegroup-virtcluster-apps \
                "
 
-IMAGE_LINGUAS = " "
+IMAGE_LINGUAS = "en-us"
 
 LICENSE = "MIT"
 
