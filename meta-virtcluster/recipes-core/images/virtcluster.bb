@@ -1,6 +1,6 @@
 DESCRIPTION = "virtcluster image"
 
-IMAGE_FEATURES = "package-management"
+IMAGE_FEATURES += "package-management ssh-server-openssh"
 
 IMAGE_INSTALL = "\
                packagegroup-virtcluster-os \
