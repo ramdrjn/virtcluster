@@ -2,7 +2,7 @@
 # Makefile                                                                  #
 #############################################################################
 
-include $(CURR_DIR)/inc/config.mk
+include $(CURR_DIR)/conf/config.mk
 
 CFLAGS := $(CFLAGS)\
 	 -Wall -Wextra -Wswitch-enum -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations\
@@ -29,9 +29,10 @@ BLD_DIR := ./bld
 RPM_DIR := ./bld/rpm/$(ARCH)
 COM_INC_DIR := $(CURR_DIR)/src/com_inc
 COM_LIB_DIR := $(CURR_DIR)/src/com_lib
+CONFIG_DIR := $(CURR_DIR)/conf
 CONFIG_INC_DIR := $(CURR_DIR)/inc
 COM_STATIC_LIB_DIR := $(COM_LIB_DIR)/static
-INCLUDE = -I$(CONFIG_INC_DIR) -I$(COM_INC_DIR) -I$(INC_DIR)
+INCLUDE = -I$(CONFIG_DIR) -I$(CONFIG_INC_DIR) -I$(COM_INC_DIR) -I$(INC_DIR)
 DEFINES =
 
 SCRIPTS_DIR := $(CURR_DIR)/scripts

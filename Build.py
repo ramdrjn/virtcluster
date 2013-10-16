@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from scripts.common import *
+from inc.scripts.py.common import *
 from scripts import virtcluster_iso
 import argparse
 
@@ -39,7 +39,8 @@ class cleanCls:
                         "TAGS",\
                         "cscope*",\
                         "output/*iso",\
-                        "output/logs/*log*"\
+                        "output/logs/*log*",\
+                        "init_env.sh"\
                         ]
       def __del__(self):
             log(debug, "Finalized %s class", self.__class__)
@@ -47,8 +48,8 @@ class cleanCls:
             log(debug, "In Function", inspect.stack()[0][3])
             log(debug, "Removing iso images")
             [[os.remove(f) for f in glob.glob(pat)] for pat in self.pat_lst]
-            [os.remove(f) for f in ["./inc/config.h", "./inc/config.mk",\
-                                           "./inc/config.bld"]]
+            [os.remove(f) for f in ["./conf/config.h", "./conf/config.mk",\
+                                           "./conf/config.bld"]]
 
 class buildCls:
       def __init__(self):
@@ -65,10 +66,12 @@ class buildCls:
             global log_file
             with open(log_file, 'a') as f:
                   exec_cmd(cmd_lst, f)
-      def build(self, testbin, mod, target):
+      def build(self, testbin, host, mod, target):
             log(debug, "In Function", inspect.stack()[0][3])
             if testbin:
                   self._make("TFW", mod, target)
+            elif host:
+                  self._make("Host", mod, target)
             else:
                   self._make("src", mod, target)
 
@@ -92,10 +95,10 @@ def build_prep(logf):
             f.write("\nBuilding from {0}".format(currdir))
             f.write("\nStarted at {0}\n".format(time.asctime()))
 
-def build_action(testbin, mod, target):
+def build_action(testbin, host, mod, target):
       log(debug, "In Function", inspect.stack()[0][3])
       build=buildCls()
-      build.build(testbin, mod, target)
+      build.build(testbin, host, mod, target)
 
 def args_actions(args):
       if args.verbosity:
@@ -110,7 +113,7 @@ def args_actions(args):
       if args.tags:
             tags=tagsCls()
             tags.gen()
-      build_action(args.testbin, args.module, args.target)
+      build_action(args.testbin, args.host, args.module, args.target)
       if args.iso:
             global currdir
             iso=isoCls()
@@ -119,6 +122,8 @@ def args_actions(args):
 def process_cmd_args():
       parser = argparse.ArgumentParser(description="Build script")
       parser.add_argument("--testbin", help="Compile test binaries",\
+                                action="store_true")
+      parser.add_argument("--host", help="Build host packages",\
                                 action="store_true")
       parser.add_argument("--tags", help="Generate ctags and cscope files",\
                                 action="store_true")

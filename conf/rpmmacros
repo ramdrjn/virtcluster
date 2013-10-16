@@ -12,16 +12,24 @@
 #binary packages path
 %_libdir /usr/lib
 %_testbindir /usr/local/bin
+#host
+%_hostscriptsdir /opt/x86vm
 
 #virtcluster paths.
 %virtcluster_lib %{buildroot}%{_libdir}
 %virtcluster_testbin %{buildroot}%{_testbindir}
+#host
+%virtcluster_host_scripts %{buildroot}%{_hostscriptsdir}
 
 #vircluster macros
 %virtcluster_rm_br rm -rf %{buildroot}
 %virtcluster_c_lib_p mkdir -p %{virtcluster_lib}
 %virtcluster_c_testbin_p mkdir -p %{virtcluster_testbin}
+#host
+%virtcluster_host_scripts_p mkdir -p %{virtcluster_host_scripts}
 
 #file perm, owner, group, dir perm
 %virtcluster_lib_perm %defattr(0644,root,root,0644)
-%virtcluster_bin_perm %defattr(0755,root,root,0644)
+%virtcluster_bin_perm %defattr(0755,root,root,0755)
+#host
+%virtcluster_host_scripts_perm %defattr(0755,root,root,0755)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from scripts.common import *
+from inc.scripts.py.common import *
 
 def prep(iso_dir):
       log(debug, "In Function", inspect.stack()[0][3])
@@ -11,6 +11,22 @@ def prep(iso_dir):
 def prep_dir(iso_dir, arch, rpm_lst, cwd):
       log(debug, "In Function", inspect.stack()[0][3])
       arch_dir=iso_dir+arch
+      log(debug, "arch dir: {0}".format(arch_dir))
+      os.mkdir(arch_dir)
+      with open(rpm_lst, 'r') as f:
+            for rpm in f:
+                  rpmf=(os.path.join(cwd,rpm)).strip("\n")
+                  log(debug, "rpm file: {0}".format(rpmf))
+                  try:
+                        shutil.copy(rpmf, arch_dir)
+                  except IOError:
+                        log(error, "Skipping file: {0}".format(rpmf))
+
+def prep_host_dir(iso_dir, arch, rpm_lst, cwd):
+      log(debug, "In Function", inspect.stack()[0][3])
+      host_dir=iso_dir+"host/"
+      os.mkdir(host_dir)
+      arch_dir=host_dir+arch
       log(debug, "arch dir: {0}".format(arch_dir))
       os.mkdir(arch_dir)
       with open(rpm_lst, 'r') as f:
@@ -46,10 +62,16 @@ def gen_iso(cwd):
       log(debug, "ARCH: {0}".format(ARCH))
       ISO_NAME="{0}/output/virtcluster-{1}.iso".format(currdir,ARCH)
       log(debug, "ISO_NAME: {0}".format(ISO_NAME))
-      RPM_LST="{0}/inc/rpm.list.{1}".format(currdir,ARCH)
+      RPM_LST="{0}/conf/rpm.list.{1}".format(currdir,ARCH)
       log(debug, "RPM_LST: {0}".format(RPM_LST))
+
+      host_arch=os.environ['HOST_ARCH']
+      log(debug, "HOST_ARCH: {0}".format(host_arch))
+      host_rpm_lst="{0}/conf/rpm.host.list.{1}".format(currdir,host_arch)
+      log(debug, "HOST_RPM_LST: {0}".format(host_rpm_lst))
 
       prep(ISO_GEN_DIR)
       prep_dir(ISO_GEN_DIR, ARCH, RPM_LST, currdir)
+      prep_host_dir(ISO_GEN_DIR, host_arch, host_rpm_lst, currdir)
       make_iso(ISO_GEN_DIR, ISO_NAME, RES_OP)
       cleanup(ISO_GEN_DIR)

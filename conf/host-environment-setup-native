@@ -1,0 +1,8 @@
+export HOST_CC=gcc
+export HOST_LD=gcc
+export HOST_STRIP=strip
+export HOST_RANLIB=ranlib
+export HOST_AR=ar
+export HOST_CFLAGS=""
+export HOST_LDFLAGS=""
+export HOST_ARCH=x86_64
