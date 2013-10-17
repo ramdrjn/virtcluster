@@ -13,20 +13,23 @@
 %_libdir /usr/lib
 %_testbindir /usr/local/bin
 #host
-%_hostscriptsdir /opt/x86vm
+%_hostdir /opt/x86vm
+%_hostcommisiondir /opt/x86vm/commision
 
 #virtcluster paths.
 %virtcluster_lib %{buildroot}%{_libdir}
 %virtcluster_testbin %{buildroot}%{_testbindir}
 #host
-%virtcluster_host_scripts %{buildroot}%{_hostscriptsdir}
+%virtcluster_host_dir %{buildroot}%{_hostdir}
+%virtcluster_host_commision_dir %{buildroot}%{_hostcommisiondir}
 
 #vircluster macros
 %virtcluster_rm_br rm -rf %{buildroot}
 %virtcluster_c_lib_p mkdir -p %{virtcluster_lib}
 %virtcluster_c_testbin_p mkdir -p %{virtcluster_testbin}
 #host
-%virtcluster_host_scripts_p mkdir -p %{virtcluster_host_scripts}
+%virtcluster_host_p mkdir -p %{virtcluster_host_dir}
+%virtcluster_host_commision_p mkdir -p %{virtcluster_host_commision_dir}
 
 #file perm, owner, group, dir perm
 %virtcluster_lib_perm %defattr(0644,root,root,0644)

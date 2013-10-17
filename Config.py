@@ -87,27 +87,33 @@ def args_actions(args):
             log_file.write("\nGCOV_FLAGS= -ftest-coverage -fprofile-arcs")
             log(info, "GCOV={0}".format(args.gcov))
       if args.host:
+            tdir=os.path.join(conf_dir, "host")
+            host_dir=os.path.join(tdir, args.host)
+            filename=os.path.join(host_dir, "host.desc")
+            with open(filename) as infile:
+                  host_desc = json.load(infile)
             log_file.write("\nSelecting host as {0}".format(args.host))
-            if args.host:
-                  #Native compiler
-                  initenv.sendData("\n . " +\
-                                  os.path.join(conf_dir, "host-environment-setup-native"))
-                  log_file.write("\nSelecting native toolset for host")
-                  log(info, "Selecting native toolset for host")
+            if host_desc["environment_setup_script"]:
+                  sdk=host_desc["environment_setup_script"]
+                  initenv.sendData("\n . "+sdk)
+            if host_desc["extra_environment_setup_script"]:
+                  sdk=host_desc["extra_environment_setup_script"]
+                  initenv.sendData("\n . "+sdk)
+            initenv.sendData("\nexport HOST_TYPE="+args.host)
       if args.target:
+            tdir=os.path.join(conf_dir, "target")
+            target_dir=os.path.join(tdir, args.target)
+            filename=os.path.join(target_dir, "target.desc")
+            with open(filename) as infile:
+                  target_desc = json.load(infile)
             log_file.write("\nSelecting target as {0}".format(args.target))
-            if args.target == 'x86vm':
-                  #Yocto
-                  yocto_sdk="/Work/Contents/ToolChains/x86vm/environment-setup-i586-poky-linux"
-                  initenv.sendData("\n . "+yocto_sdk)
-                  log_file.write("\nSelecting yocto toolset at {0}".format(yocto_sdk))
-                  log(info, "Selecting yocto toolset at {0}".format(yocto_sdk))
-            else:
-                  #Native compiler
-                  initenv.sendData("\n . " +\
-                                  os.path.join(conf_dir, "environment-setup-native"))
-                  log_file.write("\nSelecting native toolset")
-                  log(info, "Selecting native toolset")
+            if target_desc["environment_setup_script"]:
+                  sdk=target_desc["environment_setup_script"]
+                  initenv.sendData("\n . "+sdk)
+            if target_desc["extra_environment_setup_script"]:
+                  sdk=target_desc["extra_environment_setup_script"]
+                  initenv.sendData("\n . "+sdk)
+            initenv.sendData("\nexport TARGET_TYPE="+args.target)
 
 def process_cmd_args():
       parser = argparse.ArgumentParser(description="Configuration script")
@@ -139,12 +145,12 @@ def process_cmd_args():
                                    help="Enable gcov")
 
       ################## - host type - ##################
-      parser.add_argument("--host", default="x86_84", nargs='?',\
-                                help="Host CPU type else x86_64")
+      parser.add_argument("--host", default="native-x86_64", nargs='?',\
+                                help="Host type else native-x86_64")
 
       ################## - target type - ##################
-      parser.add_argument("--target", default="x86_64", nargs='?',\
-                                help="Target CPU type else x86")
+      parser.add_argument("--target", default="yocto-x86", nargs='?',\
+                                help="Target type else yocto-x86")
 
       ################## - End of options - ##################
       args = parser.parse_args()
@@ -156,17 +162,17 @@ def prep(logf):
       global log_file
       global conf_dir
       currdir = os.getcwd()
-      conf_dir = os.path.join(currdir, "./conf")
+      conf_dir = os.path.join(currdir, "conf")
       log_file = open(os.path.join(currdir, logf), 'w')
 
       log_file.write("\nConfiguration Started at {0}\n".format(time.asctime()))
-      shutil.copy(os.path.join(conf_dir, "config.h.def"),\
+      shutil.copy(os.path.join(conf_dir, "def_configs/config.h.def"),\
                                      os.path.join(conf_dir, "config.h"))
       log_file.write("Copied default configs {0}\n".format("config.h"))
-      shutil.copy(os.path.join(conf_dir, "config.mk.def"),\
+      shutil.copy(os.path.join(conf_dir, "def_configs/config.mk.def"),\
                                      os.path.join(conf_dir, "config.mk"))
       log_file.write("Copied default configs {0}\n".format("config.mk"))
-      shutil.copy(os.path.join(conf_dir, "config.bld.def"),\
+      shutil.copy(os.path.join(conf_dir, "def_configs/config.bld.def"),\
                                      os.path.join(conf_dir, "config.bld"))
       log_file.write("Copied default configs {0}\n".format("config.bld"))
 

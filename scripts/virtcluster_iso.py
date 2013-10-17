@@ -62,12 +62,21 @@ def gen_iso(cwd):
       log(debug, "ARCH: {0}".format(ARCH))
       ISO_NAME="{0}/output/virtcluster-{1}.iso".format(currdir,ARCH)
       log(debug, "ISO_NAME: {0}".format(ISO_NAME))
-      RPM_LST="{0}/conf/rpm.list.{1}".format(currdir,ARCH)
+
+      t_dir=os.environ['TARGET_TYPE']
+      filename="{0}/conf/target/{1}/target.desc".format(currdir,t_dir)
+      with open(filename) as infile:
+            target_desc = json.load(infile)
+      RPM_LST=target_desc["rpm_list"]
       log(debug, "RPM_LST: {0}".format(RPM_LST))
 
       host_arch=os.environ['HOST_ARCH']
       log(debug, "HOST_ARCH: {0}".format(host_arch))
-      host_rpm_lst="{0}/conf/rpm.host.list.{1}".format(currdir,host_arch)
+      t_dir=os.environ['HOST_TYPE']
+      filename="{0}/conf/host/{1}/host.desc".format(currdir,t_dir)
+      with open(filename) as infile:
+            host_desc = json.load(infile)
+      host_rpm_lst=host_desc["rpm_list"]
       log(debug, "HOST_RPM_LST: {0}".format(host_rpm_lst))
 
       prep(ISO_GEN_DIR)

@@ -3,6 +3,7 @@
 
 from inc.scripts.py.common import *
 from scripts import virtcluster_iso
+from scripts import virtcluster_image
 import argparse
 
 currdir=""
@@ -74,6 +75,9 @@ class buildCls:
                   self._make("Host", mod, target)
             else:
                   self._make("src", mod, target)
+      def build_image_rpm(self):
+            log(debug, "In Function", inspect.stack()[0][3])
+            self._make("Image", "all", "rpm")
 
 class isoCls:
       def __init__(self):
@@ -83,6 +87,15 @@ class isoCls:
       def create_iso(self, currdir):
             log(debug, "In Function", inspect.stack()[0][3])
             virtcluster_iso.gen_iso(currdir)
+
+class imageCls:
+      def __init__(self):
+            log(debug, "Initialized %s class", self.__class__)
+      def __del__(self):
+            log(debug, "Finalized %s class", self.__class__)
+      def prep_image(self, currdir):
+            log(debug, "In Function", inspect.stack()[0][3])
+            virtcluster_image.package_image(currdir)
 
 def build_prep(logf):
       global currdir
@@ -95,12 +108,8 @@ def build_prep(logf):
             f.write("\nBuilding from {0}".format(currdir))
             f.write("\nStarted at {0}\n".format(time.asctime()))
 
-def build_action(testbin, host, mod, target):
-      log(debug, "In Function", inspect.stack()[0][3])
-      build=buildCls()
-      build.build(testbin, host, mod, target)
-
 def args_actions(args):
+      global currdir
       if args.verbosity:
             set_debug_lvl(args.verbosity)
       if args.quiet:
@@ -113,9 +122,13 @@ def args_actions(args):
       if args.tags:
             tags=tagsCls()
             tags.gen()
-      build_action(args.testbin, args.host, args.module, args.target)
+      build=buildCls()
+      if args.image:
+            image=imageCls()
+            image.prep_image(currdir)
+            build.build_image_rpm()
+      build.build(args.testbin, args.host, args.module, args.target)
       if args.iso:
-            global currdir
             iso=isoCls()
             iso.create_iso(currdir)
 
@@ -128,6 +141,8 @@ def process_cmd_args():
       parser.add_argument("--tags", help="Generate ctags and cscope files",\
                                 action="store_true")
       parser.add_argument("--iso", help="Create final ISO of rpms",\
+                                action="store_true")
+      parser.add_argument("--image", help="Create virtcluster images",\
                                 action="store_true")
       parser.add_argument("--distclean", help="Super clean",\
                                 action="store_true")

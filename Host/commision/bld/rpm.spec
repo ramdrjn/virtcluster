@@ -12,19 +12,18 @@ Commisioning scripts
 
 %install
 %virtcluster_rm_br
-%virtcluster_host_scripts_p
-%define virtcluster_commision_dir %{virtcluster_host_scripts}/commision/
-mkdir -p %{virtcluster_commision_dir}
+%virtcluster_host_p
+%virtcluster_host_commision_p
 
-cp ./src/common.py %{virtcluster_commision_dir}
-cp ./src/cli_mon.py %{virtcluster_commision_dir}
-cp ./src/py_libvirt.py %{virtcluster_commision_dir}
+cp ./src/common.py %{virtcluster_host_commision_dir}
+cp ./src/cli_mon.py %{virtcluster_host_commision_dir}
+cp ./src/py_libvirt.py %{virtcluster_host_commision_dir}
 
 %clean
 %virtcluster_rm_br
 
 %files
 %virtcluster_host_scripts_perm
-%{_hostscriptsdir}/commision/common.py
-%{_hostscriptsdir}/commision/cli_mon.py
-%{_hostscriptsdir}/commision/py_libvirt.py
+%{_hostcommisiondir}/common.py
+%{_hostcommisiondir}/cli_mon.py
+%{_hostcommisiondir}/py_libvirt.py

@@ -1,10 +1,15 @@
 #############################################################################
 # Makefile                                                                  #
 #############################################################################
-include $(CURR_DIR)/inc/make_inc.mk
 
-#Overwrite host architecture
-ARCH := $(HOST_ARCH)
-RPM_DIR := ./bld/rpm/$(ARCH)
+target:rpm
+
+include $(CURR_DIR)/Image/com_inc/make_inc.mk
+
+IMAGE_RPM = $(RPM_DIR)/image*.rpm
+
+$(IMAGE_RPM):images/manifest
+
+rpm:$(IMAGE_RPM)
 
 #############################################################################

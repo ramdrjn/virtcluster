@@ -1,10 +1,13 @@
 #############################################################################
 # Makefile                                                                  #
 #############################################################################
-include $(CURR_DIR)/inc/make_inc.mk
 
-#Overwrite host architecture
-ARCH := $(HOST_ARCH)
-RPM_DIR := ./bld/rpm/$(ARCH)
+target:$(MODULE)
 
-#############################################################################
+.PHONY:pre_built_images
+pre_built_images:
+	$(MAKE) -C ./pre_built_images/ $(TARGET)
+
+all:pre_built_images
+
+##############################################################################
