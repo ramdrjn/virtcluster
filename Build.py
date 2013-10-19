@@ -1,40 +1,52 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from inc.scripts.py.common import *
+from inc.scripts.py import common
 from scripts import virtcluster_iso
 from scripts import virtcluster_image
 import argparse
+import os
+import inspect
+import time
+import glob
+import sys
 
 currdir=""
 log_file=""
 
 class tagsCls:
       def __init__(self):
-            log(debug, "Initialized %s class", self.__class__)
+            common.log(common.debug,
+                       "Initialized {0} class".format(self.__class__))
       def __del__(self):
-            log(debug, "Finalized %s class", self.__class__)
+            common.log(common.debug,
+                       "Finalized {0} class".format(self.__class__))
       def gen_listof_files(self):
-            log(debug, "In Function", inspect.stack()[0][3])
-            exec_cmd(["find", "./src/", "-name", "*.[ch]", "-fprint", "cscope.files"])
-            log(info, "Generated list of files")
+            common.log(common.debug,
+                       "In Function {0}".format(inspect.stack()[0][3]))
+            common.exec_cmd(["find", "./src/", "-name", "*.[ch]", "-fprint", "cscope.files"])
+            common.log(common.info, "Generated list of files")
       def gen_tags(self):
-            log(debug, "In Function", inspect.stack()[0][3])
-            exec_cmd(["ctags", "-e", "-L", "cscope.files"])
-            log(info, "Generated TAGS")
+            common.log(common.debug,
+                       "In Function {0}".format(inspect.stack()[0][3]))
+            common.exec_cmd(["ctags", "-e", "-L", "cscope.files"])
+            common.log(common.info, "Generated TAGS")
       def gen_cscope(self):
-            log(debug, "In Function", inspect.stack()[0][3])
-            exec_cmd(["cscope", "-bq"])
-            log(info, "Generated cscope db")
+            common.log(common.debug,
+                       "In Function {0}".format(inspect.stack()[0][3]))
+            common.exec_cmd(["cscope", "-bq"])
+            common.log(common.info, "Generated cscope db")
       def gen(self):
-            log(debug, "In Function", inspect.stack()[0][3])
+            common.log(common.debug,
+                       "In Function {0}".format(inspect.stack()[0][3]))
             self.gen_listof_files()
             self.gen_tags()
             self.gen_cscope()
 
 class cleanCls:
       def __init__(self):
-            log(debug, "Initialized %s class", self.__class__)
+            common.log(common.debug,
+                       "Initialized {0} class".format(self.__class__))
             self.pat_lst=[\
                   "tags",\
                         "TAGS",\
@@ -44,31 +56,37 @@ class cleanCls:
                         "init_env.sh"\
                         ]
       def __del__(self):
-            log(debug, "Finalized %s class", self.__class__)
+            common.log(common.debug,
+                       "Finalized {0} class".format(self.__class__))
       def dist_clean(self):
-            log(debug, "In Function", inspect.stack()[0][3])
-            log(debug, "Removing iso images")
+            common.log(common.debug,
+                       "In Function {0}".format(inspect.stack()[0][3]))
+            common.log(common.debug, "Removing iso images")
             [[os.remove(f) for f in glob.glob(pat)] for pat in self.pat_lst]
             [os.remove(f) for f in ["./conf/config.h", "./conf/config.mk",\
                                            "./conf/config.bld"]]
 
 class buildCls:
       def __init__(self):
-            log(debug, "Initialized %s class", self.__class__)
+            common.log(common.debug,
+                       "Initialized {0} class".format(self.__class__))
       def __del__(self):
-            log(debug, "Finalized %s class", self.__class__)
+            common.log(common.debug,
+                       "Finalized {0} class".format(self.__class__))
       def _make(self, direc, mod, target):
             global log_file
-            log(debug, "In Function", inspect.stack()[0][3])
+            common.log(common.debug,
+                       "In Function {0}".format(inspect.stack()[0][3]))
             cmd_lst=["make", "-C", direc,\
                            "MODULE={0}".format(mod),\
                            "TARGET={0}".format(target)\
                            ]
             global log_file
             with open(log_file, 'a') as f:
-                  exec_cmd(cmd_lst, f)
+                  common.exec_cmd(cmd_lst, f)
       def build(self, testbin, host, mod, target):
-            log(debug, "In Function", inspect.stack()[0][3])
+            common.log(common.debug,
+                       "In Function {0}".format(inspect.stack()[0][3]))
             if testbin:
                   self._make("TFW", mod, target)
             elif host:
@@ -76,25 +94,32 @@ class buildCls:
             else:
                   self._make("src", mod, target)
       def build_image_rpm(self, mod, target):
-            log(debug, "In Function", inspect.stack()[0][3])
+            common.log(common.debug,
+                       "In Function {0}".format(inspect.stack()[0][3]))
             self._make("Image", mod, target)
 
 class isoCls:
       def __init__(self):
-            log(debug, "Initialized %s class", self.__class__)
+            common.log(common.debug,
+                       "Initialized {0} class".format(self.__class__))
       def __del__(self):
-            log(debug, "Finalized %s class", self.__class__)
+            common.log(common.debug,
+                       "Finalized {0} class".format(self.__class__))
       def create_iso(self, currdir):
-            log(debug, "In Function", inspect.stack()[0][3])
+            common.log(common.debug,
+                       "In Function {0}".format(inspect.stack()[0][3]))
             virtcluster_iso.gen_iso(currdir)
 
 class imageCls:
       def __init__(self):
-            log(debug, "Initialized %s class", self.__class__)
+            common.log(common.debug,
+                       "Initialized {0} class".format(self.__class__))
       def __del__(self):
-            log(debug, "Finalized %s class", self.__class__)
+            common.log(common.debug,
+                       "Finalized {0} class".format(self.__class__))
       def prep_image(self, currdir):
-            log(debug, "In Function", inspect.stack()[0][3])
+            common.log(common.debug,
+                       "In Function {0}".format(inspect.stack()[0][3]))
             virtcluster_image.package_image(currdir)
 
 def build_prep(logf):
@@ -102,19 +127,19 @@ def build_prep(logf):
       global log_file
       currdir = os.getcwd()
       os.environ ['CURR_DIR'] = currdir
-      log(info, "\nBuilding from {0}".format(currdir))
       log_file = os.path.join(currdir, logf)
       with open(log_file, 'w') as f:
-            f.write("\nBuilding from {0}".format(currdir))
-            f.write("\nStarted at {0}\n".format(time.asctime()))
+            common.log([common.info, common.screen_file, f],
+                       "\nBuilding from {0}".format(currdir))
+            common.log([common.info, common.file, f],
+                       "\nStarted at {0}\n".format(time.asctime()))
 
 def args_actions(args):
       global currdir
       if args.verbosity:
-            set_debug_lvl(args.verbosity)
+            common.set_debug_lvl(args.verbosity)
       if args.quiet:
-            global error
-            set_debug_lvl(error)
+            common.set_debug_lvl(common.error)
       if args.distclean:
             clean=cleanCls()
             clean.dist_clean()
@@ -163,7 +188,8 @@ def cleanup():
       global currdir
       global log_file
       with open(log_file, 'a') as f:
-            f.write("\nEnding at {0}\n".format(time.asctime()))
+            common.log([common.info, common.file, f],
+                       "\nEnding at {0}\n".format(time.asctime()))
 
 def main():
       build_prep("output/logs/build.log")

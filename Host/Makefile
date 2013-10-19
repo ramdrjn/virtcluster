@@ -4,10 +4,10 @@
 
 target:$(MODULE)
 
-.PHONY:commision
-commision:
-	$(MAKE) -C ./commision/ $(TARGET)
+.PHONY:provision
+provision:
+	$(MAKE) -C ./provision/ $(TARGET)
 
-all:commision
+all:provision
 
 ##############################################################################

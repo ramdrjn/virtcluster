@@ -8,10 +8,10 @@ include $(CURR_DIR)/Host/com_inc/make_inc.mk
 
 vpath %.c $(SRC_DIR)
 
-COMMISION_RPM = $(RPM_DIR)/commision*.rpm
+PROVISION_RPM = $(RPM_DIR)/provision*.rpm
 
-$(COMMISION_RPM):
+$(PROVISION_RPM):
 
-rpm:$(COMMISION_RPM)
+rpm:$(PROVISION_RPM)
 
 #############################################################################

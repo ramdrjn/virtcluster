@@ -3,12 +3,6 @@
 
 import subprocess
 import inspect
-import os
-import shutil
-import glob
-import time
-import sys
-import json
 
 debug=1
 info=3
@@ -16,17 +10,31 @@ error=5
 
 debug_lvl=info
 
+screen=0
+file=1
+screen_file=2
+
 def set_debug_lvl(lvl):
       global debug_lvl
       debug_lvl = lvl
 
-def log(lvl, arg, *args):
-      if lvl >= debug_lvl:
-            print(arg, (lambda: args and args or "")())
-            return lvl
+def log(ctrl, arg):
+      if not isinstance(ctrl, list):
+            ctrl_lst=[]
+            ctrl_lst.append(ctrl)
+            ctrl_lst.append(screen)
+            ctrl_lst.append(None)
+      else:
+            ctrl_lst=ctrl
+      lvl=ctrl_lst[0]
+      if lvl >= debug_lvl and ctrl_lst[1] != 1:
+            print(arg)
+      if ctrl_lst[1] and ctrl_lst[2]:
+            ctrl_lst[2].write(arg)
+      return lvl
 
 def exec_cmd(cmd, out=None, err=None):
-      log(debug, "In Function", inspect.stack()[0][3])
+      log(debug, "In Function {0}".format(inspect.stack()[0][3]))
       if out:
             err = subprocess.STDOUT
       try:
