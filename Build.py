@@ -75,9 +75,9 @@ class buildCls:
                   self._make("Host", mod, target)
             else:
                   self._make("src", mod, target)
-      def build_image_rpm(self):
+      def build_image_rpm(self, mod, target):
             log(debug, "In Function", inspect.stack()[0][3])
-            self._make("Image", "all", "rpm")
+            self._make("Image", mod, target)
 
 class isoCls:
       def __init__(self):
@@ -126,7 +126,7 @@ def args_actions(args):
       if args.image:
             image=imageCls()
             image.prep_image(currdir)
-            build.build_image_rpm()
+            build.build_image_rpm(args.module, args.target)
       build.build(args.testbin, args.host, args.module, args.target)
       if args.iso:
             iso=isoCls()
