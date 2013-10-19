@@ -124,8 +124,9 @@ def args_actions(args):
             tags.gen()
       build=buildCls()
       if args.image:
-            image=imageCls()
-            image.prep_image(currdir)
+            if args.target != "cleanall":
+                  image=imageCls()
+                  image.prep_image(currdir)
             build.build_image_rpm(args.module, args.target)
       build.build(args.testbin, args.host, args.module, args.target)
       if args.iso:
