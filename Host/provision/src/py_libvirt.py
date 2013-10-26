@@ -8,7 +8,7 @@ import libvirt
 '''               Utility functions'''
 
 def _debug(msg):
-    print (msg)
+    common.log(common.debug, msg)
 
 def _validate_dom(dom):
     if not dom:

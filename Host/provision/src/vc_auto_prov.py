@@ -44,7 +44,10 @@ def prep(currdir):
       common.log(common.debug,
                  "In Function {0}".format(inspect.stack()[0][3]))
       log_dir=os.path.join(currdir, "logs")
-      os.makedirs(log_dir)
+      try:
+            os.makedirs(log_dir)
+      except:
+            common.log(common.debug, "Logs directory already exist.")
       ts=time.strftime("%A_%d_%B_%H_%M_%S")
       logfname="prov_{0}.log".format(ts)
       log_file = os.path.join(log_dir, logfname)
