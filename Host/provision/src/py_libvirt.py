@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import libvirt
+import common
 
 '''                              Internal functions'''
 
@@ -115,6 +116,9 @@ def _resume_domain(dom):
 def _pause_domain(dom):
     None
 
+def _start_resume_domain(dom):
+    dom.create()
+
 '''               Devices'''
 #vcpu
 #mem
@@ -161,6 +165,10 @@ def network_lookup(con, name):
         nwk = _lookup_network(con, name)
     return nwk
 
+def network_defineXML(con, xml):
+    nwk = _define_network(con, xml)
+    return nwk
+
 def network_define(con, nwk_name, br_name, br_mac, br_ip, d_start, d_end):
     xml="\
   <network>\
@@ -174,7 +182,7 @@ def network_define(con, nwk_name, br_name, br_mac, br_ip, d_start, d_end):
     </ip>\
   </network>\
  ".format(nwk_name, br_name, br_mac, br_ip, d_start, d_end)
-    nwk = _define_network(con, xml)
+    nwk = network_defineXML(con, xml)
     return nwk
 
 def network_undefine(nwk):
@@ -219,6 +227,12 @@ def dom_define(con, name, kernel, mem=524288, arch='i686'):
             dom = _def_domain(con, def_xml)
     return dom
 
+def dom_defineXML(con, xml):
+    dom = None
+    if _validate_con(con):
+        dom = _def_domain(con, xml)
+    return dom
+
 def dom_undefine(dom):
     if _validate_dom(dom):
         _undef_domain(dom)
@@ -229,6 +243,13 @@ def dom_start(dom):
     #Start domain but in paused mode
     if _validate_dom(dom):
         _start_domain(dom)
+        return True
+    return False
+
+def dom_start_resume(dom):
+    #Start domain but in paused mode
+    if _validate_dom(dom):
+        _start_resume_domain(dom)
         return True
     return False
 
