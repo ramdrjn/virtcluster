@@ -1,14 +1,23 @@
 
 import common
+import readline
 import cmd
 
-
-def exec_cmd(cmd, out=None, err=None):
-      log(debug, "In Function {0}".format(inspect.stack()[0][3]))
-      if out:
-            err = subprocess.STDOUT
-      try:
-            log(debug, "Executing command {0}".format(cmd))
-            subprocess.check_call(cmd, stdout=out, stderr=err)
-      except subprocess.CalledProcessError as e:
-            log(error, "Cmd: {0} returned {1}\n".format(e.cmd, e.returncode))
+class VCCli(cmd.Cmd):
+      def __init__(self, intro="virtcluster", prompt="(vc)"):
+            cmd.Cmd.__init__(self)
+            self.intro=intro
+            self.prompt=prompt
+            self.doc_header="virtcluster commands (type help <topic>):"
+      def emptyline(self):
+            pass
+      def do_EOF(self, args):
+            return True
+      def help_EOF(self, args):
+            return True
+      def do_quit(self, args):
+            return True
+      def help_quit(self, args):
+            return True
+      def _autocomp(self, lst, text):
+            return [i for i in lst if i.startswith(text)]

@@ -4,26 +4,32 @@
 Name: provision
 Version: 1.0
 Release: 1
-Summary: Commisioning scripts
 License: license.txt
-
+Summary: Common scripts and provisioning scripts
 %description
-Commisioning scripts
+Common scripts and provisioning scripts
+
+#Ignore unlisted files so that they will not cause a build fail
+%define _unpackaged_files_terminate_build 0
+#Ignore auto dependency for python
+%global __requires_exclude ^/usr/bin/python$
+
+%package -n py-scripts-common
+Summary: common python scripts
+%description -n py-scripts-common
+Common scripts
 
 %install
 %virtcluster_rm_br
-%virtcluster_host_p
-%virtcluster_host_provision_p
-
-cp ./src/common.py %{virtcluster_host_provision_dir}
-cp ./src/cli_mon.py %{virtcluster_host_provision_dir}
-cp ./src/py_libvirt.py %{virtcluster_host_provision_dir}
+%virtcluster_c_br_p
+tar zxvf ./dist/py-scripts-common-1.0.linux-x86_64.tar.gz -C %{virtcluster_br}
+tar zxvf ./dist/provisioning-1.0.linux-x86_64.tar.gz -C %{virtcluster_br}
 
 %clean
 %virtcluster_rm_br
 
-%files
+%files -n py-scripts-common -f ./bld/py-scripts-common.files
 %virtcluster_host_scripts_perm
-%{_hostprovisiondir}/common.py
-%{_hostprovisiondir}/cli_mon.py
-%{_hostprovisiondir}/py_libvirt.py
+
+%files -f ./bld/provisioning.files
+%virtcluster_host_scripts_perm
