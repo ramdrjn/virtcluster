@@ -13,8 +13,7 @@ Virtcluster boot and os images
 %install
 %virtcluster_rm_br
 %virtcluster_host_p
-%virtcluster_host_provision_p
-%define virtcluster_image_dir %{virtcluster_host_provision_dir}/images/
+%define virtcluster_image_dir %{virtcluster_host_dir}/images/
 mkdir -p %{virtcluster_image_dir}
 
 cp ./images/manifest %{virtcluster_image_dir}
@@ -25,6 +24,6 @@ cp ./images/virtcluster-image-*.tgz %{virtcluster_image_dir}
 
 %files
 %virtcluster_host_scripts_perm
-%{_hostprovisiondir}/images/manifest
-%{_hostprovisiondir}/images/virtcluster-image-*.tgz
+%{_hostdir}/images/manifest
+%{_hostdir}/images/virtcluster-image-*.tgz
 

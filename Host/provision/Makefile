@@ -10,6 +10,7 @@ vpath %.c $(SRC_DIR)
 
 PROVISION_RPM = $(RPM_DIR)/provision*.rpm
 
+.PHONY:provision
 provision:../../inc/scripts/py/cli_fmwk.py ../../inc/scripts/py/common.py
 	cp ../../inc/scripts/py/cli_fmwk.py ./common/cli_fmwk.py
 	cp ../../inc/scripts/py/common.py ./common/common.py
