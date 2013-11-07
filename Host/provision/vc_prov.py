@@ -1,9 +1,7 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
-from provision import py_libvirt
-from common import cli_fmwk
 from common import common
+from common import cli_fmwk
+from provision import py_libvirt
 import inspect
 
 class provCLI(cli_fmwk.VCCli):
