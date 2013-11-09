@@ -5,6 +5,7 @@ from common import common
 from common import cli_fmwk
 from provision import py_libvirt
 import inspect
+import string
 
 class provCLI(cli_fmwk.VCCli):
     def __init__(self):
@@ -39,7 +40,7 @@ class provCLI(cli_fmwk.VCCli):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
 
-        comp_type=cli_fmwk.VCCli._autocomp(self, self.def_comp_lst, text)
+        comp_type=cli_fmwk.VCCli._autocomp(self, ['domain'], text)
 
         args=line.split()
         if len(args) == 2 and line[-1] == ' ':
@@ -53,7 +54,7 @@ class provCLI(cli_fmwk.VCCli):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
 
-        comp_type=cli_fmwk.VCCli._autocomp(self, self.def_comp_lst, text)
+        comp_type=cli_fmwk.VCCli._autocomp(self, ['network'], text)
 
         args=line.split()
         if len(args) == 2 and line[-1] == ' ':
@@ -66,7 +67,7 @@ class provCLI(cli_fmwk.VCCli):
     def do_domain(self, args):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
-        dom_cli=provCLI_domain()
+        dom_cli=provCLI_domain(self._con)
         dom_cli.cmdloop()
 
     def help_domain(self):
@@ -77,7 +78,7 @@ class provCLI(cli_fmwk.VCCli):
     def do_network(self, args):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
-        nwk_cli=provCLI_network()
+        nwk_cli=provCLI_network(self._con)
         nwk_cli.cmdloop()
 
     def help_network(self):
@@ -102,7 +103,8 @@ class provCLI(cli_fmwk.VCCli):
             if not dom:
                 print("Domain not defined")
                 return
-            py_libvirt.info_domain(dom)
+            s=py_libvirt.info_domain(dom)
+            print(s)
         else:
             print("Enter domain")
             return
@@ -120,8 +122,9 @@ class provCLI(cli_fmwk.VCCli):
     def do_list(self, args):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
-        py_libvirt.list_domains(self._con)
-
+        s = py_libvirt.list_domains(self._con)
+        print (s)
+        #network
     def help_list(self):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
@@ -144,14 +147,16 @@ class provCLI(cli_fmwk.VCCli):
             if not dom:
                 print("Domain not defined")
                 return
-            py_libvirt.dumpxml_domain(dom)
+            s = py_libvirt.dumpxml_domain(dom)
+            print(s)
         elif comp_type==['network']:
             nwk_name=arg_lst[1]
             nwk = py_libvirt.network_lookup(self._con, nwk_name)
             if not nwk:
                 print("Network not defined")
                 return
-            py_libvirt.dumpxml_network(nwk)
+            s=py_libvirt.dumpxml_network(nwk)
+            print(s)
         else:
             print("Enter either domain or network")
             return
@@ -170,12 +175,13 @@ class provCLI(cli_fmwk.VCCli):
         return self._complete_nwk_dom(text, line, begidx, endidx)
 
 class provCLI_domain(cli_fmwk.VCCli):
-    def __init__(self):
+    def __init__(self, con):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
         cli_fmwk.VCCli.__init__(self, intro="Domain subcommands")
         self.prompt = self.prompt[:-1]+':Domain)'
         self.def_comp_lst=['domain']
+        self._con = con
 
     def _complete_dom(self, text, line, begidx, endidx):
         common.log(common.debug,
@@ -191,19 +197,58 @@ class provCLI_domain(cli_fmwk.VCCli):
                 comp_type=['']
         return comp_type
 
+    def _dom_xml_comp(self, val):
+        xml="\
+            <domain type='kvm'>\
+              <name>$domain</name>\
+              <memory unit='KiB'>$memory</memory>\
+              <currentMemory unit='KiB'>$memory</currentMemory>\
+              <vcpu placement='static'>$vcpu</vcpu>\
+              <os>\
+                <type arch='$arch' machine='pc-1.1'>hvm</type>\
+                <kernel>$kernel</kernel>\
+                <cmdline>vga=0 root=/dev/hda</cmdline>\
+                <boot dev='hd'/>\
+              </os>\
+              <clock offset='utc'/>\
+              <on_poweroff>destroy</on_poweroff>\
+              <on_reboot>restart</on_reboot>\
+              <on_crash>destroy</on_crash>\
+              <devices>\
+                <emulator>/usr/bin/kvm</emulator>\
+                <disk type='file' device='disk'>\
+                  <driver name='qemu' type='raw'/>\
+                  <source file='$rootfs'/>\
+                  <target dev='hda' bus='ide'/>\
+                </disk>\
+                <interface type='network'>\
+                  <mac address='$fab0_nic_mac'/>\
+                  <source network='virtcluster_fabric0'/>\
+                  <target dev='vfab0'/>\
+                  <model type='virtio'/>\
+                </interface>\
+                <graphics type='vnc' port='5900' autoport='yes'/>\
+              </devices>\
+              <seclabel type='none'/>\
+            </domain>\
+"
+        xmlT=""
+        try:
+            xmlT=string.Template(xml).substitute(val)
+        except Exception as E:
+            print("Invalid arguments")
+        return xmlT
+
     def do_define(self, args):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
 
         arg_lst=args.split()
-        if len(arg_lst) != 2:
-            self.help_define()
-            return
+        arg_d = dict(zip(arg_lst[::2], [arg_lst[i]
+                                        for i in range(1, len(arg_lst), 2)]))
 
-        comp_type=cli_fmwk.VCCli._autocomp(self, self.def_comp_lst, arg_lst[0])
-
-        if comp_type==['domain']:
-            dom_name=arg_lst[1]
+        dom_name=arg_d['domain']
+        if dom_name:
             dom = py_libvirt.dom_lookup(self._con, dom_name)
             if dom:
                 print("Domain already defined")
@@ -211,6 +256,9 @@ class provCLI_domain(cli_fmwk.VCCli):
         else:
             print("Enter domain ")
             return
+
+        xml = self._dom_xml_comp(arg_d)
+        dom = py_libvirt.dom_defineXML(self._con, xml)
 
     def help_define(self):
         common.log(common.debug,
@@ -415,12 +463,13 @@ class provCLI_domain(cli_fmwk.VCCli):
         return self._complete_dom(text, line, begidx, endidx)
 
 class provCLI_network(cli_fmwk.VCCli):
-    def __init__(self):
+    def __init__(self, con):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
         cli_fmwk.VCCli.__init__(self, intro="Network subcommands")
         self.prompt = self.prompt[:-1]+':Network)'
         self.def_comp_lst=['network']
+        self._con = con
 
     def _complete_network(self, text, line, begidx, endidx):
         common.log(common.debug,
@@ -436,27 +485,46 @@ class provCLI_network(cli_fmwk.VCCli):
                 comp_type=['']
         return comp_type
 
+    def _nwk_xml_comp(self, val):
+        xml="\
+           <network>\
+             <name>$network</name>\
+             <bridge name='virfab0' stp='on' delay='0' />\
+             <mac address='52:54:00:3E:31:C9'/>\
+             <ip address='192.168.100.1' netmask='255.255.255.0'>\
+               <dhcp>\
+                 <range start='192.168.100.128' end='192.168.100.254' />\
+               </dhcp>\
+             </ip>\
+           </network>\
+"
+        xmlT=""
+        try:
+            xmlT=string.Template(xml).substitute(val)
+        except Exception as E:
+            print("Invalid arguments")
+        return xmlT
+
     def do_define(self, args):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
 
         arg_lst=args.split()
-        if len(arg_lst) != 2:
-            self.help_define()
-            return
+        arg_d = dict(zip(arg_lst[::2], [arg_lst[i]
+                                        for i in range(1, len(arg_lst), 2)]))
 
-        comp_type=cli_fmwk.VCCli._autocomp(self, self.def_comp_lst, arg_lst[0])
-
-        if comp_type==['network']:
+        nwk_name = arg_d['network']
+        if nwk_name:
             nwk_name=arg_lst[1]
             nwk = py_libvirt.network_lookup(self._con, nwk_name)
             if nwk:
                 print("Network already defined")
                 return
-            nwk = py_libvirt.network_defineXML(self._con, None)
         else:
             print("Enter network")
             return
+        xml = self._nwk_xml_comp(arg_d)
+        nwk = py_libvirt.network_defineXML(self._con, xml)
 
     def help_define(self):
         common.log(common.debug,
@@ -570,6 +638,3 @@ if __name__=='__main__':
 
     prov_cmd=provCLI()
     prov_cmd.cmdloop()
-
-#    name = 'x86vm'
-#    nwk_name = 'virtcluster_fabric0'

@@ -2,6 +2,7 @@
 import common
 import readline
 import cmd
+import sys
 
 class VCCli(cmd.Cmd):
       def __init__(self, intro="virtcluster", prompt="(vc)"):
@@ -11,13 +12,15 @@ class VCCli(cmd.Cmd):
             self.doc_header="virtcluster commands (type help <topic>):"
       def emptyline(self):
             pass
-      def do_EOF(self, args):
+      def do_end(self, args):
             return True
-      def help_EOF(self, args):
-            return True
+      def help_end(self, args):
+            print("End session")
+      do_EOF = do_end
+      help_EOF = help_end
       def do_quit(self, args):
             return True
       def help_quit(self, args):
-            return True
+            print("Quit session")
       def _autocomp(self, lst, text):
             return [i for i in lst if i.startswith(text)]

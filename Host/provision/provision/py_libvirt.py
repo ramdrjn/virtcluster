@@ -204,10 +204,8 @@ def network_stop(nwk):
 '''     Network utils'''
 def dumpxml_network(nwk):
     if not _validate_nwk(nwk):
-        return False
-    _debug("\nNetwork xml")
-    _debug(nwk.XMLDesc(0))
-    return True
+        return ""
+    return ("\nNetwork xml\n"+nwk.XMLDesc(0))
 
 '''               Domain information'''
 
@@ -284,12 +282,9 @@ def dom_pause(dom):
 '''     Domains utils'''
 def list_domains(con):
     if not _validate_con(con):
-        return False
-    _debug("\nRunning domains")
-    _debug(con.listDomainsID())
-    _debug("\nDefined domains")
-    _debug(con.listDefinedDomains())
-    return True
+        return ""
+    return ("\nRunning domains\n" + str(con.listDomainsID()) +
+            "\nDefined domains\n" + str(con.listDefinedDomains()))
 
 state_names = { libvirt.VIR_DOMAIN_RUNNING  : "running",
                 libvirt.VIR_DOMAIN_BLOCKED  : "idle",
@@ -301,28 +296,24 @@ state_names = { libvirt.VIR_DOMAIN_RUNNING  : "running",
 
 def info_domain(dom):
     if not _validate_dom(dom):
-        return False
+        return ""
     try:
         info = dom.info()
-        _debug("\nDomain info")
-        _debug("State: %s"%state_names[info[0]])
-        _debug("Max Memory: %s"%info[1])
-        _debug("Current Memory: %s"%info[2])
-        _debug("Num of Current Vcpu: %s"%info[3])
-        _debug("CPU time: %s"%info[4])
+        return ("\nDomain info\n" +
+                "State: {}\n".format(state_names[info[0]]) +
+                "Max Memory: {}\n".format(info[1]) +
+                "Current Memory: {}\n".format(info[2]) +
+                "Num of Current Vcpu: {}\n".format(info[3]) +
+                "CPU time: {}\n".format(info[4]))
     except libvirt.libvirtError as e:
         _debug(e.get_error_message())
-        return False
-    return True
+        return ""
 
 def dumpxml_domain(dom):
     if not _validate_dom(dom):
-        return False
-    _debug("\nActive domain xml")
-    _debug(dom.XMLDesc(0))
-    _debug("\nInactive domain xml")
-    _debug(dom.XMLDesc(libvirt.VIR_DOMAIN_XML_INACTIVE))
-    return True
+        return ""
+    return ("\nActive domain xml\n" + dom.XMLDesc(0) +
+            "\nInactive domain xml\n" + dom.XMLDesc(libvirt.VIR_DOMAIN_XML_INACTIVE))
 
 '''               Devices'''
 
