@@ -30,8 +30,12 @@ def _validate_nwk(nwk):
 
 '''               Connection info'''
 
+def errorHandler(ctx, err):
+    pass
+
 def _estab_connection():
     conn = libvirt.open("")
+    libvirt.registerErrorHandler(errorHandler, None)
     return conn
 
 def _close_connection(conn):

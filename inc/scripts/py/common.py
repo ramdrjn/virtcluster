@@ -40,5 +40,3 @@ def exec_cmd(cmd, out=None, err=None):
             subprocess.check_call(cmd, stdout=out, stderr=err)
       except subprocess.CalledProcessError as e:
             log(error, "Cmd: {0} returned {1}\n".format(e.cmd, e.returncode))
-
-'''                           CLI Framework                       '''

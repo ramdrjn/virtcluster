@@ -6,6 +6,9 @@ from common import cli_fmwk
 from provision import py_libvirt
 import inspect
 import string
+import os
+import json
+import shutil
 
 class provCLI(cli_fmwk.VCCli):
     def __init__(self):
@@ -223,11 +226,11 @@ class provCLI_domain(cli_fmwk.VCCli):
                 </disk>\
                 <interface type='network'>\
                   <mac address='$fab0_nic_mac'/>\
-                  <source network='virtcluster_fabric0'/>\
-                  <target dev='vfab0'/>\
+                  <source network='$fab0_net_name'/>\
+                  <target dev='$fab0_net_dev'/>\
                   <model type='virtio'/>\
                 </interface>\
-                <graphics type='vnc' port='5900' autoport='yes'/>\
+                <graphics type='vnc' port='$vnc_port' autoport='yes'/>\
               </devices>\
               <seclabel type='none'/>\
             </domain>\
@@ -256,6 +259,26 @@ class provCLI_domain(cli_fmwk.VCCli):
         else:
             print("Enter domain ")
             return
+
+        img_name=arg_d['image']
+        if img_name:
+            img_dir="provisioned_domain/{}/images".format(dom_name)
+            os.makedirs(img_dir)
+            img_tgz=os.path.join("./images",
+                                 "virtcluster-image-{}.tgz".format(img_name))
+            common.exec_cmd(["tar", "zxvf", img_tgz, "-C", img_dir])
+        else:
+            print("Enter Image")
+            return
+
+        img_dir=os.path.join(os.getcwd(),
+                  "provisioned_domain/{}/images/{}".format(dom_name, img_name))
+
+        with open(os.path.join(img_dir,"manifest")) as infile:
+            img_desc = json.load(infile)
+
+        arg_d['kernel']=os.path.join(img_dir, img_desc['kernel'])
+        arg_d['rootfs']=os.path.join(img_dir, img_desc['fs_raw'])
 
         xml = self._dom_xml_comp(arg_d)
         dom = py_libvirt.dom_defineXML(self._con, xml)
@@ -289,7 +312,7 @@ class provCLI_domain(cli_fmwk.VCCli):
                 return
             dom = py_libvirt.dom_undefine(dom)
         else:
-            print("Enter network")
+            print("Enter domain")
             return
 
     def help_undefine(self):
@@ -301,6 +324,40 @@ class provCLI_domain(cli_fmwk.VCCli):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
         return self._complete_nwk_dom(text, line, begidx, endidx)
+
+    def do_purge(self, args):
+        common.log(common.debug,
+                   "In Function {0}".format(inspect.stack()[0][3]))
+
+        arg_lst=args.split()
+        if len(arg_lst) != 2:
+            self.help_purge()
+            return
+
+        comp_type=cli_fmwk.VCCli._autocomp(self, self.def_comp_lst, arg_lst[0])
+
+        if comp_type==['domain']:
+            dom_name=arg_lst[1]
+            dom = py_libvirt.dom_lookup(self._con, dom_name)
+            if not dom:
+                shutil.rmtree(os.path.join("provisioned_domain", dom_name),
+                              True)
+            else:
+                print("Domain still defined")
+                return
+        else:
+            print("Enter network")
+            return
+
+    def help_purge(self):
+        common.log(common.debug,
+                   "In Function {0}".format(inspect.stack()[0][3]))
+        print("     Purge domain <domain name>    ")
+
+    def complete_purge(self, text, line, begidx, endidx):
+        common.log(common.debug,
+                   "In Function {0}".format(inspect.stack()[0][3]))
+        return self._complete_dom(text, line, begidx, endidx)
 
     def do_start(self, args):
         common.log(common.debug,
@@ -489,7 +546,7 @@ class provCLI_network(cli_fmwk.VCCli):
         xml="\
            <network>\
              <name>$network</name>\
-             <bridge name='virfab0' stp='on' delay='0' />\
+             <bridge name='$brname' stp='on' delay='0' />\
              <mac address='52:54:00:3E:31:C9'/>\
              <ip address='192.168.100.1' netmask='255.255.255.0'>\
                <dhcp>\
@@ -635,6 +692,11 @@ class provCLI_network(cli_fmwk.VCCli):
 
 if __name__=='__main__':
 #    common.set_debug_lvl(common.debug)
+
+    try:
+        os.mkdir("provisioned_domain")
+    except OSError:
+        pass
 
     prov_cmd=provCLI()
     prov_cmd.cmdloop()

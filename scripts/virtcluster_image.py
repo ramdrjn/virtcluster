@@ -28,14 +28,21 @@ def prep_dir(image_prep_dir, cwd, log_f):
             target_desc = json.load(infile)
       manifest=os.path.join(image_prep_dir, "manifest")
       f=open(manifest, 'w')
+      f.write("{\n")
       for t in ["device_file", "fs_raw", "fs_tar", "initramfs", "initrd", "modules", "bootloader", "kernel"]:
             t_file=target_desc[t]
             if t_file:
                   try:
                         shutil.copy(t_file, image_prep_dir)
-                        f.write("{0}:{1}\n".format(t,t_file))
+                        f.write("\"{0}\":\"{1}\"".format(t,
+                                                 t_file[t_file.rfind("/")+1:]))
+                        if t=="kernel":
+                              f.write("\n")
+                        else:
+                              f.write(",\n")
                   except IOError:
                         common.log(common.error, "Skipping file: {0}".format(t_file))
+      f.write("}")
       f.close()
 
 def pack_image(image_prep_dir, image_dir, tar_name, log_f):
