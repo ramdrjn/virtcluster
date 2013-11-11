@@ -26,7 +26,8 @@ STATIC_LIB_DIR := $(LIB_DIR)/static
 INC_DIR := ./inc
 SRC_DIR := ./src
 BLD_DIR := ./bld
-RPM_DIR := ./bld/rpm/$(ARCH)
+_RPM_DIR := ./bld/rpm
+RPM_DIR := $(_RPM_DIR)/$(ARCH)
 COM_INC_DIR := $(CURR_DIR)/src/com_inc
 COM_LIB_DIR := $(CURR_DIR)/src/com_lib
 CONFIG_DIR := $(CURR_DIR)/conf
@@ -69,8 +70,13 @@ endif
 %.exe:
 	$(LINK.exe) $^ $(LIBS) $(OUTPUT.exe)
 
+RPM_TARGET := $(OVERRIDE_RPM_TARGET)
+ifndef RPM_TARGET
+	RPM_TARGET := $(ARCH)-vc-linux
+endif
+
 %.rpm:
-	rpmbuild --target $(ARCH) -bb $(BLD_DIR)/rpm.spec
+	rpmbuild --target=$(RPM_TARGET) -bb $(BLD_DIR)/rpm.spec
 
 .PHONY:clean
 clean:
@@ -86,7 +92,7 @@ cleanall:
 	rm -vf $(BIN_DIR)/*.exe
 	rm -vf $(LIB_DIR)/*.so
 	rm -vf $(STATIC_LIB_DIR)/*.a
-	rm -vf $(RPM_DIR)/*.rpm
+	rm -vrf $(_RPM_DIR)/*
 	rm -vf $(OBJ_DIR)/*.gcno
 	rm -vf $(OBJ_DIR)/*.gcda
 	rm -vf $(OBJ_DIR)/*.sa

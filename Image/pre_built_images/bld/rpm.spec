@@ -6,6 +6,7 @@ Version: 1.0
 Release: 1
 Summary: Virtcluster boot images
 License: license.txt
+AutoReq:no
 
 %description
 Virtcluster boot and os images

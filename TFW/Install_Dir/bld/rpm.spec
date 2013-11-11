@@ -6,6 +6,7 @@ Version: 1.0
 Release: 1
 Summary: Test binaries
 License: license.txt
+AutoReq:no
 
 %description
 Test Binaries

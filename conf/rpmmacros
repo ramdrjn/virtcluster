@@ -9,6 +9,8 @@
 %_buildrootdir %{_topdir}/rpmbuild
 %buildroot %{_buildrootdir}/%{name}-%{version}-%{release}
 
+%vendor vc
+
 #binary packages path
 %_libdir /usr/lib
 %_testbindir /usr/local/bin

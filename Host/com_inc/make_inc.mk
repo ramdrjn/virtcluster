@@ -6,5 +6,6 @@ include $(CURR_DIR)/inc/make_inc.mk
 #Overwrite host architecture
 ARCH := $(HOST_ARCH)
 RPM_DIR := ./bld/rpm/$(ARCH)
+RPM_TARGET := $(ARCH)-vc-linux
 
 #############################################################################

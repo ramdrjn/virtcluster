@@ -1,3 +1,4 @@
-TFW/Install_Dir/bld/rpm/x86/test_bin-1.0-1.x86.rpm
-src/utLib/bld/rpm/x86/utLib-1.0-1.x86.rpm
-Image/pre_built_images/bld/rpm/x86/virtcluster-image-1.0-1.x86.rpm
+TFW/Install_Dir/bld/rpm/i586/test_bin-1.0-1.i586.rpm
+Image/pre_built_images/bld/rpm/i586/virtcluster-image-1.0-1.i586.rpm
+src/utLib/bld/rpm/i586/utLib-1.0-1.i586.rpm
+
