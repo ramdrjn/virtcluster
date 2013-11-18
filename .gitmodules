@@ -1,6 +1,0 @@
-[submodule "Image/virtcluster-images"]
-	path = Image/virtcluster-images
-	url = https://github.com/plasmixs/virtcluster-images.git
-[submodule "TFW/TestGenerator/TestAuto_Mate"]
-	path = TFW/TestGenerator/TestAuto_Mate
-	url = https://github.com/plasmixs/TestAuto_Mate.git
