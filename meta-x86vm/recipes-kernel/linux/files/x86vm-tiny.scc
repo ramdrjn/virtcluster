@@ -1,0 +1,7 @@
+define KMACHINE x86vm
+define KTYPE tiny
+define KARCH i386
+
+include ktypes/tiny/tiny.scc
+
+include x86vm.scc

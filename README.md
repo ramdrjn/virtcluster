@@ -3,8 +3,6 @@ vcluster
 
 Virtual Clusters
 
-
-
 License
 ========
 
