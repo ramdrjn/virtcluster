@@ -42,7 +42,7 @@ SCRIPTS_DIR := $(CURR_DIR)/scripts
 OF_CMD := find . -iname "*.c" -exec basename {} \;|xargs
 
 COMPILE.o = $(CC) $(CFLAGS) $(INCLUDE) $(DEFINES) -MMD -MT $@ -c
-LINK.exe = $(LD) $(LFLAGS) $(INCLUDE) $(DEFINES)
+LINK.exe = $(CC) $(LFLAGS) $(INCLUDE) $(DEFINES)
 OUTPUT.o = -o $@
 OUTPUT.exe = -o $@
 LIB.so = $(LD) $(LFLAGS) $(SH_LIB_LFLAGS) $(DEFINES)
