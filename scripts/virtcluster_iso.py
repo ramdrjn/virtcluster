@@ -47,6 +47,18 @@ def prep_host_dir(iso_dir, arch, rpm_lst, cwd):
                   except IOError:
                         common.log(common.error, "Skipping file: {0}".format(rpmf))
 
+def prep_host_scripts(iso_dir, cwd):
+      common.log(common.debug,
+                 "In Function {0}".format(inspect.stack()[0][3]))
+      for f in ["inc/scripts/py/common.py", "scripts/install_iso.py"]:
+            scriptf=os.path.join(cwd, f)
+            common.log(common.debug, "script file: {0}".format(scriptf))
+            try:
+                  shutil.copy(scriptf, iso_dir)
+            except IOError:
+                  common.log(common.error,"Skipping file: {0}".format(scriptf))
+      common.log(common.debug, "Install scripts copied to ISO dir")
+
 def make_iso(iso_dir, iso_name, op_log):
       common.log(common.debug,
                  "In Function {0}".format(inspect.stack()[0][3]))
@@ -94,5 +106,6 @@ def gen_iso(cwd):
       prep(ISO_GEN_DIR)
       prep_dir(ISO_GEN_DIR, ARCH, RPM_LST, currdir)
       prep_host_dir(ISO_GEN_DIR, host_arch, host_rpm_lst, currdir)
+      prep_host_scripts(ISO_GEN_DIR, currdir)
       make_iso(ISO_GEN_DIR, ISO_NAME, RES_OP)
       cleanup(ISO_GEN_DIR)
