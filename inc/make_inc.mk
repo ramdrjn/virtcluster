@@ -8,18 +8,14 @@ CFLAGS := $(CFLAGS)\
 	 -Wall -Wextra -Wswitch-enum -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations\
 	 $(DEBUG_FLAG) $(PROD_FLAG) $(GCONF_FLAGS) $(GPROF_FLAGS)
 
-ifeq ($(LD),gcc)
-	LFLAGS := $(LFLAGS)\
+LFLAGS := $(LFLAGS) $(LDFLAGS)\
 	 -Wall -Wextra -Wswitch-enum -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations\
 	 $(DEBUG_FLAG) $(PROD_FLAG)
-else
-	LFLAGS := $(DEBUG_FLAG) $(PROD_FLAG)
-	LIBS = -lc --entry main
-endif
 
 SH_LIB_CFLAGS := -fPIC
 SH_LIB_LFLAGS := -shared
 
+LD := $(CC)
 ARFLAGS := cr
 OBJ_DIR := ./obj
 BIN_DIR := ./bin
