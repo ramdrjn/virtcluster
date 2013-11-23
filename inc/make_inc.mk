@@ -9,7 +9,9 @@ CFLAGS := $(CFLAGS)\
 	 $(DEBUG_FLAG) $(PROD_FLAG) $(GCONF_FLAGS) $(GPROF_FLAGS)
 
 ifeq ($(LD),gcc)
-	LFLAGS := $(LFLAGS) -Wall -Wextra -Wswitch-enum -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations $(DEBUG_FLAG) $(PROD_FLAG)
+	LFLAGS := $(LFLAGS)\
+	 -Wall -Wextra -Wswitch-enum -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations\
+	 $(DEBUG_FLAG) $(PROD_FLAG)
 else
 	LFLAGS := $(DEBUG_FLAG) $(PROD_FLAG)
 	LIBS = -lc --entry main
