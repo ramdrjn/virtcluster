@@ -89,6 +89,17 @@ class provCLI(cli_fmwk.VCCli):
                    "In Function {0}".format(inspect.stack()[0][3]))
         print("     Network subcommands    ")
 
+    def do_commision(self, args):
+        common.log(common.debug,
+                   "In Function {0}".format(inspect.stack()[0][3]))
+        com_cli=provCLI_commision(self._con)
+        com_cli.cmdloop()
+
+    def help_commision(self):
+        common.log(common.debug,
+                   "In Function {0}".format(inspect.stack()[0][3]))
+        print("     Commisioning subcommands    ")
+
     def do_info(self, args):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
@@ -657,6 +668,47 @@ class provCLI_network(cli_fmwk.VCCli):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
         return self._complete_network(text, line, begidx, endidx)
+
+    def do_stop(self, args):
+        common.log(common.debug,
+                   "In Function {0}".format(inspect.stack()[0][3]))
+
+        arg_lst=args.split()
+        if len(arg_lst) != 2:
+            self.help_stop()
+            return
+
+        comp_type=cli_fmwk.VCCli._autocomp(self, self.def_comp_lst, arg_lst[0])
+
+        if comp_type==['network']:
+            nwk_name=arg_lst[1]
+            nwk = py_libvirt.network_lookup(self._con, nwk_name)
+            if not nwk:
+                print("Network not defined")
+                return
+            py_libvirt.network_stop(nwk)
+        else:
+            print("Enter network")
+            return
+
+    def help_stop(self):
+        common.log(common.debug,
+                   "In Function {0}".format(inspect.stack()[0][3]))
+        print("     Stop network <network name>  ")
+
+    def complete_stop(self, text, line, begidx, endidx):
+        common.log(common.debug,
+                   "In Function {0}".format(inspect.stack()[0][3]))
+        return self._complete_network(text, line, begidx, endidx)
+
+class provCLI_commision(cli_fmwk.VCCli):
+    def __init__(self, con):
+        common.log(common.debug,
+                   "In Function {0}".format(inspect.stack()[0][3]))
+        cli_fmwk.VCCli.__init__(self, intro="Commision subcommands")
+        self.prompt = self.prompt[:-1]+':Commision)'
+        self.def_comp_lst=['commision']
+        self._con = con
 
     def do_stop(self, args):
         common.log(common.debug,
