@@ -55,7 +55,8 @@ def main():
       prep()
       install_host_rpm()
       install_images()
-      repo_setup()
+      if local_repo:
+            repo_setup()
       cleanup()
 
 if __name__=='__main__':

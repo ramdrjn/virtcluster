@@ -4,6 +4,7 @@
 from common import common
 from common import cli_fmwk
 from provision import py_libvirt
+from provision import vc_commision
 import inspect
 import string
 import os
@@ -707,16 +708,16 @@ class provCLI_commision(cli_fmwk.VCCli):
                    "In Function {0}".format(inspect.stack()[0][3]))
         cli_fmwk.VCCli.__init__(self, intro="Commision subcommands")
         self.prompt = self.prompt[:-1]+':Commision)'
-        self.def_comp_lst=['commision']
+        self.def_comp_lst=['domain']
         self._con = con
 
-    def do_stop(self, args):
+    def do_start(self, args):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
 
         arg_lst=args.split()
         if len(arg_lst) != 2:
-            self.help_stop()
+            self.help_start()
             return
 
         comp_type=cli_fmwk.VCCli._autocomp(self, self.def_comp_lst, arg_lst[0])
