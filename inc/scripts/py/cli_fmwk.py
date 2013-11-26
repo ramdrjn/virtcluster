@@ -4,6 +4,9 @@ import readline
 import cmd
 import sys
 
+def autocomp(lst, text):
+      return [i for i in lst if i.startswith(text)]
+
 class VCCli(cmd.Cmd):
       def __init__(self, intro="virtcluster", prompt="(vc)"):
             cmd.Cmd.__init__(self)
@@ -22,5 +25,3 @@ class VCCli(cmd.Cmd):
             return True
       def help_quit(self, args):
             print("Quit session")
-      def _autocomp(self, lst, text):
-            return [i for i in lst if i.startswith(text)]

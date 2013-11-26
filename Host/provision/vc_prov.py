@@ -11,6 +11,51 @@ import os
 import json
 import shutil
 
+def complete_dom(text, line, begidx, endidx):
+    common.log(common.debug,
+               "In Function {0}".format(inspect.stack()[0][3]))
+
+    comp_type=cli_fmwk.autocomp(['domain'], text)
+
+    args=line.split()
+    if len(args) == 2 and line[-1] == ' ':
+        #Second level.
+        if args[1]=='domain':
+            print("<domain name>")
+            comp_type=['']
+    return comp_type
+
+def complete_network(text, line, begidx, endidx):
+    common.log(common.debug,
+               "In Function {0}".format(inspect.stack()[0][3]))
+
+    comp_type=cli_fmwk.autocomp(['network'], text)
+
+    args=line.split()
+    if len(args) == 2 and line[-1] == ' ':
+        #Second level.
+        if args[1]=='network':
+            print("<network name>")
+            comp_type=['']
+    return comp_type
+
+def complete_nwk_dom(text, line, begidx, endidx):
+    common.log(common.debug,
+               "In Function {0}".format(inspect.stack()[0][3]))
+
+    comp_type=cli_fmwk.autocomp(['domain', 'network'], text)
+
+    args=line.split()
+    if len(args) == 2 and line[-1] == ' ':
+        #Second level.
+        if args[1]=='domain':
+            print("<domain name>")
+            comp_type=['']
+        if args[1]=='network':
+            print("<network name>")
+            comp_type=['']
+    return comp_type
+
 class provCLI(cli_fmwk.VCCli):
     def __init__(self):
         common.log(common.debug,
@@ -22,51 +67,6 @@ class provCLI(cli_fmwk.VCCli):
         py_libvirt.con_fin(self._con)
     def preloop(self):
         self._con = py_libvirt.con_init()
-
-    def _complete_nwk_dom(self, text, line, begidx, endidx):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
-
-        comp_type=cli_fmwk.VCCli._autocomp(self, self.def_comp_lst, text)
-
-        args=line.split()
-        if len(args) == 2 and line[-1] == ' ':
-            #Second level.
-            if args[1]=='domain':
-                print("<domain name>")
-                comp_type=['']
-            if args[1]=='network':
-                print("<network name>")
-                comp_type=['']
-        return comp_type
-
-    def _complete_dom(self, text, line, begidx, endidx):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
-
-        comp_type=cli_fmwk.VCCli._autocomp(self, ['domain'], text)
-
-        args=line.split()
-        if len(args) == 2 and line[-1] == ' ':
-            #Second level.
-            if args[1]=='domain':
-                print("<domain name>")
-                comp_type=['']
-        return comp_type
-
-    def _complete_network(self, text, line, begidx, endidx):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
-
-        comp_type=cli_fmwk.VCCli._autocomp(self, ['network'], text)
-
-        args=line.split()
-        if len(args) == 2 and line[-1] == ' ':
-            #Second level.
-            if args[1]=='network':
-                print("<network name>")
-                comp_type=['']
-        return comp_type
 
     def do_domain(self, args):
         common.log(common.debug,
@@ -110,7 +110,7 @@ class provCLI(cli_fmwk.VCCli):
             self.help_info()
             return
 
-        comp_type=cli_fmwk.VCCli._autocomp(self, ['domain'], arg_lst[0])
+        comp_type=cli_fmwk.autocomp(['domain'], arg_lst[0])
 
         if comp_type==['domain']:
             dom_name=arg_lst[1]
@@ -132,7 +132,7 @@ class provCLI(cli_fmwk.VCCli):
     def complete_info(self, text, line, begidx, endidx):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
-        return self._complete_dom(text, line, begidx, endidx)
+        return complete_dom(text, line, begidx, endidx)
 
     def do_list(self, args):
         common.log(common.debug,
@@ -154,7 +154,7 @@ class provCLI(cli_fmwk.VCCli):
             self.help_dumpxml()
             return
 
-        comp_type=cli_fmwk.VCCli._autocomp(self, self.def_comp_lst, arg_lst[0])
+        comp_type=cli_fmwk.autocomp(self.def_comp_lst, arg_lst[0])
 
         if comp_type==['domain']:
             dom_name=arg_lst[1]
@@ -187,7 +187,7 @@ class provCLI(cli_fmwk.VCCli):
     def complete_dumpxml(self, text, line, begidx, endidx):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
-        return self._complete_nwk_dom(text, line, begidx, endidx)
+        return complete_nwk_dom(text, line, begidx, endidx)
 
 class provCLI_domain(cli_fmwk.VCCli):
     def __init__(self, con):
@@ -197,20 +197,6 @@ class provCLI_domain(cli_fmwk.VCCli):
         self.prompt = self.prompt[:-1]+':Domain)'
         self.def_comp_lst=['domain']
         self._con = con
-
-    def _complete_dom(self, text, line, begidx, endidx):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
-
-        comp_type=cli_fmwk.VCCli._autocomp(self, self.def_comp_lst, text)
-
-        args=line.split()
-        if len(args) == 2 and line[-1] == ' ':
-            #Second level.
-            if args[1]=='domain':
-                print("<domain name>")
-                comp_type=['']
-        return comp_type
 
     def _dom_xml_comp(self, val):
         xml="\
@@ -303,7 +289,7 @@ class provCLI_domain(cli_fmwk.VCCli):
     def complete_define(self, text, line, begidx, endidx):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
-        return self._complete_dom(text, line, begidx, endidx)
+        return complete_dom(text, line, begidx, endidx)
 
     def do_undefine(self, args):
         common.log(common.debug,
@@ -314,7 +300,7 @@ class provCLI_domain(cli_fmwk.VCCli):
             self.help_undefine()
             return
 
-        comp_type=cli_fmwk.VCCli._autocomp(self, self.def_comp_lst, arg_lst[0])
+        comp_type=cli_fmwk.autocomp(self.def_comp_lst, arg_lst[0])
 
         if comp_type==['domain']:
             dom_name=arg_lst[1]
@@ -335,7 +321,7 @@ class provCLI_domain(cli_fmwk.VCCli):
     def complete_undefine(self, text, line, begidx, endidx):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
-        return self._complete_nwk_dom(text, line, begidx, endidx)
+        return complete_nwk_dom(text, line, begidx, endidx)
 
     def do_purge(self, args):
         common.log(common.debug,
@@ -346,7 +332,7 @@ class provCLI_domain(cli_fmwk.VCCli):
             self.help_purge()
             return
 
-        comp_type=cli_fmwk.VCCli._autocomp(self, self.def_comp_lst, arg_lst[0])
+        comp_type=cli_fmwk.autocomp(self.def_comp_lst, arg_lst[0])
 
         if comp_type==['domain']:
             dom_name=arg_lst[1]
@@ -369,7 +355,7 @@ class provCLI_domain(cli_fmwk.VCCli):
     def complete_purge(self, text, line, begidx, endidx):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
-        return self._complete_dom(text, line, begidx, endidx)
+        return complete_dom(text, line, begidx, endidx)
 
     def do_start(self, args):
         common.log(common.debug,
@@ -380,7 +366,7 @@ class provCLI_domain(cli_fmwk.VCCli):
             self.help_start()
             return
 
-        comp_type=cli_fmwk.VCCli._autocomp(self, self.def_comp_lst, arg_lst[0])
+        comp_type=cli_fmwk.autocomp(self.def_comp_lst, arg_lst[0])
 
         if comp_type==['domain']:
             dom_name=arg_lst[1]
@@ -401,7 +387,7 @@ class provCLI_domain(cli_fmwk.VCCli):
     def complete_start(self, text, line, begidx, endidx):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
-        return self._complete_nwk_dom(text, line, begidx, endidx)
+        return complete_nwk_dom(text, line, begidx, endidx)
 
     def do_stop(self, args):
         common.log(common.debug,
@@ -412,7 +398,7 @@ class provCLI_domain(cli_fmwk.VCCli):
             self.help_stop()
             return
 
-        comp_type=cli_fmwk.VCCli._autocomp(self, self.def_comp_lst, arg_lst[0])
+        comp_type=cli_fmwk.autocomp(self.def_comp_lst, arg_lst[0])
 
         if comp_type==['domain']:
             dom_name=arg_lst[1]
@@ -433,7 +419,7 @@ class provCLI_domain(cli_fmwk.VCCli):
     def complete_stop(self, text, line, begidx, endidx):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
-        return self._complete_nwk_dom(text, line, begidx, endidx)
+        return complete_nwk_dom(text, line, begidx, endidx)
 
     def do_shut(self, args):
         common.log(common.debug,
@@ -444,7 +430,7 @@ class provCLI_domain(cli_fmwk.VCCli):
             self.help_shut()
             return
 
-        comp_type=cli_fmwk.VCCli._autocomp(self, self.def_comp_lst, arg_lst[0])
+        comp_type=cli_fmwk.autocomp(self.def_comp_lst, arg_lst[0])
 
         if comp_type==['domain']:
             dom_name=arg_lst[1]
@@ -465,7 +451,7 @@ class provCLI_domain(cli_fmwk.VCCli):
     def complete_shut(self, text, line, begidx, endidx):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
-        return self._complete_dom(text, line, begidx, endidx)
+        return complete_dom(text, line, begidx, endidx)
 
     def do_pause(self, args):
         common.log(common.debug,
@@ -476,7 +462,7 @@ class provCLI_domain(cli_fmwk.VCCli):
             self.help_pause()
             return
 
-        comp_type=cli_fmwk.VCCli._autocomp(self, self.def_comp_lst, arg_lst[0])
+        comp_type=cli_fmwk.autocomp(self.def_comp_lst, arg_lst[0])
 
         if comp_type==['domain']:
             dom_name=arg_lst[1]
@@ -497,7 +483,7 @@ class provCLI_domain(cli_fmwk.VCCli):
     def complete_pause(self, text, line, begidx, endidx):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
-        return self._complete_dom(text, line, begidx, endidx)
+        return complete_dom(text, line, begidx, endidx)
 
     def do_resume(self, args):
         common.log(common.debug,
@@ -508,7 +494,7 @@ class provCLI_domain(cli_fmwk.VCCli):
             self.help_resume()
             return
 
-        comp_type=cli_fmwk.VCCli._autocomp(self, self.def_comp_lst, arg_lst[0])
+        comp_type=cli_fmwk.autocomp(self.def_comp_lst, arg_lst[0])
 
         if comp_type==['domain']:
             dom_name=arg_lst[1]
@@ -529,7 +515,7 @@ class provCLI_domain(cli_fmwk.VCCli):
     def complete_resume(self, text, line, begidx, endidx):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
-        return self._complete_dom(text, line, begidx, endidx)
+        return complete_dom(text, line, begidx, endidx)
 
 class provCLI_network(cli_fmwk.VCCli):
     def __init__(self, con):
@@ -539,20 +525,6 @@ class provCLI_network(cli_fmwk.VCCli):
         self.prompt = self.prompt[:-1]+':Network)'
         self.def_comp_lst=['network']
         self._con = con
-
-    def _complete_network(self, text, line, begidx, endidx):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
-
-        comp_type=cli_fmwk.VCCli._autocomp(self, self.def_comp_lst, text)
-
-        args=line.split()
-        if len(args) == 2 and line[-1] == ' ':
-            #Second level.
-            if args[1]=='network':
-                print("<network name>")
-                comp_type=['']
-        return comp_type
 
     def _nwk_xml_comp(self, val):
         xml="\
@@ -604,7 +576,7 @@ class provCLI_network(cli_fmwk.VCCli):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
 
-        return self._complete_network(text, line, begidx, endidx)
+        return complete_network(text, line, begidx, endidx)
 
     def do_undefine(self, args):
         common.log(common.debug,
@@ -615,7 +587,7 @@ class provCLI_network(cli_fmwk.VCCli):
             self.help_undefine()
             return
 
-        comp_type=cli_fmwk.VCCli._autocomp(self, self.def_comp_lst, arg_lst[0])
+        comp_type=cli_fmwk.autocomp(self.def_comp_lst, arg_lst[0])
 
         if comp_type==['network']:
             nwk_name=arg_lst[1]
@@ -636,7 +608,7 @@ class provCLI_network(cli_fmwk.VCCli):
     def complete_undefine(self, text, line, begidx, endidx):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
-        return self._complete_network(text, line, begidx, endidx)
+        return complete_network(text, line, begidx, endidx)
 
     def do_start(self, args):
         common.log(common.debug,
@@ -647,7 +619,7 @@ class provCLI_network(cli_fmwk.VCCli):
             self.help_start()
             return
 
-        comp_type=cli_fmwk.VCCli._autocomp(self, self.def_comp_lst, arg_lst[0])
+        comp_type=cli_fmwk.autocomp(self.def_comp_lst, arg_lst[0])
 
         if comp_type==['network']:
             nwk_name=arg_lst[1]
@@ -668,7 +640,7 @@ class provCLI_network(cli_fmwk.VCCli):
     def complete_start(self, text, line, begidx, endidx):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
-        return self._complete_network(text, line, begidx, endidx)
+        return complete_network(text, line, begidx, endidx)
 
     def do_stop(self, args):
         common.log(common.debug,
@@ -679,7 +651,7 @@ class provCLI_network(cli_fmwk.VCCli):
             self.help_stop()
             return
 
-        comp_type=cli_fmwk.VCCli._autocomp(self, self.def_comp_lst, arg_lst[0])
+        comp_type=cli_fmwk.autocomp(self.def_comp_lst, arg_lst[0])
 
         if comp_type==['network']:
             nwk_name=arg_lst[1]
@@ -700,7 +672,7 @@ class provCLI_network(cli_fmwk.VCCli):
     def complete_stop(self, text, line, begidx, endidx):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
-        return self._complete_network(text, line, begidx, endidx)
+        return complete_network(text, line, begidx, endidx)
 
 class provCLI_commision(cli_fmwk.VCCli):
     def __init__(self, con):
@@ -715,39 +687,26 @@ class provCLI_commision(cli_fmwk.VCCli):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
 
-        arg_lst=args.split()
-        if len(arg_lst) != 2:
-            self.help_start()
-            return
-
-        comp_type=cli_fmwk.VCCli._autocomp(self, self.def_comp_lst, arg_lst[0])
-
-        if comp_type==['network']:
-            nwk_name=arg_lst[1]
-            nwk = py_libvirt.network_lookup(self._con, nwk_name)
-            if not nwk:
-                print("Network not defined")
-                return
-            py_libvirt.network_stop(nwk)
-        else:
-            print("Enter network")
-            return
-
-    def help_stop(self):
+    def help_start(self):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
-        print("     Stop network <network name>  ")
+        print("     Start domain <domain name>  ")
 
     def complete_stop(self, text, line, begidx, endidx):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
-        return self._complete_network(text, line, begidx, endidx)
+        return complete_dom(text, line, begidx, endidx)
 
 if __name__=='__main__':
 #    common.set_debug_lvl(common.debug)
 
     try:
         os.mkdir("provisioned_domain")
+    except OSError:
+        pass
+
+    try:
+        os.mkdir("commisioned_domain")
     except OSError:
         pass
 
