@@ -344,7 +344,7 @@ class provCLI_domain(cli_fmwk.VCCli):
                 print("Domain still defined")
                 return
         else:
-            print("Enter network")
+            print("Enter Domain")
             return
 
     def help_purge(self):
@@ -686,13 +686,32 @@ class provCLI_commision(cli_fmwk.VCCli):
     def do_start(self, args):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
+        arg_lst=args.split()
+        arg_d = dict(zip(arg_lst[::2], [arg_lst[i]
+                                        for i in range(1, len(arg_lst), 2)]))
+        dom_name=arg_d['domain']
+        if dom_name:
+            dom = py_libvirt.dom_lookup(self._con, dom_name)
+            if not dom:
+                print("Domain not defined")
+                return
+            s=py_libvirt.info_domain(dom)
+            if not "State: running" in s:
+                print("Domain not running")
+                return
+        else:
+            print("Enter domain ")
+            return
+
+        comi_dir=os.path.join(os.getcwd(), "commisioned_domain")
+        vc_commision.start(comi_dir, arg_d)
 
     def help_start(self):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
         print("     Start domain <domain name>  ")
 
-    def complete_stop(self, text, line, begidx, endidx):
+    def complete_start(self, text, line, begidx, endidx):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
         return complete_dom(text, line, begidx, endidx)
