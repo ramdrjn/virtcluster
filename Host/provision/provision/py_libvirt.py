@@ -374,3 +374,13 @@ def attach_interface(dom, mac, nwk_name, net_dev_name):
   </interface>\
  ".format(mac, nwk_name, net_dev_name)
     _nhp_set_dev(dom, xml)
+
+'''               Other interfaces'''
+def get_fabric_ip(dom):
+    '''Get the fabric ip address of the domain.
+    two methods.
+    1. dhcp lease files to be examined.
+    2. have mechanism to map domain to ip.
+    1. could be via dhcp/dnc pair.
+    3. Lookout for arp cache and determine ip.'''
+    return (('192.168.100.134','ip'))

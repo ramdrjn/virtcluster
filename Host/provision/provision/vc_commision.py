@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from common import common
+from provision import py_libvirt
+
 import inspect
 import os
 
@@ -10,7 +12,9 @@ def _prep_commision(dat_dir, fname):
         f.write("Initiated")
     key_fname = os.path.join(dat_dir, "host_key")
     common.exec_cmd(["ssh-keygen", "-P", "", "-f", key_fname])
-    return (0, "success")
+    with open(fname, "w") as f:
+        f.write("Done")
+    return ((0, "success"))
 
 def _check_commision_prep(comi_dir):
     dat_dir = os.path.join(comi_dir, "dat")
@@ -24,32 +28,49 @@ def _check_commision_prep(comi_dir):
     if not os.path.isfile(fname):
         prep_status=_prep_commision(dat_dir, fname)
 
+    if prep_status[0] != 0:
+        return prep_status
+
     state="Done"
     with open(fname) as f:
         state=f.readline()
 
     if state != "Initiated":
         if state != "Done":
-            return (-1, "commision.dat state not valid")
+            return ((-1, "commision.dat state not valid"))
 
-    return (0, "success")
+    return ((0, "success"))
 
-def _do_ssh_config(domain_dir):
-    pass
+def _do_ssh_config(domain_dir, ip_host):
+    print ip_host
+
+
+def _do_ssh_linkup(ip_host):
+    ip=ip_host[0]
+    common.exec_cmd(["ssh-keygen", "-P", "", "-f", key_fname])
+
 def start(comi_dir, arg_d):
     common.log(common.debug,
                "In Function {0}".format(inspect.stack()[0][3]))
     ck_status = _check_commision_prep(comi_dir)
+    if ck_status[0] != 0:
+        return ck_status
 
     #Proceed with domain specific commision processing.
+    ip_host=py_libvirt.get_fabric_ip(arg_d['domain'])
+
+    lk_status=_do_ssh_linkup(ip_host)
+    if lk_status[0] != 0:
+        return lk_status
 
     domain_dir = os.path.join(comi_dir, arg_d['domain'])
     try:
         os.mkdir(domain_dir)
     except OSError:
-        return (-1, "Unable to create domain directory")
+        return ((-1, "Unable to create domain directory"))
 
-    _do_ssh_config(domain_dir)
+    _do_ssh_config(domain_dir, ip_host)
 
     print arg_d
     print ck_status
+    return ((0, "success"))
