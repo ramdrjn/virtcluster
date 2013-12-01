@@ -51,7 +51,9 @@ def _do_ssh_linkup(known_host_fname, id_fname, ip_host):
                      "-o", "UserKnownHostsFile={0}".format(known_host_fname),
                      "-o", "StrictHostKeyChecking=no",
                      "-i", id_fname,
-                     ip])
+                     ip,
+                     "hostname"])
+    return ((0, "success"))
 
 def start(comi_dir, arg_d):
     common.log(common.debug,
