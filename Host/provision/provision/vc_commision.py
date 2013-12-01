@@ -16,8 +16,8 @@ def _prep_commision(dat_dir, fname):
         f.write("Done")
     return ((0, "success"))
 
-def _check_commision_prep(comi_dir):
-    dat_dir = os.path.join(comi_dir, "dat")
+def _check_commision_prep(dat_dir):
+    prep_status=(0, "success")
     try:
         os.mkdir(dat_dir)
     except OSError:
@@ -45,21 +45,31 @@ def _do_ssh_config(domain_dir, ip_host):
     print ip_host
 
 
-def _do_ssh_linkup(ip_host):
+def _do_ssh_linkup(known_host_fname, id_fname, ip_host):
     ip=ip_host[0]
-    common.exec_cmd(["ssh-keygen", "-P", "", "-f", key_fname])
+    common.exec_cmd(["ssh",
+                     "-o", "UserKnownHostsFile={0}".format(known_host_fname),
+                     "-o", "StrictHostKeyChecking=no",
+                     "-i", id_fname,
+                     ip])
 
 def start(comi_dir, arg_d):
     common.log(common.debug,
                "In Function {0}".format(inspect.stack()[0][3]))
-    ck_status = _check_commision_prep(comi_dir)
+
+    dat_dir = os.path.join(comi_dir, "dat")
+
+    ck_status = _check_commision_prep(dat_dir)
     if ck_status[0] != 0:
         return ck_status
+
+    known_host_fname = os.path.join(dat_dir, "known_hosts")
+    id_fname = os.path.join(dat_dir, "host_key.pub")
 
     #Proceed with domain specific commision processing.
     ip_host=py_libvirt.get_fabric_ip(arg_d['domain'])
 
-    lk_status=_do_ssh_linkup(ip_host)
+    lk_status=_do_ssh_linkup(known_host_fname, id_fname, ip_host)
     if lk_status[0] != 0:
         return lk_status
 
