@@ -80,6 +80,7 @@ def _do_pm_config_file(pm_config, arg_d):
         f.write("[main]\n")
         f.write("   type = rpm-md\n")
         f.write("   baseurl = {0}\n".format(arg_d['pm-url']))
+    return ((0, "success"))
 
 def start(comi_dir, arg_d):
     common.log(common.debug,
