@@ -50,7 +50,7 @@ def prep_host_dir(iso_dir, arch, rpm_lst, cwd):
 def prep_host_scripts(iso_dir, cwd):
       common.log(common.debug,
                  "In Function {0}".format(inspect.stack()[0][3]))
-      for f in ["inc/scripts/py/common.py", "scripts/install_iso.py"]:
+      for f in ["inc/scripts/py/common.py", "Host/iso_scripts/install_iso.py"]:
             scriptf=os.path.join(cwd, f)
             common.log(common.debug, "script file: {0}".format(scriptf))
             try:

@@ -8,6 +8,10 @@ target:$(MODULE)
 utLib:
 	$(MAKE) -C ./utLib/ $(TARGET)
 
-all:utLib
+.PHONY:commision
+commision:
+	$(MAKE) -C ./commision/ $(TARGET)
+
+all:utLib commision
 
 ##############################################################################

@@ -7,4 +7,5 @@ setup(name='provisioning',
       url='vc',
       packages=['provision'],
       scripts=['vc_prov.py'],
+      package_data={'': ['bootstrap_com.sh']}
       )

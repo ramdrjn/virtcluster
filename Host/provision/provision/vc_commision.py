@@ -6,6 +6,8 @@ from provision import py_libvirt
 
 import inspect
 import os
+import json
+import urlparse
 
 def _prep_commision(dat_dir, fname):
     with open(fname, "w") as f:
@@ -110,20 +112,37 @@ def start(comi_dir, arg_d):
 
     _do_ssh_config(domain_dir, known_host_fname, id_fname, ip_host)
 
-    config_file = os.path.join(domain_dir, "ssh_config")
+    ssh_config_file = os.path.join(domain_dir, "ssh_config")
 
     rmt_conf_dir='/opt/x86vm'
     cmd='mkdir -p {0}'.format(rmt_conf_dir)
-    exec_status=_exec_remote_cmd(ip_host, config_file, cmd)
+    exec_status=_exec_remote_cmd(ip_host, ssh_config_file, cmd)
     if exec_status[0] != 0:
         return exec_status
 
-    pm_config = os.path.join(domain_dir, "pm_config")
+    conf={}
+    conf['pkg-mgmt']=arg_d['pkg-mgmt']
+
+    url=urlparse.urlparse(arg_d['pm-url'])
+    conf['pm-url-scheme']=url.scheme
+
+    pm_config_fname="pm_config"
+    pm_config = os.path.join(domain_dir, pm_config_fname)
     pm_status=_do_pm_config_file(pm_config, arg_d)
     if pm_status[0] != 0:
         return pm_status
 
-    cp_status=_remote_cp(ip_host, config_file, pm_config, rmt_conf_dir)
+    cp_status=_remote_cp(ip_host, ssh_config_file, pm_config, rmt_conf_dir)
+    if cp_status[0] != 0:
+        return cp_status
+
+    conf['pm-config-file']=os.path.join(rmt_conf_dir, pm_config_fname)
+
+    comm_conf = os.path.join(domain_dir, "commision.conf")
+    with open(comm_conf, 'w') as f:
+        json.dump(conf, f)
+
+    cp_status=_remote_cp(ip_host, ssh_config_file, comm_conf, rmt_conf_dir)
     if cp_status[0] != 0:
         return cp_status
 
