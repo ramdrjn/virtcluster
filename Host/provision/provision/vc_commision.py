@@ -41,9 +41,13 @@ def _check_commision_prep(dat_dir):
 
     return ((0, "success"))
 
-def _do_ssh_config(domain_dir, ip_host):
-    print ip_host
-
+def _do_ssh_config(domain_dir, known_host_fname, id_fname, ip_host):
+    ssh_config = os.path.join(domain_dir, "ssh_config")
+    with open(ssh_config, "w") as f:
+        f.write("Host {0}\n".format(ip_host[0]))
+        f.write("  User root\n")
+        f.write("  IdentityFile {0}\n".format(id_fname))
+        f.write("  UserKnownHostsFile {0}\n".format(known_host_fname))
 
 def _do_ssh_linkup(known_host_fname, id_fname, ip_host):
     ip=ip_host[0]
@@ -53,6 +57,14 @@ def _do_ssh_linkup(known_host_fname, id_fname, ip_host):
                      "-i", id_fname,
                      ip,
                      "hostname"])
+    return ((0, "success"))
+
+def _exec_remote_cmd(ip_host, config_file, cmd):
+    ip=ip_host[0]
+    common.exec_cmd(["ssh",
+                     "-F", config_file,
+                     ip,
+                     cmd])
     return ((0, "success"))
 
 def start(comi_dir, arg_d):
@@ -81,8 +93,13 @@ def start(comi_dir, arg_d):
     except OSError:
         return ((-1, "Unable to create domain directory"))
 
-    _do_ssh_config(domain_dir, ip_host)
+    _do_ssh_config(domain_dir, known_host_fname, id_fname, ip_host)
 
-    print arg_d
-    print ck_status
+    config_file = os.path.join(domain_dir, "ssh_config")
+
+    cmd='hostname'
+    exec_status=_exec_remote_cmd(ip_host, config_file, cmd)
+    if exec_status[0] != 0:
+        return exec_status
+
     return ((0, "success"))
