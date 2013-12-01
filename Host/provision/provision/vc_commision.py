@@ -67,7 +67,7 @@ def _exec_remote_cmd(ip_host, config_file, cmd):
                      cmd])
     return ((0, "success"))
 
-def _remote_cp(ip_host, src, dst):
+def _remote_cp(ip_host, config_file, src, dst):
     ip=ip_host[0]
     common.exec_cmd(["scp",
                      "-F", config_file,
@@ -123,7 +123,7 @@ def start(comi_dir, arg_d):
     if pm_status[0] != 0:
         return pm_status
 
-    cp_status=_remote_cp(ip_host, pm_config, rmt_conf_dir)
+    cp_status=_remote_cp(ip_host, config_file, pm_config, rmt_conf_dir)
     if cp_status[0] != 0:
         return cp_status
 
