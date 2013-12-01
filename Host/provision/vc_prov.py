@@ -340,6 +340,8 @@ class provCLI_domain(cli_fmwk.VCCli):
             if not dom:
                 shutil.rmtree(os.path.join("provisioned_domain", dom_name),
                               True)
+                shutil.rmtree(os.path.join("commisioned_domain", dom_name),
+                              True)
             else:
                 print("Domain still defined")
                 return
