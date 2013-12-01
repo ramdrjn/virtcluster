@@ -67,6 +67,20 @@ def _exec_remote_cmd(ip_host, config_file, cmd):
                      cmd])
     return ((0, "success"))
 
+def _remote_cp(ip_host, src, dst):
+    ip=ip_host[0]
+    common.exec_cmd(["scp",
+                     "-F", config_file,
+                     src,
+                     ip+":"+dst])
+    return ((0, "success"))
+
+def _do_pm_config_file(pm_config, arg_d):
+    with open(pm_config, "w") as f:
+        f.write("[main]\n")
+        f.write("   type = rpm-md\n")
+        f.write("   baseurl = {0}\n".format(arg_d['pm-url']))
+
 def start(comi_dir, arg_d):
     common.log(common.debug,
                "In Function {0}".format(inspect.stack()[0][3]))
@@ -97,9 +111,19 @@ def start(comi_dir, arg_d):
 
     config_file = os.path.join(domain_dir, "ssh_config")
 
-    cmd='hostname'
+    rmt_conf_dir='/opt/x86vm'
+    cmd='mkdir -p {0}'.format(rmt_conf_dir)
     exec_status=_exec_remote_cmd(ip_host, config_file, cmd)
     if exec_status[0] != 0:
         return exec_status
+
+    pm_config = os.path.join(domain_dir, "pm_config")
+    pm_status=_do_pm_config_file(pm_config, arg_d)
+    if pm_status[0] != 0:
+        return pm_status
+
+    cp_status=_remote_cp(ip_host, pm_config, rmt_conf_dir)
+    if cp_status[0] != 0:
+        return cp_status
 
     return ((0, "success"))
