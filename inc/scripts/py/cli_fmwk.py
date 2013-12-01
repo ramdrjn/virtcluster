@@ -3,6 +3,7 @@ import common
 import readline
 import cmd
 import sys
+import time
 
 def autocomp(lst, text):
       return [i for i in lst if i.startswith(text)]
@@ -15,6 +16,10 @@ class VCCli(cmd.Cmd):
             self.doc_header="virtcluster commands (type help <topic>):"
       def emptyline(self):
             pass
+      def do_sleep(self, args):
+            time.sleep(int(args))
+      def help_sleep(self, args):
+            print("Pause cli session")
       def do_end(self, args):
             return True
       def help_end(self, args):
