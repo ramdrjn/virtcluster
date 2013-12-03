@@ -1,5 +1,8 @@
+try:
+      import subprocess
+except ImportError:
+      import commands
 
-import subprocess
 import inspect
 
 debug=1
@@ -40,3 +43,17 @@ def exec_cmd(cmd, out=None, err=None):
             subprocess.check_call(cmd, stdout=out, stderr=err)
       except subprocess.CalledProcessError as e:
             log(error, "Cmd: {0} returned {1}\n".format(e.cmd, e.returncode))
+
+def exec_command(cmd, out=None, err=None):
+      log(debug, "In Function {0}".format(inspect.stack()[0][3]))
+
+      try:
+            log(debug, "Executing command {0}".format(cmd))
+            (status, op)=commands.getstatusoutput(cmd)
+      except subprocess.CalledProcessError as e:
+            log(error, "Cmd: {0} returned {1}\n".format(e.cmd, e.returncode))
+
+      if status != 0:
+            err=op
+      else:
+            out=op
