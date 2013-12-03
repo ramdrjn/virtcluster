@@ -52,6 +52,8 @@ def uninstall():
 def main():
       common.log(common.debug,
                  "In Function {0}".format(inspect.stack()[0][3]))
+      local_repo=True
+
       prep()
       install_host_rpm()
       install_images()

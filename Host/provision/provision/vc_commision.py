@@ -138,12 +138,24 @@ def start(comi_dir, arg_d):
 
     conf['pm-config-file']=os.path.join(rmt_conf_dir, pm_config_fname)
 
-    comm_conf = os.path.join(domain_dir, "commision.conf")
+    comm_fname="commision.conf"
+    rem_comm_file = os.path.join(rmt_conf_dir, comm_fname)
+    comm_conf = os.path.join(domain_dir, comm_fname)
     with open(comm_conf, 'w') as f:
         json.dump(conf, f)
 
-    cp_status=_remote_cp(ip_host, ssh_config_file, comm_conf, rmt_conf_dir)
+    cp_status=_remote_cp(ip_host, ssh_config_file, comm_conf, rem_comm_file)
     if cp_status[0] != 0:
         return cp_status
+
+    bootstrap_f = os.path.join(comi_dir, "../provision/bootstrap_com.sh")
+    cp_status=_remote_cp(ip_host, ssh_config_file, bootstrap_f, rmt_conf_dir)
+    if cp_status[0] != 0:
+        return cp_status
+
+    cmd="sh -x /opt/x86vm/bootstrap_com.sh {0}".format(rem_comm_file)
+    exec_status=_exec_remote_cmd(ip_host, ssh_config_file, cmd)
+    if exec_status[0] != 0:
+        return exec_status
 
     return ((0, "success"))
