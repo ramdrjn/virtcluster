@@ -8,4 +8,5 @@ setup(name='commisioning',
       url='vc',
       packages=['commision'],
       scripts=['vc_com.py'],
+      data_files=[('conf', ['rpm.install'])]
       )
