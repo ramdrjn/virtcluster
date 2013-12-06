@@ -90,17 +90,6 @@ class provCLI(cli_fmwk.VCCli):
                    "In Function {0}".format(inspect.stack()[0][3]))
         print("     Network subcommands    ")
 
-    def do_commision(self, args):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
-        com_cli=provCLI_commision(self._con)
-        com_cli.cmdloop()
-
-    def help_commision(self):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
-        print("     Commisioning subcommands    ")
-
     def do_info(self, args):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
@@ -258,6 +247,14 @@ class provCLI_domain(cli_fmwk.VCCli):
             print("Enter domain ")
             return
 
+        #Get fabric network details and update arg_d
+        arg_d['fab0_net_name']='virtcluster_fabric0'
+        arg_d['fab0_net_dev']='vfab0'
+        arg_d['fab0_nic_mac']='52:54:00:d7:2a:31'
+
+        #Request for vnc port auto allocation
+        arg_d['vnc_port']='-1'
+
         img_name=arg_d['image']
         if img_name:
             img_dir="provisioned_domain/{}/images".format(dom_name)
@@ -287,6 +284,39 @@ class provCLI_domain(cli_fmwk.VCCli):
         print("     Define domain <domain name>    ")
 
     def complete_define(self, text, line, begidx, endidx):
+        common.log(common.debug,
+                   "In Function {0}".format(inspect.stack()[0][3]))
+        return complete_dom(text, line, begidx, endidx)
+
+    def do_commision(self, args):
+        common.log(common.debug,
+                   "In Function {0}".format(inspect.stack()[0][3]))
+        arg_lst=args.split()
+        arg_d = dict(zip(arg_lst[::2], [arg_lst[i]
+                                        for i in range(1, len(arg_lst), 2)]))
+        dom_name=arg_d['domain']
+        if dom_name:
+            dom = py_libvirt.dom_lookup(self._con, dom_name)
+            if not dom:
+                print("Domain not defined")
+                return
+            s=py_libvirt.info_domain(dom)
+            if not "State: running" in s:
+                print("Domain not running")
+                return
+        else:
+            print("Enter domain ")
+            return
+
+        comi_dir=os.path.join(os.getcwd(), "commisioned_domain")
+        vc_commision.start(comi_dir, arg_d)
+
+    def help_commision(self):
+        common.log(common.debug,
+                   "In Function {0}".format(inspect.stack()[0][3]))
+        print("     Start domain <domain name>  ")
+
+    def complete_commision(self, text, line, begidx, endidx):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
         return complete_dom(text, line, begidx, endidx)
@@ -684,39 +714,6 @@ class provCLI_commision(cli_fmwk.VCCli):
         self.prompt = self.prompt[:-1]+':Commision)'
         self.def_comp_lst=['domain']
         self._con = con
-
-    def do_start(self, args):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
-        arg_lst=args.split()
-        arg_d = dict(zip(arg_lst[::2], [arg_lst[i]
-                                        for i in range(1, len(arg_lst), 2)]))
-        dom_name=arg_d['domain']
-        if dom_name:
-            dom = py_libvirt.dom_lookup(self._con, dom_name)
-            if not dom:
-                print("Domain not defined")
-                return
-            s=py_libvirt.info_domain(dom)
-            if not "State: running" in s:
-                print("Domain not running")
-                return
-        else:
-            print("Enter domain ")
-            return
-
-        comi_dir=os.path.join(os.getcwd(), "commisioned_domain")
-        vc_commision.start(comi_dir, arg_d)
-
-    def help_start(self):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
-        print("     Start domain <domain name>  ")
-
-    def complete_start(self, text, line, begidx, endidx):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
-        return complete_dom(text, line, begidx, endidx)
 
 if __name__=='__main__':
 #    common.set_debug_lvl(common.debug)
