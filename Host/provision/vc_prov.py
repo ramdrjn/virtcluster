@@ -212,7 +212,7 @@ class provCLI_domain(cli_fmwk.VCCli):
                   <target dev='hda' bus='ide'/>\
                 </disk>\
                 <interface type='network'>\
-                  <mac address='$fab0_nic_mac'/>\
+                  <mac address='$fab0_dom_mac'/>\
                   <source network='$fab0_net_name'/>\
                   <target dev='$fab0_net_dev'/>\
                   <model type='virtio'/>\
@@ -248,9 +248,26 @@ class provCLI_domain(cli_fmwk.VCCli):
             return
 
         #Get fabric network details and update arg_d
-        arg_d['fab0_net_name']='virtcluster_fabric0'
-        arg_d['fab0_net_dev']='vfab0'
-        arg_d['fab0_nic_mac']='52:54:00:d7:2a:31'
+        j_dict={}
+
+        net_fname="{0}.net".format(dom_name)
+        net_dir = os.path.join("provisioned_domain", "net")
+        net_file = os.path.join(net_dir, net_fname)
+        with open(net_file, 'r') as f:
+            j_dict=json.load(f)
+
+        arg_d['fab0_dom_mac']=j_dict['fab0_dom_mac']
+
+        j_dict={}
+
+        fab_fname="fab0_host.net"
+        net_dir = os.path.join("provisioned_domain", "net")
+        fab_file = os.path.join(net_dir, fab_fname)
+        with open(fab_file, 'r') as f:
+            j_dict=json.load(f)
+
+        arg_d['fab0_net_name']=j_dict['fab0_net_name']
+        arg_d['fab0_net_dev']=j_dict['fab0_net_dev']
 
         #Request for vnc port auto allocation
         arg_d['vnc_port']='-1'
@@ -549,6 +566,107 @@ class provCLI_domain(cli_fmwk.VCCli):
                    "In Function {0}".format(inspect.stack()[0][3]))
         return complete_dom(text, line, begidx, endidx)
 
+class provCLI_dhcp(cli_fmwk.VCCli):
+    def __init__(self, arg_d):
+        common.log(common.debug,
+                   "In Function {0}".format(inspect.stack()[0][3]))
+        self.arg_d=arg_d
+        cli_fmwk.VCCli.__init__(self, intro="DHCP subcommands")
+        self.prompt = self.prompt[:-1]+':dhcp)'
+
+    def do_range(self, args):
+        t_dict=args.split()
+        t_dict = dict(zip(t_dict[::2], [t_dict[i]
+                                        for i in range(1, len(t_dict), 2)]))
+        self.arg_d['dhcp_start']=t_dict['start']
+        self.arg_d['dhcp_end']=t_dict['end']
+
+    def help_range(self, args):
+        pass
+    def complete_range(self, args):
+        pass
+
+    def do_host(self, args):
+        t_dict=args.split()
+        t_dict = dict(zip(t_dict[::2], [t_dict[i]
+                                        for i in range(1, len(t_dict), 2)]))
+        host_xml="<host mac='$mac' name='$name' ip='$ip'/>\ \n"
+        hostT=string.Template(host_xml).substitute(t_dict)
+        if 'host' in self.arg_d:
+            self.arg_d['host']=self.arg_d['host']+hostT
+        else:
+            self.arg_d['host']=hostT
+
+        #Store domain net configs in net directory
+        j_dict={}
+        j_dict['fab0_dom_name']=t_dict['name']
+        j_dict['fab0_dom_ip']=t_dict['ip']
+        j_dict['fab0_dom_mac']=t_dict['mac']
+
+        net_fname="{0}.net".format(t_dict['name'])
+        net_dir = os.path.join("provisioned_domain", "net")
+        net_file = os.path.join(net_dir, net_fname)
+        with open(net_file, 'w') as f:
+            json.dump(j_dict, f)
+
+    def help_host(self, args):
+        pass
+    def complete_host(self, args):
+        pass
+
+class provCLI_network_define(cli_fmwk.VCCli):
+    def __init__(self, arg_d):
+        common.log(common.debug,
+                   "In Function {0}".format(inspect.stack()[0][3]))
+        self.arg_d=arg_d
+        cli_fmwk.VCCli.__init__(self, intro="Network define subcommands")
+        self.prompt = self.prompt[:-1]+':Network {0})'.format(arg_d['network'])
+        if self.arg_d['network']=='fabric':
+            self.is_fabric=True
+            self.arg_d['network']='virtcluster_fabric0'
+
+    def do_bridge(self, args):
+        common.log(common.debug,
+                   "In Function {0}".format(inspect.stack()[0][3]))
+
+        t_dict=args.split()
+        t_dict = dict(zip(t_dict[::2], [t_dict[i]
+                                        for i in range(1, len(t_dict), 2)]))
+        if self.is_fabric:
+            self.arg_d['brname']='virfab0'
+        else:
+            self.arg_d['brname']=t_dict['name']
+        self.arg_d['ip_addr']=t_dict['ip']
+        self.arg_d['netmask']=t_dict['netmask']
+
+        #Store host configs in net directory
+        j_dict={}
+        j_dict['fab0_net_name']=self.arg_d['network']
+        j_dict['fab0_host_net_ip']=t_dict['ip']
+        j_dict['fab0_net_dev']='vfab0'
+
+        net_fname="fab0_host.net"
+        net_dir = os.path.join("provisioned_domain", "net")
+        net_file = os.path.join(net_dir, net_fname)
+        with open(net_file, 'w') as f:
+            json.dump(j_dict, f)
+
+    def help_bridge(self, args):
+        pass
+    def complete_bridge(self, args):
+        pass
+    def do_dhcp(self, args):
+        common.log(common.debug,
+                   "In Function {0}".format(inspect.stack()[0][3]))
+
+        dhcp_cli=provCLI_dhcp(self.arg_d)
+        dhcp_cli.cmdloop()
+
+    def help_dhcp(self, args):
+        pass
+    def complete_dhcp(self, args):
+        pass
+
 class provCLI_network(cli_fmwk.VCCli):
     def __init__(self, con):
         common.log(common.debug,
@@ -563,10 +681,10 @@ class provCLI_network(cli_fmwk.VCCli):
            <network>\
              <name>$network</name>\
              <bridge name='$brname' stp='on' delay='0' />\
-             <mac address='52:54:00:3E:31:C9'/>\
-             <ip address='192.168.100.1' netmask='255.255.255.0'>\
+             <ip address='$ip_addr' netmask='$netmask'>\
                <dhcp>\
-                 <range start='192.168.100.128' end='192.168.100.254' />\
+                 <range start='$dhcp_start' end='$dhcp_end' />\
+                 $host \
                </dhcp>\
              </ip>\
            </network>\
@@ -596,6 +714,10 @@ class provCLI_network(cli_fmwk.VCCli):
         else:
             print("Enter network")
             return
+
+        nwk_def_cli=provCLI_network_define(arg_d)
+        nwk_def_cli.cmdloop()
+
         xml = self._nwk_xml_comp(arg_d)
         nwk = py_libvirt.network_defineXML(self._con, xml)
 
@@ -706,15 +828,6 @@ class provCLI_network(cli_fmwk.VCCli):
                    "In Function {0}".format(inspect.stack()[0][3]))
         return complete_network(text, line, begidx, endidx)
 
-class provCLI_commision(cli_fmwk.VCCli):
-    def __init__(self, con):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
-        cli_fmwk.VCCli.__init__(self, intro="Commision subcommands")
-        self.prompt = self.prompt[:-1]+':Commision)'
-        self.def_comp_lst=['domain']
-        self._con = con
-
 if __name__=='__main__':
 #    common.set_debug_lvl(common.debug)
 
@@ -725,6 +838,11 @@ if __name__=='__main__':
 
     try:
         os.mkdir("commisioned_domain")
+    except OSError:
+        pass
+
+    try:
+        os.mkdir("provisioned_domain/net")
     except OSError:
         pass
 

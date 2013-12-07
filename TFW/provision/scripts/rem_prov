@@ -1,0 +1,14 @@
+network
+  stop network virtcluster_fabric0
+  undefine network virtcluster_fabric0
+end
+
+domain
+  shut domain x86vm0
+  stop domain x86vm0
+  undefine domain x86vm0
+  purge domain x86vm0
+end
+
+list
+quit

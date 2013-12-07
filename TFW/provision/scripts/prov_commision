@@ -1,0 +1,27 @@
+network
+  define network fabric
+    bridge ip 192.168.100.1 netmask 255.255.255.0
+    dhcp
+      range start 192.168.100.128 end 192.168.100.130
+      host name x86vm0 mac 52:54:00:d7:2a:30 ip 192.168.100.128
+      host name x86vm1 mac 52:54:00:d7:2a:31 ip 192.168.100.129
+    end
+  end
+  start network virtcluster_fabric0
+end
+
+domain
+  define domain x86vm0 image yocto-x86 memory 524288 vcpu 2 arch i686
+  start domain x86vm0
+  resume domain x86vm0
+end
+
+sleep 20
+
+domain
+  commision domain x86vm0 pkg-mgmt smart pm-url http://192.168.100.1:8000/main
+end
+
+list
+info domain x86vm0
+quit
