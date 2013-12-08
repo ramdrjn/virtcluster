@@ -1,24 +1,23 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 from common import common
-from provision import py_libvirt
+from provision import ssh
 
 import inspect
 import os
 import json
 import urlparse
 
-def _prep_commision(dat_dir, fname):
-    with open(fname, "w") as f:
-        f.write("Initiated")
-    key_fname = os.path.join(dat_dir, "host_key")
-    common.exec_cmd(["ssh-keygen", "-P", "", "-f", key_fname])
-    with open(fname, "w") as f:
-        f.write("Done")
-    return ((0, "success"))
+def _prep_commision(dat_dir, fname, sshi):
+    common.log(common.debug,
+               "In Function {0}".format(inspect.stack()[0][3]))
 
-def _check_commision_prep(dat_dir):
+    status=sshi.createHostKeys()
+    return (status)
+
+def _check_commision_prep(dat_dir, sshi):
+    common.log(common.debug,
+               "In Function {0}".format(inspect.stack()[0][3]))
+
     prep_status=(0, "success")
     try:
         os.mkdir(dat_dir)
@@ -28,53 +27,11 @@ def _check_commision_prep(dat_dir):
     fname = os.path.join(dat_dir, "commision.dat")
 
     if not os.path.isfile(fname):
-        prep_status=_prep_commision(dat_dir, fname)
+        prep_status=_prep_commision(dat_dir, fname, sshi)
 
     if prep_status[0] != 0:
         return prep_status
 
-    state="Done"
-    with open(fname) as f:
-        state=f.readline()
-
-    if state != "Initiated":
-        if state != "Done":
-            return ((-1, "commision.dat state not valid"))
-
-    return ((0, "success"))
-
-def _do_ssh_config(domain_dir, known_host_fname, id_fname, ip_host):
-    ssh_config = os.path.join(domain_dir, "ssh_config")
-    with open(ssh_config, "w") as f:
-        f.write("Host {0}\n".format(ip_host[0]))
-        f.write("  User root\n")
-        f.write("  IdentityFile {0}\n".format(id_fname))
-        f.write("  UserKnownHostsFile {0}\n".format(known_host_fname))
-
-def _do_ssh_linkup(known_host_fname, id_fname, ip_host):
-    ip=ip_host[0]
-    common.exec_cmd(["ssh",
-                     "-o", "UserKnownHostsFile={0}".format(known_host_fname),
-                     "-o", "StrictHostKeyChecking=no",
-                     "-i", id_fname,
-                     ip,
-                     "hostname"])
-    return ((0, "success"))
-
-def _exec_remote_cmd(ip_host, config_file, cmd):
-    ip=ip_host[0]
-    common.exec_cmd(["ssh",
-                     "-F", config_file,
-                     ip,
-                     cmd])
-    return ((0, "success"))
-
-def _remote_cp(ip_host, config_file, src, dst):
-    ip=ip_host[0]
-    common.exec_cmd(["scp",
-                     "-F", config_file,
-                     src,
-                     ip+":"+dst])
     return ((0, "success"))
 
 def _do_pm_config_file(pm_config, arg_d):
@@ -84,39 +41,36 @@ def _do_pm_config_file(pm_config, arg_d):
         f.write("   baseurl = {0}\n".format(arg_d['pm-url']))
     return ((0, "success"))
 
-def start(comi_dir, arg_d):
+def start(comi_dir, net_dir, arg_d):
     common.log(common.debug,
                "In Function {0}".format(inspect.stack()[0][3]))
 
-    dat_dir = os.path.join(comi_dir, "dat")
-
-    ck_status = _check_commision_prep(dat_dir)
-    if ck_status[0] != 0:
-        return ck_status
-
-    known_host_fname = os.path.join(dat_dir, "known_hosts")
-    id_fname = os.path.join(dat_dir, "host_key.pub")
-
-    #Proceed with domain specific commision processing.
-    ip_host=py_libvirt.get_fabric_ip(arg_d['domain'])
-
-    lk_status=_do_ssh_linkup(known_host_fname, id_fname, ip_host)
-    if lk_status[0] != 0:
-        return lk_status
-
-    domain_dir = os.path.join(comi_dir, arg_d['domain'])
+    domain=arg_d['domain']
+    domain_dir = os.path.join(comi_dir, domain)
     try:
         os.mkdir(domain_dir)
     except OSError:
         return ((-1, "Unable to create domain directory"))
 
-    _do_ssh_config(domain_dir, known_host_fname, id_fname, ip_host)
+    sshi=ssh.ssh_Cls(domain, domain_dir, net_dir)
 
-    ssh_config_file = os.path.join(domain_dir, "ssh_config")
+    dat_dir = os.path.join(comi_dir, "dat")
+
+    ck_status = _check_commision_prep(dat_dir, sshi)
+    if ck_status[0] != 0:
+        return ck_status
+
+    lk_status=sshi.do_ssh_linkup()
+    if lk_status[0] != 0:
+        return lk_status
+
+    status=sshi.do_ssh_config()
+    if status[0] != 0:
+        return status
 
     rmt_conf_dir='/opt/x86vm'
     cmd='mkdir -p {0}'.format(rmt_conf_dir)
-    exec_status=_exec_remote_cmd(ip_host, ssh_config_file, cmd)
+    exec_status=sshi.exec_remote_cmd(cmd)
     if exec_status[0] != 0:
         return exec_status
 
@@ -132,7 +86,7 @@ def start(comi_dir, arg_d):
     if pm_status[0] != 0:
         return pm_status
 
-    cp_status=_remote_cp(ip_host, ssh_config_file, pm_config, rmt_conf_dir)
+    cp_status=sshi.remote_cp(pm_config, rmt_conf_dir)
     if cp_status[0] != 0:
         return cp_status
 
@@ -144,17 +98,17 @@ def start(comi_dir, arg_d):
     with open(comm_conf, 'w') as f:
         json.dump(conf, f)
 
-    cp_status=_remote_cp(ip_host, ssh_config_file, comm_conf, rem_comm_file)
+    cp_status=sshi.remote_cp(comm_conf, rem_comm_file)
     if cp_status[0] != 0:
         return cp_status
 
     bootstrap_f = os.path.join(comi_dir, "../provision/bootstrap_com.sh")
-    cp_status=_remote_cp(ip_host, ssh_config_file, bootstrap_f, rmt_conf_dir)
+    cp_status=sshi.remote_cp(bootstrap_f, rmt_conf_dir)
     if cp_status[0] != 0:
         return cp_status
 
     cmd="sh -x /opt/x86vm/bootstrap_com.sh {0}".format(rem_comm_file)
-    exec_status=_exec_remote_cmd(ip_host, ssh_config_file, cmd)
+    exec_status=sshi.exec_remote_cmd(cmd)
     if exec_status[0] != 0:
         return exec_status
 

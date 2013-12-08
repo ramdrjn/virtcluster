@@ -251,8 +251,7 @@ class provCLI_domain(cli_fmwk.VCCli):
         j_dict={}
 
         net_fname="{0}.net".format(dom_name)
-        net_dir = os.path.join("provisioned_domain", "net")
-        net_file = os.path.join(net_dir, net_fname)
+        net_file = os.path.join("net", net_fname)
         with open(net_file, 'r') as f:
             j_dict=json.load(f)
 
@@ -261,8 +260,7 @@ class provCLI_domain(cli_fmwk.VCCli):
         j_dict={}
 
         fab_fname="fab0_host.net"
-        net_dir = os.path.join("provisioned_domain", "net")
-        fab_file = os.path.join(net_dir, fab_fname)
+        fab_file = os.path.join("net", fab_fname)
         with open(fab_file, 'r') as f:
             j_dict=json.load(f)
 
@@ -326,7 +324,8 @@ class provCLI_domain(cli_fmwk.VCCli):
             return
 
         comi_dir=os.path.join(os.getcwd(), "commisioned_domain")
-        vc_commision.start(comi_dir, arg_d)
+        net_dir=os.path.join(os.getcwd(), "net")
+        vc_commision.start(comi_dir, net_dir, arg_d)
 
     def help_commision(self):
         common.log(common.debug,
@@ -604,8 +603,7 @@ class provCLI_dhcp(cli_fmwk.VCCli):
         j_dict['fab0_dom_mac']=t_dict['mac']
 
         net_fname="{0}.net".format(t_dict['name'])
-        net_dir = os.path.join("provisioned_domain", "net")
-        net_file = os.path.join(net_dir, net_fname)
+        net_file = os.path.join("net", net_fname)
         with open(net_file, 'w') as f:
             json.dump(j_dict, f)
 
@@ -646,8 +644,7 @@ class provCLI_network_define(cli_fmwk.VCCli):
         j_dict['fab0_net_dev']='vfab0'
 
         net_fname="fab0_host.net"
-        net_dir = os.path.join("provisioned_domain", "net")
-        net_file = os.path.join(net_dir, net_fname)
+        net_file = os.path.join("net", net_fname)
         with open(net_file, 'w') as f:
             json.dump(j_dict, f)
 
@@ -842,7 +839,7 @@ if __name__=='__main__':
         pass
 
     try:
-        os.mkdir("provisioned_domain/net")
+        os.mkdir("net")
     except OSError:
         pass
 

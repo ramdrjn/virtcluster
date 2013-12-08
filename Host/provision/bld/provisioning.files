@@ -1,5 +1,6 @@
 /opt/x86vm/provision/__init__.py
 /opt/x86vm/provision/py_libvirt.py
 /opt/x86vm/provision/vc_commision.py
+/opt/x86vm/provision/ssh.py
 /opt/x86vm/provision/bootstrap_com.sh
 /opt/x86vm/vc_prov.py
