@@ -341,6 +341,11 @@ class provCLI_domain(cli_fmwk.VCCli):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
 
+        nopurge=False
+        if 'nopurge' in args:
+            nopurge=True
+            args=args.replace('nopurge', '')
+
         arg_lst=args.split()
         if len(arg_lst) != 2:
             self.help_undefine()
@@ -355,6 +360,14 @@ class provCLI_domain(cli_fmwk.VCCli):
                 print("Domain not defined")
                 return
             dom = py_libvirt.dom_undefine(dom)
+            if not nopurge:
+                shutil.rmtree(os.path.join("provisioned_domain", dom_name),
+                              True)
+                shutil.rmtree(os.path.join("commisioned_domain", dom_name),
+                              True)
+                comi_dir=os.path.join(os.getcwd(), "commisioned_domain")
+                net_dir=os.path.join(os.getcwd(), "net")
+                vc_commision.cleanup(dom_name, comi_dir, net_dir)
         else:
             print("Enter domain")
             return
@@ -368,42 +381,6 @@ class provCLI_domain(cli_fmwk.VCCli):
         common.log(common.debug,
                    "In Function {0}".format(inspect.stack()[0][3]))
         return complete_nwk_dom(text, line, begidx, endidx)
-
-    def do_purge(self, args):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
-
-        arg_lst=args.split()
-        if len(arg_lst) != 2:
-            self.help_purge()
-            return
-
-        comp_type=cli_fmwk.autocomp(self.def_comp_lst, arg_lst[0])
-
-        if comp_type==['domain']:
-            dom_name=arg_lst[1]
-            dom = py_libvirt.dom_lookup(self._con, dom_name)
-            if not dom:
-                shutil.rmtree(os.path.join("provisioned_domain", dom_name),
-                              True)
-                shutil.rmtree(os.path.join("commisioned_domain", dom_name),
-                              True)
-            else:
-                print("Domain still defined")
-                return
-        else:
-            print("Enter Domain")
-            return
-
-    def help_purge(self):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
-        print("     Purge domain <domain name>    ")
-
-    def complete_purge(self, text, line, begidx, endidx):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
-        return complete_dom(text, line, begidx, endidx)
 
     def do_start(self, args):
         common.log(common.debug,

@@ -113,3 +113,11 @@ def start(comi_dir, net_dir, arg_d):
         return exec_status
 
     return ((0, "success"))
+
+def cleanup(domain, comi_dir, net_dir):
+    common.log(common.debug,
+               "In Function {0}".format(inspect.stack()[0][3]))
+
+    domain_dir = os.path.join(comi_dir, domain)
+    sshi=ssh.ssh_Cls(domain, domain_dir, net_dir)
+    sshi.remove_domain_from_known_host()

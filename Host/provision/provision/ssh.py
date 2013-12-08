@@ -84,3 +84,12 @@ class ssh_Cls():
                          src,
                          self.ip_host[0]+":"+dst])
         return ((0, "success"))
+
+    def remove_domain_from_known_host(self):
+        common.log(common.debug,
+                   "In Function {0}".format(inspect.stack()[0][3]))
+
+        common.exec_cmd(["ssh-keygen",
+                         "-R", self.ip_host[0],
+                         "-f", self.known_host])
+        return ((0, "success"))
