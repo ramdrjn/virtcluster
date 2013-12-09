@@ -131,7 +131,7 @@ def build_prep(logf):
       with open(log_file, 'w') as f:
             common.log([common.info, common.screen_file, f],
                        "\nBuilding from {0}".format(currdir))
-            common.log([common.info, common.file, f],
+            common.log([common.info, common.lfile, f],
                        "\nStarted at {0}\n".format(time.asctime()))
 
 def args_actions(args):
@@ -188,7 +188,7 @@ def cleanup():
       global currdir
       global log_file
       with open(log_file, 'a') as f:
-            common.log([common.info, common.file, f],
+            common.log([common.info, common.lfile, f],
                        "\nEnding at {0}\n".format(time.asctime()))
 
 def main():

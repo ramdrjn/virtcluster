@@ -12,7 +12,7 @@ error=5
 debug_lvl=info
 
 screen=0
-file=1
+lfile=1
 screen_file=2
 
 def set_debug_lvl(lvl):
@@ -32,17 +32,34 @@ def log(ctrl, arg):
             print(arg)
       if ctrl_lst[1] and ctrl_lst[2]:
             ctrl_lst[2].write(arg)
-      return lvl
+      return (lvl)
+
+class execCmdError(Exception):
+      def __init__(self, value):
+            self.value=value
+      def __str__(self):
+            return repr(self.value)
 
 def exec_cmd(cmd, out=None, err=None):
       log(debug, "In Function {0}".format(inspect.stack()[0][3]))
-      if out:
-            err = subprocess.STDOUT
+      log(debug, "Executing command {0}".format(cmd))
       try:
-            log(debug, "Executing command {0}".format(cmd))
+            if not err:
+                  err = subprocess.STDOUT
             subprocess.check_call(cmd, stdout=out, stderr=err)
       except subprocess.CalledProcessError as e:
-            log(error, "Cmd: {0} returned {1}\n".format(e.cmd, e.returncode))
+            raise execCmdError("Cmd: {0} returned {1} error: {3}\n".format(
+                  e.cmd, e.returncode, e.output if e.output else ""))
+
+def exec_cmd_op(cmd, out=None):
+      log(debug, "In Function {0}".format(inspect.stack()[0][3]))
+      log(debug, "Executing command {0}".format(cmd))
+      try:
+            out=subprocess.check_output(cmd)
+      except subprocess.CalledProcessError as e:
+            raise execCmdError("Cmd: {0} returned {1} error: {3}\n".format(
+                        e.cmd, e.returncode, e.output if e.output else ""))
+      return (out)
 
 def exec_command(cmd, out=None, err=None):
       log(debug, "In Function {0}".format(inspect.stack()[0][3]))
@@ -50,10 +67,10 @@ def exec_command(cmd, out=None, err=None):
       try:
             log(debug, "Executing command {0}".format(cmd))
             (status, op)=commands.getstatusoutput(cmd)
-      except subprocess.CalledProcessError as e:
-            log(error, "Cmd: {0} returned {1}\n".format(e.cmd, e.returncode))
-
-      if status != 0:
-            err=op
-      else:
+      except:
+            raise execCmdError("Cmd execution failed")
+      if status!=0:
             out=op
+      else:
+            err=op
+      return (status)

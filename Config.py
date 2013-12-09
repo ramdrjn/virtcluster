@@ -70,7 +70,7 @@ def args_actions(args):
 
       if args.sa:
             configmk.sendConf("\nSA={0}".format(args.sa))
-            common.log([common.info, common.screen_file, common.log_file],
+            common.log([common.info, common.screen_file, log_file],
                        "\nSA flag set as SA={0}".format(args.sa))
       if args.debug:
             configmk.sendConf("\nDEBUG_FLAG=-g")
@@ -177,25 +177,25 @@ def prep(logf):
       conf_dir = os.path.join(currdir, "conf")
       log_file = open(os.path.join(currdir, logf), 'w')
 
-      common.log([common.info, common.file, log_file],
+      common.log([common.info, common.lfile, log_file],
                  "\nConfiguration Started at {0}\n".format(time.asctime()))
       shutil.copy(os.path.join(conf_dir, "def_configs/config.h.def"),\
                         os.path.join(conf_dir, "config.h"))
-      common.log([common.info, common.file, log_file],
+      common.log([common.info, common.lfile, log_file],
                  "Copied default configs {0}\n".format("config.h"))
       shutil.copy(os.path.join(conf_dir, "def_configs/config.mk.def"),\
                         os.path.join(conf_dir, "config.mk"))
-      common.log([common.info, common.file, log_file],
+      common.log([common.info, common.lfile, log_file],
                  "Copied default configs {0}\n".format("config.mk"))
       shutil.copy(os.path.join(conf_dir, "def_configs/config.bld.def"),\
                         os.path.join(conf_dir, "config.bld"))
-      common.log([common.info, common.file, log_file],
+      common.log([common.info, common.lfile, log_file],
                  "Copied default configs {0}\n".format("config.bld"))
 
 def cleanup():
       global currdir
       global log_file
-      common.log([common.info, common.file, log_file],
+      common.log([common.info, common.lfile, log_file],
                  "\nEnded at {0}\n".format(time.asctime()))
       log_file.close()
 
