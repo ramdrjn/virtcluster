@@ -48,8 +48,8 @@ def exec_cmd(cmd, out=None, err=None):
                   err = subprocess.STDOUT
             subprocess.check_call(cmd, stdout=out, stderr=err)
       except subprocess.CalledProcessError as e:
-            raise execCmdError("Cmd: {0} returned {1} error: {3}\n".format(
-                  e.cmd, e.returncode, e.output if e.output else ""))
+            raise execCmdError("Cmd: {0} returned {1} \n".format(
+                  e.cmd, e.returncode))
 
 def exec_cmd_op(cmd, out=None):
       log(debug, "In Function {0}".format(inspect.stack()[0][3]))
@@ -57,8 +57,11 @@ def exec_cmd_op(cmd, out=None):
       try:
             out=subprocess.check_output(cmd)
       except subprocess.CalledProcessError as e:
-            raise execCmdError("Cmd: {0} returned {1} error: {3}\n".format(
-                        e.cmd, e.returncode, e.output if e.output else ""))
+            errstr="Cmd: {0} returned {1}\n".format(e.cmd, e.returncode)
+            if e.output != None:
+                  errstr=errstr+"Output {0}\n".format(e.output)
+            raise execCmdError(errstr)
+
       return (out)
 
 def exec_command(cmd, out=None, err=None):

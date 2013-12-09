@@ -363,7 +363,7 @@ class provCLI_domain(cli_fmwk.VCCli):
         net_dir=os.path.join(os.getcwd(), "net")
         common.log([common.info, common.lfile, log_file],
                    "\nCommision start\n")
-        vc_commision.start(comi_dir, net_dir, arg_d)
+        vc_commision.start(comi_dir, net_dir, arg_d, log_file)
 
     def help_commision(self):
         common.log(common.debug,
@@ -409,7 +409,7 @@ class provCLI_domain(cli_fmwk.VCCli):
                 net_dir=os.path.join(os.getcwd(), "net")
                 common.log([common.info, common.lfile, log_file],
                            "\nCommision cleanup")
-                vc_commision.cleanup(dom_name, comi_dir, net_dir)
+                vc_commision.cleanup(dom_name, comi_dir, net_dir, log_file)
         else:
             print("Enter domain")
             return
@@ -922,13 +922,17 @@ def main():
         prov_cmd=provCLI()
         prov_cmd.cmdloop()
     except common.execCmdError as e:
-        common.log([common.error, common.lfile, log_file], e)
+        common.log([common.error, common.lfile, log_file],
+                   "Error {0}".format(e))
     except provisionError as e:
-        common.log([common.error, common.lfile, log_file], e)
+        common.log([common.error, common.lfile, log_file],
+                   "Error {0}".format(e))
     except vc_commision.commisionError as e:
-        common.log([common.error, common.lfile, log_file], e)
+        common.log([common.error, common.lfile, log_file],
+                   "Error {0}".format(e))
     except ssh.sshError as e:
-        common.log([common.error, common.lfile, log_file], e)
+        common.log([common.error, common.lfile, log_file],
+                   "Error {0}".format(e))
     except IOError as e:
         common.log([common.error, common.lfile, log_file],
                    "Error {0}".format(e))

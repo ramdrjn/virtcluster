@@ -29,7 +29,11 @@ def _check_commision_prep(dat_dir, sshi):
     common.log(common.debug,
                "In Function {0}".format(inspect.stack()[0][3]))
 
-    os.mkdir(dat_dir)
+    try:
+        os.mkdir(dat_dir)
+    except:
+        pass
+
     fname = os.path.join(dat_dir, "commision.dat")
 
     if not os.path.isfile(fname):
@@ -43,13 +47,13 @@ def _do_pm_config_file(pm_config, arg_d):
         f.write("   type = rpm-md\n")
         f.write("   baseurl = {0}\n".format(arg_d['pm-url']))
 
-def start(comi_dir, net_dir, arg_d):
+def start(comi_dir, net_dir, arg_d, lf):
     global log_file
 
     common.log(common.debug,
                "In Function {0}".format(inspect.stack()[0][3]))
 
-    log_file=open(os.path.join("logs", "commision.log"), 'a+')
+    log_file=lf
 
     common.log([common.info, common.lfile, log_file],
                "\nCommision initiated on {0}".format(time.asctime()))
@@ -128,19 +132,17 @@ def start(comi_dir, net_dir, arg_d):
     sshi.exec_remote_cmd(cmd)
     common.log([common.info, common.lfile, log_file],
                "\nCommision initiated for domain")
-    log_file.close()
 
-def cleanup(domain, comi_dir, net_dir):
+def cleanup(domain, comi_dir, net_dir, lf):
     global log_file
 
     common.log(common.debug,
                "In Function {0}".format(inspect.stack()[0][3]))
 
-    log_file=open(os.path.join("logs", "commision.log"), 'a+')
+    log_file=lf
 
     domain_dir = os.path.join(comi_dir, domain)
     sshi=ssh.ssh_Cls(domain, domain_dir, net_dir, log_file)
     common.log([common.info, common.lfile, log_file],
                "\nRemoving domain entry from known host")
     sshi.remove_domain_from_known_host()
-    log_file.close()
