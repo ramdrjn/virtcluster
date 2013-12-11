@@ -61,7 +61,6 @@ def exec_cmd_op(cmd, out=None):
             if e.output != None:
                   errstr=errstr+"Output {0}\n".format(e.output)
             raise execCmdError(errstr)
-
       return (out)
 
 def exec_command(cmd, out=None, err=None):

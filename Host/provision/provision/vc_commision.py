@@ -7,8 +7,9 @@ import os
 import json
 import urlparse
 import time
+import logging
 
-log_file=None
+logger=None
 
 class commisionError(Exception):
     def __init__(self, value):
@@ -17,73 +18,66 @@ class commisionError(Exception):
         return repr(self.value)
 
 def _prep_commision(dat_dir, fname, sshi):
-    common.log(common.debug,
-               "In Function {0}".format(inspect.stack()[0][3]))
+    logger.debug("In Function {0}".format(inspect.stack()[0][3]))
 
+    logger.info("Updating {0} file".format(fname))
     with open(fname, 'w') as f:
         f.write("Done at {0}".format(time.asctime()))
 
     sshi.createHostKeys()
 
 def _check_commision_prep(dat_dir, sshi):
-    common.log(common.debug,
-               "In Function {0}".format(inspect.stack()[0][3]))
+    logger.debug("In Function {0}".format(inspect.stack()[0][3]))
 
     try:
         os.mkdir(dat_dir)
     except:
-        pass
+        logger.debug("Commision data directory skipped")
 
     fname = os.path.join(dat_dir, "commision.dat")
 
     if not os.path.isfile(fname):
-        common.log([common.info, common.lfile, log_file],
-                   "\nCommision prep at {0}".format(time.asctime()))
+        logger.info("Commision prep")
         _prep_commision(dat_dir, fname, sshi)
 
 def _do_pm_config_file(pm_config, arg_d):
+    logger.debug("In Function {0}".format(inspect.stack()[0][3]))
     with open(pm_config, "w") as f:
         f.write("[main]\n")
         f.write("   type = rpm-md\n")
         f.write("   baseurl = {0}\n".format(arg_d['pm-url']))
 
-def start(comi_dir, net_dir, arg_d, lf):
-    global log_file
+def start(comi_dir, net_dir, arg_d):
+    global logger
+    logger = logging.getLogger('provision.commision')
 
-    common.log(common.debug,
-               "In Function {0}".format(inspect.stack()[0][3]))
+    logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+    logger.debug("Commision start args {0}", arg_d)
 
-    log_file=lf
-
-    common.log([common.info, common.lfile, log_file],
-               "\nCommision initiated on {0}".format(time.asctime()))
+    logger.info("Commision initiated")
 
     domain=arg_d['domain']
     domain_dir = os.path.join(comi_dir, domain)
 
+    logger.info("Commision domain directory {0}".format(domain_dir))
     os.mkdir(domain_dir)
-    common.log([common.info, common.lfile, log_file],
-               "\nCommision directory {0}".format(domain_dir))
 
-    sshi=ssh.ssh_Cls(domain, domain_dir, net_dir, log_file)
+    sshi=ssh.ssh_Cls(domain, domain_dir, net_dir,
+                     logging.getLogger('provision.commision.ssh'))
 
     dat_dir = os.path.join(comi_dir, "dat")
-    common.log([common.info, common.lfile, log_file],
-               "\nCommision dat directory {0}".format(dat_dir))
+    logger.info("Commision dat directory {0}".format(dat_dir))
 
     _check_commision_prep(dat_dir, sshi)
 
-    common.log([common.info, common.lfile, log_file],
-               "\nAttempting SSH linkup")
+    logger.info("Attempting SSH linkup")
     sshi.do_ssh_linkup()
 
-    common.log([common.info, common.lfile, log_file],
-               "\nBuilding SSH config")
+    logger.info("Building SSH config")
     sshi.do_ssh_config()
 
     rmt_conf_dir='/opt/x86vm'
-    common.log([common.info, common.lfile, log_file],
-               "\nBuilding remote directory {0}".format(rmt_conf_dir))
+    logger.info("Building remote directory {0}".format(rmt_conf_dir))
     cmd='mkdir -p {0}'.format(rmt_conf_dir)
     sshi.exec_remote_cmd(cmd)
 
@@ -93,18 +87,15 @@ def start(comi_dir, net_dir, arg_d, lf):
     url=urlparse.urlparse(arg_d['pm-url'])
     conf['pm-url-scheme']=url.scheme
 
-    common.log([common.info, common.lfile, log_file],
-               "\nPM {0} url {1} {0}".format(arg_d['pkg-mgmt'], arg_d['pm-url']))
+    logger.info("PM {0} url {1}".format(arg_d['pkg-mgmt'], arg_d['pm-url']))
 
     pm_config_fname="pm_config"
     pm_config = os.path.join(domain_dir, pm_config_fname)
-    common.log([common.info, common.lfile, log_file],
-               "\nLocal PM config file {0}".format(pm_config))
+    logger.info("Local PM config file {0}".format(pm_config))
 
     _do_pm_config_file(pm_config, arg_d)
 
-    common.log([common.info, common.lfile, log_file],
-               "\nMoving PM config file to remote")
+    logger.info("Moving PM config file to remote")
     sshi.remote_cp(pm_config, rmt_conf_dir)
 
     conf['pm-config-file']=os.path.join(rmt_conf_dir, pm_config_fname)
@@ -112,37 +103,31 @@ def start(comi_dir, net_dir, arg_d, lf):
     comm_fname="commision.conf"
     rem_comm_file = os.path.join(rmt_conf_dir, comm_fname)
     comm_conf = os.path.join(domain_dir, comm_fname)
-    common.log([common.info, common.lfile, log_file],
-               "\nLocal commision config file {0}".format(comm_conf))
+    logger.info("Writing to local commision config file {0}".format(comm_conf))
     with open(comm_conf, 'w') as f:
         json.dump(conf, f)
 
-    common.log([common.info, common.lfile, log_file],
-               "\nMoving commision config file to remote")
+    logger.info("Moving commision config file to remote")
     sshi.remote_cp(comm_conf, rem_comm_file)
 
     bootstrap_f = os.path.join(comi_dir, "../provision/bootstrap_com.sh")
-    common.log([common.info, common.lfile, log_file],
-               "\nMoving local bootstrap {0} to remote".format(bootstrap_f))
+    logger.info("Moving local stage 1 {0} to remote".format(bootstrap_f))
     sshi.remote_cp(bootstrap_f, rmt_conf_dir)
 
     cmd="sh /opt/x86vm/bootstrap_com.sh {0}".format(rem_comm_file)
-    common.log([common.info, common.lfile, log_file],
-               "\nExecuting command {0} in target".format(cmd))
+    logger.info("Executing command {0} in target".format(cmd))
+    logger.info("Commision stage 1 initiated for domain")
     sshi.exec_remote_cmd(cmd)
-    common.log([common.info, common.lfile, log_file],
-               "\nCommision initiated for domain")
+    logger.info("Domain commision cli end")
 
-def cleanup(domain, comi_dir, net_dir, lf):
-    global log_file
+def cleanup(domain, comi_dir, net_dir):
+    global logger
+    logger = logging.getLogger('provision.commision')
 
-    common.log(common.debug,
-               "In Function {0}".format(inspect.stack()[0][3]))
-
-    log_file=lf
+    logger.debug("In Function {0}".format(inspect.stack()[0][3]))
 
     domain_dir = os.path.join(comi_dir, domain)
-    sshi=ssh.ssh_Cls(domain, domain_dir, net_dir, log_file)
-    common.log([common.info, common.lfile, log_file],
-               "\nRemoving domain entry from known host")
+    sshi=ssh.ssh_Cls(domain, domain_dir, net_dir,
+                     logging.getLogger('provision.commision.ssh'))
+    logger.info("Removing domain entry from known host")
     sshi.remove_domain_from_known_host()

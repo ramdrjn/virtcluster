@@ -11,9 +11,10 @@ import string
 import os
 import json
 import shutil
-import time
+import logging
+import logging.handlers
 
-log_file=None
+logger=None
 
 class provisionError(Exception):
     def __init__(self, value):
@@ -22,8 +23,7 @@ class provisionError(Exception):
         return repr(self.value)
 
 def complete_dom(text, line, begidx, endidx):
-    common.log(common.debug,
-               "In Function {0}".format(inspect.stack()[0][3]))
+    logger.debug("In Function {0}".format(inspect.stack()[0][3]))
 
     comp_type=cli_fmwk.autocomp(['domain'], text)
 
@@ -36,8 +36,7 @@ def complete_dom(text, line, begidx, endidx):
     return comp_type
 
 def complete_network(text, line, begidx, endidx):
-    common.log(common.debug,
-               "In Function {0}".format(inspect.stack()[0][3]))
+    logger.debug("In Function {0}".format(inspect.stack()[0][3]))
 
     comp_type=cli_fmwk.autocomp(['network'], text)
 
@@ -50,8 +49,7 @@ def complete_network(text, line, begidx, endidx):
     return comp_type
 
 def complete_nwk_dom(text, line, begidx, endidx):
-    common.log(common.debug,
-               "In Function {0}".format(inspect.stack()[0][3]))
+    logger.debug("In Function {0}".format(inspect.stack()[0][3]))
 
     comp_type=cli_fmwk.autocomp(['domain', 'network'], text)
 
@@ -66,10 +64,13 @@ def complete_nwk_dom(text, line, begidx, endidx):
             comp_type=['']
     return comp_type
 
+def error_log_print(msg):
+    logger.error(msg)
+    print(msg)
+
 class provCLI(cli_fmwk.VCCli):
     def __init__(self):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         cli_fmwk.VCCli.__init__(self, intro="virtcluster provision cli")
         self.def_comp_lst=['domain', 'network']
 
@@ -79,30 +80,25 @@ class provCLI(cli_fmwk.VCCli):
         self._con = py_libvirt.con_init()
 
     def do_domain(self, args):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         dom_cli=provCLI_domain(self._con)
         dom_cli.cmdloop()
 
     def help_domain(self):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         print("     Domain subcommands    ")
 
     def do_network(self, args):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         nwk_cli=provCLI_network(self._con)
         nwk_cli.cmdloop()
 
     def help_network(self):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         print("     Network subcommands    ")
 
     def do_info(self, args):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
 
         arg_lst=args.split()
         if len(arg_lst) != 2:
@@ -115,7 +111,7 @@ class provCLI(cli_fmwk.VCCli):
             dom_name=arg_lst[1]
             dom = py_libvirt.dom_lookup(self._con, dom_name)
             if not dom:
-                print("Domain not defined")
+                error_log_print("Domain not defined")
                 return
             s=py_libvirt.info_domain(dom)
             print(s)
@@ -124,29 +120,24 @@ class provCLI(cli_fmwk.VCCli):
             return
 
     def help_info(self):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         print("     Info domain <domain name>    ")
 
     def complete_info(self, text, line, begidx, endidx):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         return complete_dom(text, line, begidx, endidx)
 
     def do_list(self, args):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         s = py_libvirt.list_domains(self._con)
         print (s)
         #network
     def help_list(self):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         print("     List domains    ")
 
     def do_dumpxml(self, args):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
 
         arg_lst=args.split()
         if len(arg_lst) != 2:
@@ -159,7 +150,7 @@ class provCLI(cli_fmwk.VCCli):
             dom_name=arg_lst[1]
             dom = py_libvirt.dom_lookup(self._con, dom_name)
             if not dom:
-                print("Domain not defined")
+                error_log_print("Domain not defined")
                 return
             s = py_libvirt.dumpxml_domain(dom)
             print(s)
@@ -167,7 +158,7 @@ class provCLI(cli_fmwk.VCCli):
             nwk_name=arg_lst[1]
             nwk = py_libvirt.network_lookup(self._con, nwk_name)
             if not nwk:
-                print("Network not defined")
+                error_log_print("Network not defined")
                 return
             s=py_libvirt.dumpxml_network(nwk)
             print(s)
@@ -176,22 +167,19 @@ class provCLI(cli_fmwk.VCCli):
             return
 
     def help_dumpxml(self):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         print("     Dump XML of either:      ")
         print("      domain <domain name>    ")
         print("             or               ")
         print("      network <network name>  ")
 
     def complete_dumpxml(self, text, line, begidx, endidx):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         return complete_nwk_dom(text, line, begidx, endidx)
 
 class provCLI_domain(cli_fmwk.VCCli):
     def __init__(self, con):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         cli_fmwk.VCCli.__init__(self, intro="Domain subcommands")
         self.prompt = self.prompt[:-1]+':Domain)'
         self.def_comp_lst=['domain']
@@ -232,56 +220,50 @@ class provCLI_domain(cli_fmwk.VCCli):
               <seclabel type='none'/>\
             </domain>\
 "
-        xmlT=""
-        try:
-            xmlT=string.Template(xml).substitute(val)
-        except Exception as e:
-            raise provisionError("Domain define invalid arguments {0}".format(e))
+        xmlT=string.Template(xml).substitute(val)
         return xmlT
 
     def do_define(self, args):
-        global log_file
+        global logger
 
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
 
         arg_lst=args.split()
         arg_d = dict(zip(arg_lst[::2], [arg_lst[i]
                                         for i in range(1, len(arg_lst), 2)]))
 
-        common.log([common.info, common.lfile, log_file],
-                   "\nDomain define args {0}".format(args))
+        logger.debug("Domain define args {0}".format(args))
 
         dom_name=arg_d['domain']
         if dom_name:
             dom = py_libvirt.dom_lookup(self._con, dom_name)
             if dom:
-                print("Domain already defined")
+                error_log_print("Domain already defined")
                 return
         else:
             print("Enter domain ")
             return
 
-        common.log([common.info, common.lfile, log_file],
-                   "\nDomain name {0}".format(dom_name))
+        logger.info("Domain name {0}".format(dom_name))
 
         #Get fabric network details and update arg_d
         j_dict={}
 
         net_fname="{0}.net".format(dom_name)
         net_file = os.path.join("net", net_fname)
+        logger.info("Domain network file name {0}".format(net_file))
         with open(net_file, 'r') as f:
             j_dict=json.load(f)
 
         arg_d['fab0_dom_mac']=j_dict['fab0_dom_mac']
 
-        common.log([common.info, common.lfile, log_file],
-                   "\nDomain mac {0}".format(arg_d['fab0_dom_mac']))
+        logger.info("Domain mac {0}".format(arg_d['fab0_dom_mac']))
 
         j_dict={}
 
         fab_fname="fab0_host.net"
         fab_file = os.path.join("net", fab_fname)
+        logger.info("Fabric network file name {0}".format(fab_file))
         with open(fab_file, 'r') as f:
             j_dict=json.load(f)
 
@@ -291,57 +273,57 @@ class provCLI_domain(cli_fmwk.VCCli):
         #Request for vnc port auto allocation
         arg_d['vnc_port']='-1'
 
-        common.log([common.info, common.lfile, log_file],
-                   "\nDomain net {0} dev {1} \n".format
-                   (arg_d['fab0_net_name'], arg_d['fab0_net_dev']))
+        logger.info("Domain net {0} dev {1}".format(arg_d['fab0_net_name'],
+                                                     arg_d['fab0_net_dev']))
 
         img_name=arg_d['image']
-        common.log([common.info, common.lfile, log_file],
-                   "\nImage name {0} \n".format(img_name))
+        logger.info("Image name {0} ".format(img_name))
 
         if img_name:
             img_dir="provisioned_domain/{}/images".format(dom_name)
-            common.log([common.info, common.lfile, log_file],
-                       "\nImage dir {0} \n".format(img_dir))
+            logger.info("Image dir {0}".format(img_dir))
             os.makedirs(img_dir)
+            logger.debug("Extracting image tar")
             img_tgz=os.path.join("./images",
                                  "virtcluster-image-{}.tgz".format(img_name))
             op=common.exec_cmd_op(["tar", "zxvf", img_tgz, "-C", img_dir])
-            common.log([common.info, common.lfile, log_file], op)
+            logger.info(op)
         else:
             print("Enter Image")
             return
 
         img_dir=os.path.join(os.getcwd(),
                   "provisioned_domain/{}/images/{}".format(dom_name, img_name))
-        common.log([common.info, common.lfile, log_file],
-                   "\nProvisioned domain Image dir {0} \n".format(img_dir))
+        logger.info("Provisioned domain Image dir {0}".format(img_dir))
 
-        with open(os.path.join(img_dir,"manifest")) as infile:
+        logger.debug("Accessing manifest file")
+        with open(os.path.join(img_dir, "manifest")) as infile:
             img_desc = json.load(infile)
 
         arg_d['kernel']=os.path.join(img_dir, img_desc['kernel'])
         arg_d['rootfs']=os.path.join(img_dir, img_desc['fs_raw'])
-        common.log([common.info, common.lfile, log_file],
-                   "\nkernel {0} rootfs {1}\n".format(arg_d['kernel'], arg_d['rootfs']))
+        logger.info("kernel {0} rootfs {1}".format(arg_d['kernel'],
+                                                   arg_d['rootfs']))
 
+        logger.debug("Forming domain xml from template")
         xml = self._dom_xml_comp(arg_d)
-        common.log([common.info, common.lfile, log_file], xml)
+        logger.info(xml)
+        logger.debug("Defining domain")
         dom = py_libvirt.dom_defineXML(self._con, xml)
 
     def help_define(self):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         print("     Define domain <domain name>    ")
 
     def complete_define(self, text, line, begidx, endidx):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         return complete_dom(text, line, begidx, endidx)
 
     def do_commision(self, args):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+
+        logger.debug("Commision args {0}".format(args))
+
         arg_lst=args.split()
         arg_d = dict(zip(arg_lst[::2], [arg_lst[i]
                                         for i in range(1, len(arg_lst), 2)]))
@@ -349,11 +331,11 @@ class provCLI_domain(cli_fmwk.VCCli):
         if dom_name:
             dom = py_libvirt.dom_lookup(self._con, dom_name)
             if not dom:
-                print("Domain not defined")
+                error_log_print("Domain not defined")
                 return
             s=py_libvirt.info_domain(dom)
             if not "State: running" in s:
-                print("Domain not running")
+                error_log_print("Domain not running")
                 return
         else:
             print("Enter domain ")
@@ -361,23 +343,21 @@ class provCLI_domain(cli_fmwk.VCCli):
 
         comi_dir=os.path.join(os.getcwd(), "commisioned_domain")
         net_dir=os.path.join(os.getcwd(), "net")
-        common.log([common.info, common.lfile, log_file],
-                   "\nCommision start\n")
-        vc_commision.start(comi_dir, net_dir, arg_d, log_file)
+        logger.debug("Commision start")
+        vc_commision.start(comi_dir, net_dir, arg_d)
 
     def help_commision(self):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         print("     Start domain <domain name>  ")
 
     def complete_commision(self, text, line, begidx, endidx):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         return complete_dom(text, line, begidx, endidx)
 
     def do_undefine(self, args):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+
+        logger.debug("Domain undefine args {0}".format(args))
 
         nopurge=False
         if 'nopurge' in args:
@@ -395,38 +375,35 @@ class provCLI_domain(cli_fmwk.VCCli):
             dom_name=arg_lst[1]
             dom = py_libvirt.dom_lookup(self._con, dom_name)
             if not dom:
-                print("Domain not defined")
+                error_log_print("Domain not defined")
                 return
             dom = py_libvirt.dom_undefine(dom)
             if not nopurge:
-                common.log([common.info, common.lfile, log_file],
-                           "\nPurge selected")
+                logger.info("Purge selected")
                 shutil.rmtree(os.path.join("provisioned_domain", dom_name),
                               True)
                 shutil.rmtree(os.path.join("commisioned_domain", dom_name),
                               True)
                 comi_dir=os.path.join(os.getcwd(), "commisioned_domain")
                 net_dir=os.path.join(os.getcwd(), "net")
-                common.log([common.info, common.lfile, log_file],
-                           "\nCommision cleanup")
-                vc_commision.cleanup(dom_name, comi_dir, net_dir, log_file)
+                logger.debug("Commision cleanup")
+                vc_commision.cleanup(dom_name, comi_dir, net_dir)
         else:
             print("Enter domain")
             return
 
     def help_undefine(self):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         print("     Undefine domain <domain name>    ")
 
     def complete_undefine(self, text, line, begidx, endidx):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         return complete_nwk_dom(text, line, begidx, endidx)
 
     def do_start(self, args):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+
+        logger.debug("Domain start args {0}".format(args))
 
         arg_lst=args.split()
         if len(arg_lst) != 2:
@@ -439,28 +416,26 @@ class provCLI_domain(cli_fmwk.VCCli):
             dom_name=arg_lst[1]
             dom = py_libvirt.dom_lookup(self._con, dom_name)
             if not dom:
-                print("Domain not defined")
+                error_log_print("Domain not defined")
                 return
-            common.log([common.info, common.lfile, log_file],
-                       "\nDomain {0} started at {1}".format(dom_name, time.asctime()))
+            logger.info("Domain {0} started".format(dom_name))
             py_libvirt.dom_start(dom)
         else:
             print("Enter domain")
             return
 
     def help_start(self):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         print("     Start domain <domain name>    ")
 
     def complete_start(self, text, line, begidx, endidx):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         return complete_nwk_dom(text, line, begidx, endidx)
 
     def do_stop(self, args):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+
+        logger.debug("Domain stop args {0}".format(args))
 
         arg_lst=args.split()
         if len(arg_lst) != 2:
@@ -473,28 +448,26 @@ class provCLI_domain(cli_fmwk.VCCli):
             dom_name=arg_lst[1]
             dom = py_libvirt.dom_lookup(self._con, dom_name)
             if not dom:
-                print("Domain not defined")
+                error_log_print("Domain not defined")
                 return
-            common.log([common.info, common.lfile, log_file],
-                       "\nDomain {0} stopped at {1}".format(dom_name, time.asctime()))
+            logger.info("Domain {0} stopped".format(dom_name))
             py_libvirt.dom_stop(dom)
         else:
-            print("Enter either domain or network")
+            print("Enter domain")
             return
 
     def help_stop(self):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         print("     Stop domain <domain name>    ")
 
     def complete_stop(self, text, line, begidx, endidx):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         return complete_nwk_dom(text, line, begidx, endidx)
 
     def do_shut(self, args):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+
+        logger.debug("Domain shut args {0}".format(args))
 
         arg_lst=args.split()
         if len(arg_lst) != 2:
@@ -507,28 +480,26 @@ class provCLI_domain(cli_fmwk.VCCli):
             dom_name=arg_lst[1]
             dom = py_libvirt.dom_lookup(self._con, dom_name)
             if not dom:
-                print("Domain not defined")
+                error_log_print("Domain not defined")
                 return
-            common.log([common.info, common.lfile, log_file],
-                       "\nDomain {0} shut at {1}".format(dom_name, time.asctime()))
+            logger.info("Domain {0} shut".format(dom_name))
             py_libvirt.dom_shut(dom)
         else:
             print("Enter domain")
             return
 
     def help_shut(self):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         print("     Shut domain <domain name>    ")
 
     def complete_shut(self, text, line, begidx, endidx):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         return complete_dom(text, line, begidx, endidx)
 
     def do_pause(self, args):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+
+        logger.debug("Domain pause args {0}".format(args))
 
         arg_lst=args.split()
         if len(arg_lst) != 2:
@@ -541,28 +512,26 @@ class provCLI_domain(cli_fmwk.VCCli):
             dom_name=arg_lst[1]
             dom = py_libvirt.dom_lookup(self._con, dom_name)
             if not dom:
-                print("Domain not defined")
+                error_log_print("Domain not defined")
                 return
-            common.log([common.info, common.lfile, log_file],
-                       "\nDomain {0} paused at {1}".format(dom_name, time.asctime()))
+            logger.info("Domain {0} paused".format(dom_name))
             py_libvirt.dom_pause(dom)
         else:
             print("Enter domain")
             return
 
     def help_pause(self):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         print("     Pause domain <domain name>    ")
 
     def complete_pause(self, text, line, begidx, endidx):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         return complete_dom(text, line, begidx, endidx)
 
     def do_resume(self, args):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+
+        logger.debug("Domain resume args {0}".format(args))
 
         arg_lst=args.split()
         if len(arg_lst) != 2:
@@ -575,41 +544,40 @@ class provCLI_domain(cli_fmwk.VCCli):
             dom_name=arg_lst[1]
             dom = py_libvirt.dom_lookup(self._con, dom_name)
             if not dom:
-                print("Domain not defined")
+                error_log_print("Domain not defined")
                 return
-            common.log([common.info, common.lfile, log_file],
-                       "\nDomain {0} resumed at {1}".format(dom_name, time.asctime()))
+            logger.info("Domain {0} resumed".format(dom_name))
             py_libvirt.dom_resume(dom)
         else:
             print("Enter domain")
             return
 
     def help_resume(self):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         print("     Resume domain <domain name>    ")
 
     def complete_resume(self, text, line, begidx, endidx):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         return complete_dom(text, line, begidx, endidx)
 
 class provCLI_dhcp(cli_fmwk.VCCli):
     def __init__(self, arg_d):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         self.arg_d=arg_d
         cli_fmwk.VCCli.__init__(self, intro="DHCP subcommands")
         self.prompt = self.prompt[:-1]+':dhcp)'
 
     def do_range(self, args):
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("Dhcp range args {0}".format(args))
+
         t_dict=args.split()
         t_dict = dict(zip(t_dict[::2], [t_dict[i]
                                         for i in range(1, len(t_dict), 2)]))
         self.arg_d['dhcp_start']=t_dict['start']
         self.arg_d['dhcp_end']=t_dict['end']
-        common.log([common.info, common.lfile, log_file],
-                   "\nDHCP range starting {0} end {1}".format(self.arg_d['dhcp_start'], self.arg_d['dhcp_end']))
+        logger.info("DHCP range starting {0} end {1}".format(
+                self.arg_d['dhcp_start'], self.arg_d['dhcp_end']))
 
     def help_range(self, args):
         pass
@@ -617,18 +585,22 @@ class provCLI_dhcp(cli_fmwk.VCCli):
         pass
 
     def do_host(self, args):
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("Dhcp host args {0}".format(args))
+
         t_dict=args.split()
         t_dict = dict(zip(t_dict[::2], [t_dict[i]
                                         for i in range(1, len(t_dict), 2)]))
         host_xml="<host mac='$mac' name='$name' ip='$ip'/>\ \n"
+        logger.debug("Generating host xml")
         hostT=string.Template(host_xml).substitute(t_dict)
-        common.log([common.info, common.lfile, log_file],
-                   "\nDHCP host entry {0}".format(hostT))
+        logger.info("DHCP host entry {0}".format(hostT))
 
         if 'host' in self.arg_d:
             self.arg_d['host']=self.arg_d['host']+hostT
         else:
             self.arg_d['host']=hostT
+        logger.debug("Full host enteries {0}".format(self.arg_d['host']))
 
         #Store domain net configs in net directory
         j_dict={}
@@ -638,6 +610,7 @@ class provCLI_dhcp(cli_fmwk.VCCli):
 
         net_fname="{0}.net".format(t_dict['name'])
         net_file = os.path.join("net", net_fname)
+        logger.info("Generating domain networking file {0}".format(net_file))
         with open(net_file, 'w') as f:
             json.dump(j_dict, f)
 
@@ -648,20 +621,19 @@ class provCLI_dhcp(cli_fmwk.VCCli):
 
 class provCLI_network_define(cli_fmwk.VCCli):
     def __init__(self, arg_d):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         self.arg_d=arg_d
         cli_fmwk.VCCli.__init__(self, intro="Network define subcommands")
         self.prompt = self.prompt[:-1]+':Network {0})'.format(arg_d['network'])
         if self.arg_d['network']=='fabric':
             self.is_fabric=True
             self.arg_d['network']='virtcluster_fabric0'
-            common.log([common.info, common.lfile, log_file],
-                       "\nFabric network define")
+            logger.info("Fabric network define")
 
     def do_bridge(self, args):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+
+        logger.debug("Bridge args {0}".format(args))
 
         t_dict=args.split()
         t_dict = dict(zip(t_dict[::2], [t_dict[i]
@@ -673,9 +645,9 @@ class provCLI_network_define(cli_fmwk.VCCli):
         self.arg_d['ip_addr']=t_dict['ip']
         self.arg_d['netmask']=t_dict['netmask']
 
-        common.log([common.info, common.lfile, log_file],
-                   "\nBridge name {0}, ip, netmask".format(
-                self.arg_d['brname'], self.arg_d['ip_addr'], self.arg_d['netmask']))
+        logger.info("Bridge name {0}, ip {1}, netmask {2}".format(
+                self.arg_d['brname'], self.arg_d['ip_addr'],
+                self.arg_d['netmask']))
 
         #Store host configs in net directory
         j_dict={}
@@ -683,8 +655,13 @@ class provCLI_network_define(cli_fmwk.VCCli):
         j_dict['fab0_host_net_ip']=t_dict['ip']
         j_dict['fab0_net_dev']='vfab0'
 
-        net_fname="fab0_host.net"
+        if self.is_fabric:
+            net_fname="fab0_host.net"
+        else:
+            net_fname=self.arg_d['network']
+
         net_file = os.path.join("net", net_fname)
+        logger.debug("Accessing network file {0}".format(net_file))
         with open(net_file, 'w') as f:
             json.dump(j_dict, f)
 
@@ -693,8 +670,7 @@ class provCLI_network_define(cli_fmwk.VCCli):
     def complete_bridge(self, args):
         pass
     def do_dhcp(self, args):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
 
         dhcp_cli=provCLI_dhcp(self.arg_d)
         dhcp_cli.cmdloop()
@@ -706,8 +682,7 @@ class provCLI_network_define(cli_fmwk.VCCli):
 
 class provCLI_network(cli_fmwk.VCCli):
     def __init__(self, con):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         cli_fmwk.VCCli.__init__(self, intro="Network subcommands")
         self.prompt = self.prompt[:-1]+':Network)'
         self.def_comp_lst=['network']
@@ -726,16 +701,12 @@ class provCLI_network(cli_fmwk.VCCli):
              </ip>\
            </network>\
 "
-        xmlT=""
-        try:
-            xmlT=string.Template(xml).substitute(val)
-        except Exception as e:
-            raise provisionError("Network define invalid arguments {0}".format(e))
+        xmlT=string.Template(xml).substitute(val)
         return xmlT
 
     def do_define(self, args):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("Network args {0}".format(args))
 
         arg_lst=args.split()
         arg_d = dict(zip(arg_lst[::2], [arg_lst[i]
@@ -746,36 +717,34 @@ class provCLI_network(cli_fmwk.VCCli):
             nwk_name=arg_lst[1]
             nwk = py_libvirt.network_lookup(self._con, nwk_name)
             if nwk:
-                print("Network already defined")
+                error_log_print("Network already defined")
                 return
         else:
             print("Enter network")
             return
 
-        common.log([common.info, common.lfile, log_file],
-                   "\nNetwork {0} define at {1}".format(nwk_name, time.asctime()))
+        logger.info("Network {0} define".format(nwk_name))
 
         nwk_def_cli=provCLI_network_define(arg_d)
         nwk_def_cli.cmdloop()
 
+        logger.debug("Generating network xml".format(nwk_name))
         xml = self._nwk_xml_comp(arg_d)
-        common.log([common.info, common.lfile, log_file], xml)
+        logger.info(xml)
         nwk = py_libvirt.network_defineXML(self._con, xml)
 
     def help_define(self):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         print("     Define network <network name>  ")
 
     def complete_define(self, text, line, begidx, endidx):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
 
         return complete_network(text, line, begidx, endidx)
 
     def do_undefine(self, args):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("Network undefine args {0}".format(args))
 
         arg_lst=args.split()
         if len(arg_lst) != 2:
@@ -788,28 +757,25 @@ class provCLI_network(cli_fmwk.VCCli):
             nwk_name=arg_lst[1]
             nwk = py_libvirt.network_lookup(self._con, nwk_name)
             if not nwk:
-                print("Network not defined")
+                error_log_print("Network not defined")
                 return
-            common.log([common.info, common.lfile, log_file],
-                       "\nNetwork undefine args {0}".format(nwk_name))
+            logger.info("Network {0} undefine".format(nwk_name))
             nwk = py_libvirt.network_undefine(nwk)
         else:
             print("Enter network")
             return
 
     def help_undefine(self):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         print("     Undefine network <network name>  ")
 
     def complete_undefine(self, text, line, begidx, endidx):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         return complete_network(text, line, begidx, endidx)
 
     def do_start(self, args):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("Network start args {0}".format(args))
 
         arg_lst=args.split()
         if len(arg_lst) != 2:
@@ -822,28 +788,25 @@ class provCLI_network(cli_fmwk.VCCli):
             nwk_name=arg_lst[1]
             nwk = py_libvirt.network_lookup(self._con, nwk_name)
             if not nwk:
-                print("Network not defined")
+                error_log_print("Network not defined")
                 return
-            common.log([common.info, common.lfile, log_file],
-                       "\nNetwork {0} start at {1}".format(nwk_name, time.asctime()))
+            logger.info("Network {0} start".format(nwk_name))
             py_libvirt.network_start(nwk)
         else:
             print("Enter network")
             return
 
     def help_start(self):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         print("     Start network <network name>  ")
 
     def complete_start(self, text, line, begidx, endidx):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         return complete_network(text, line, begidx, endidx)
 
     def do_stop(self, args):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("Network stop args {0}".format(args))
 
         arg_lst=args.split()
         if len(arg_lst) != 2:
@@ -856,89 +819,80 @@ class provCLI_network(cli_fmwk.VCCli):
             nwk_name=arg_lst[1]
             nwk = py_libvirt.network_lookup(self._con, nwk_name)
             if not nwk:
-                print("Network not defined")
+                error_log_print("Network not defined")
                 return
-            common.log([common.info, common.lfile, log_file],
-                       "\nNetwork {0} stop at {1}".format(nwk_name, time.asctime()))
+            logger.info("Network {0} stop".format(nwk_name))
             py_libvirt.network_stop(nwk)
         else:
             print("Enter network")
             return
 
     def help_stop(self):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         print("     Stop network <network name>  ")
 
     def complete_stop(self, text, line, begidx, endidx):
-        common.log(common.debug,
-                   "In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         return complete_network(text, line, begidx, endidx)
 
 def prep_provision():
-    global log_file
-    common.log(common.debug,
-               "In Function {0}".format(inspect.stack()[0][3]))
+    global logger
 
     try:
         os.mkdir("logs")
     except OSError:
         pass
 
-    log_file=open(os.path.join("logs", "provision.log"), 'a+')
+    # create logger
+    logger = logging.getLogger('provision')
+    logger.setLevel(logging.DEBUG)
 
-    common.log([common.info, common.lfile, log_file],
-               "\nProvision initiated on {0}".format(time.asctime()))
+    # create file handler and set level to debug
+    fh = logging.handlers.RotatingFileHandler("logs/provision.log",
+                                              maxBytes=50*1024*1024,
+                                              backupCount=5)
+    fh.setLevel(logging.DEBUG)
+
+    # create formatter
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    # add formatter to ch
+    fh.setFormatter(formatter)
+
+    # add fh to logger
+    logger.addHandler(fh)
+
+    logger.info('Provisioning initiated')
 
 def cleanup_provision():
-    global log_file
-    common.log(common.debug,
-               "In Function {0}".format(inspect.stack()[0][3]))
-
-    log_file.close()
+    global logger
+    logger.debug("In Function {0}".format(inspect.stack()[0][3]))
 
 def main():
-    common.log(common.debug,
-               "In Function {0}".format(inspect.stack()[0][3]))
-
-    #common.set_debug_lvl(common.debug)
 
     prep_provision()
 
     try:
         os.mkdir("provisioned_domain")
-        common.log([common.info, common.lfile, log_file],
-                   "\nprovisioned_domain directory created")
+        logger.info("provisioned_domain directory created")
         os.mkdir("commisioned_domain")
-        common.log([common.info, common.lfile, log_file],
-                   "\ncommisioned_domain directory created")
+        logger.info("commisioned_domain directory created")
         os.mkdir("net")
-        common.log([common.info, common.lfile, log_file],
-                   "\nnet directory created")
+        logger.info("net directory created")
     except OSError:
+        logger.info("Skipping directory creations")
         pass
 
     try:
         prov_cmd=provCLI()
         prov_cmd.cmdloop()
-    except common.execCmdError as e:
-        common.log([common.error, common.lfile, log_file],
-                   "Error {0}".format(e))
-    except provisionError as e:
-        common.log([common.error, common.lfile, log_file],
-                   "Error {0}".format(e))
-    except vc_commision.commisionError as e:
-        common.log([common.error, common.lfile, log_file],
-                   "Error {0}".format(e))
-    except ssh.sshError as e:
-        common.log([common.error, common.lfile, log_file],
-                   "Error {0}".format(e))
-    except IOError as e:
-        common.log([common.error, common.lfile, log_file],
-                   "Error {0}".format(e))
-    except OSError as e:
-        common.log([common.error, common.lfile, log_file],
-                   "Error {0}".format(e))
+    except (common.execCmdError,
+            provisionError,
+            vc_commision.commisionError,
+            ssh.sshError,
+            IOError,
+            OSError) as e:
+        logger.exception("Error {0}".format(str(e)))
 
     cleanup_provision()
 
