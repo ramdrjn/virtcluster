@@ -76,7 +76,8 @@ def start(comi_dir, net_dir, arg_d):
     logger.info("Building SSH config")
     sshi.do_ssh_config()
 
-    rmt_conf_dir='/opt/x86vm'
+    rmt_dir='/opt/x86vm'
+    rmt_conf_dir=os.path.join(rmt_dir, 'conf')
     logger.info("Building remote directory {0}".format(rmt_conf_dir))
     cmd='mkdir -p {0}'.format(rmt_conf_dir)
     sshi.exec_remote_cmd(cmd)
@@ -112,7 +113,7 @@ def start(comi_dir, net_dir, arg_d):
 
     bootstrap_f = os.path.join(comi_dir, "../provision/bootstrap_com.sh")
     logger.info("Moving local stage 1 {0} to remote".format(bootstrap_f))
-    sshi.remote_cp(bootstrap_f, rmt_conf_dir)
+    sshi.remote_cp(bootstrap_f, rmt_dir)
 
     cmd="sh /opt/x86vm/bootstrap_com.sh {0}".format(rem_comm_file)
     logger.info("Executing command {0} in target".format(cmd))

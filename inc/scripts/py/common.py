@@ -51,7 +51,7 @@ def exec_cmd(cmd, out=None, err=None):
             raise execCmdError("Cmd: {0} returned {1} \n".format(
                   e.cmd, e.returncode))
 
-def exec_cmd_op(cmd, out=None):
+def exec_cmd_op(cmd):
       log(debug, "In Function {0}".format(inspect.stack()[0][3]))
       log(debug, "Executing command {0}".format(cmd))
       try:
@@ -63,16 +63,13 @@ def exec_cmd_op(cmd, out=None):
             raise execCmdError(errstr)
       return (out)
 
-def exec_command(cmd, out=None, err=None):
+def exec_command(cmd):
       log(debug, "In Function {0}".format(inspect.stack()[0][3]))
 
       try:
             log(debug, "Executing command {0}".format(cmd))
             (status, op)=commands.getstatusoutput(cmd)
       except:
-            raise execCmdError("Cmd execution failed")
-      if status!=0:
-            out=op
-      else:
-            err=op
-      return (status)
+            raise execCmdError("Cmd failed returned {0} output {1}".format(
+                        status, op))
+      return (op)
