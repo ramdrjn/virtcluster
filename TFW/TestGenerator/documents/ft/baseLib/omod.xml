@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<testType type="FT">
+  <testSUT lib="baseLib" version="1.0">
+
+    <testMod mod="omod">
+
+      <include>"_proto.h"</include>
+      <include>"../../../../Src/baseLib/inc/_omod.h"</include>
+
+      <code>
+        genErr_t userParseFun(bs_e_optionsType optType, char a, char *b, void *userdata)
+        {
+        static scmdF=0;
+        switch(optType)
+        {
+        case OPTIONS:
+        switch(a)
+        {
+        case 'a':
+        if ((strcmp(b, "a5") == 0) &amp;&amp; (scmdF==1))
+        break;
+        else if ((strcmp(b, "a1") == 0) &amp;&amp; (scmdF==0))
+        break;
+        return INVALID_OPTIONS;
+        case 'b':
+        if (strcmp(b, "a2") != 0)
+        return INVALID_OPTIONS;
+        break;
+        case 'd':
+        if (strcmp(b, "a3") != 0)
+        return INVALID_OPTIONS;
+        break;
+        case 'e':
+        if (strcmp(b, "a4") != 0)
+        return INVALID_OPTIONS;
+        break;
+        case 'h':
+        if (strcmp(b, "a6") != 0)
+        return INVALID_OPTIONS;
+        break;
+        case 'i':
+        if (strcmp(b, "a7") != 0)
+        return INVALID_OPTIONS;
+        break;
+        case 'j':
+        if (strcmp(b, "a8") != 0)
+        return INVALID_OPTIONS;
+        break;
+        case 'l':
+        if (strcmp(b, "a9") != 0)
+        return INVALID_OPTIONS;
+        break;
+        case 'k':
+        case 'g':
+        case 'c':
+        if (b != 0)
+        return INVALID_OPTIONS;
+        break;
+        default:
+        return INVALID_OPTIONS;
+        }
+        break;
+        case ARGS:
+        if(strcmp(b, "a10") != 0)
+        return INVALID_OPTIONS;
+        break;
+        case SUB_COMMANDS:
+        if((strcmp(b, "scmd1") != 0) &amp;&amp; (strcmp(b, "scmd2") != 0))
+        return INVALID_OPTIONS;
+        scmdF=1;
+        break;
+        default:
+        return INVALID_OPTIONS;
+        }
+        return SUCCESS;
+        }
+      </code>
+
+      <variable>bs_omodCls oObj = NULL</variable>
+
+      <variable>
+        struct bs_optsType opts[]={
+        {MANDATORY, "mandatory string", "atest", 'a'},
+        {OPTIONAL, "optional string", "btest", 'b'},
+        {NO_OPTIONS, "no options string", "ctest", 'c'},
+        {MANDATORY, "mandatory no long string", 0, 'd'},
+        {SUB_COMMAND, "sub command -header-", "scmd1", 0},
+        {MANDATORY, "mandatory string", "etest", 'e'},
+        {OPTIONAL, "optional string (same as main)", "atest", 'a'},
+        {NO_OPTIONS, "no options string", "gtest", 'g'},
+        {OPTIONAL, "optional no long string", 0, 'h'},
+        {SUB_COMMAND, "sub command 2 -header-", "scmd2", 0},
+        {MANDATORY, "mandatory string", 0, 'i'},
+        {OPTIONAL, "optional string", 0, 'j'},
+        {NO_OPTIONS, "no options string", 0, 'k'},
+        {OPTIONAL, "optional string", 0, 'l'}}
+      </variable>
+
+      <variable>char *args[]={"EXE", "--atest", "a1", "-b", "a2", "--ctest", "-d", "a3", "scmd1", "--etest", "a4", "-a", "a5", "-g", "-h", "a6", "scmd2", "-i", "a7", "-j", "a8", "-k", "-l", "a9", "a10"}</variable>
+
+      <variable>char *userDoc = "User document"</variable>
+      <variable>char *helpDoc = "Help \v document"</variable>
+      <variable>char *userData = "User Data"</variable>
+      <variable>int cnt = 25</variable>
+
+      <testCase typ="FUN">
+        <cmd> retVal = bs_omodInit(&amp;oObj, userDoc, helpDoc, opts, &amp;userParseFun, iMObj) </cmd>
+        <desc>" Initialize the options module "</desc>
+        <cond> retVal </cond>
+        <err> retVal </err>
+        <errStr> ec2ES(retVal) </errStr>
+        <flags> 0 </flags>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> retVal = bs_parseOpts(oObj, cnt, args, userData) </cmd>
+        <desc>" Start parsing the options "</desc>
+        <cond> retVal </cond>
+        <err> retVal </err>
+        <errStr> ec2ES(retVal) </errStr>
+        <flags> 0 </flags>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> retVal = bs_omodFin(&amp;oObj, iMObj) </cmd>
+        <desc>" Finalise the options module "</desc>
+        <cond> retVal </cond>
+        <err> retVal </err>
+        <errStr> ec2ES(retVal) </errStr>
+        <flags> 0 </flags>
+      </testCase>
+
+    </testMod>
+
+  </testSUT>
+</testType>

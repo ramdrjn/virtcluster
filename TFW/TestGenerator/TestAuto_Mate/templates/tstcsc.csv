@@ -1,0 +1,4 @@
+ST1 # CMD # DESC # COND # ERR # errStr # Flags # ST2
+# retVal = bs_omodInit(&oObj, userDoc, helpDoc, opts, &userParseFun, mObj) # Initialize the options module # retVal # retVal # ec2ES(retVal) # 0 #
+# retVal = bs_parseOpts(oObj, cnt, args, userData) # Start parsing the options # retVal # retVal # ec2ES(retVal) # 0 #
+# retVal = bs_omodFin(&oObj, mObj) # Finalise the options module # retVal # retVal # ec2ES(retVal) # 0 #

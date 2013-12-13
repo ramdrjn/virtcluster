@@ -1,0 +1,4 @@
+#!/bin/sh
+
+unset PYTHONHOME
+export OVERRIDE_RPM_TARGET="i586-vc-linux"

@@ -1,0 +1,584 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<testType type="FT">
+  <testSUT lib="baseLib" version="1.0">
+
+    <testMod mod="lmod">
+
+      <include>"_proto.h"</include>
+      <include>"../../../../Src/baseLib/inc/_lmod.h"</include>
+
+      <define>TEST_FILE "/tmp/testlmod"</define>
+
+      <variable>bs_lmodCls lobj = NULL</variable>
+      <variable>bs_fmodCls rdwrF = NULL</variable>
+
+
+      <testCase typ="FUN">
+        <cmd> retVal = bs_lmodInit(&amp;lobj, false, false, false, NULL, iMObj) </cmd>
+        <desc>" Initialize the lmod object. "</desc>
+        <cond> retVal </cond>
+        <err> retVal </err>
+        <errStr> ec2ES(retVal) </errStr>
+        <flags> 0 </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="FUN">
+        <cmd> retVal = bs_lmodFin(&amp;lobj, iMObj) </cmd>
+        <desc>" Finalise the lmod object. "</desc>
+        <cond> retVal </cond>
+        <err> retVal </err>
+        <errStr> ec2ES(retVal) </errStr>
+        <flags> 0 </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="FUN">
+        <cmd> retVal = bs_lmodInit(&amp;lobj , true, false, false, NULL, iMObj) </cmd>
+        <desc>" Initialize the lmod object with syslog. "</desc>
+        <cond> retVal </cond>
+        <err> retVal </err>
+        <errStr> ec2ES(retVal) </errStr>
+        <flags> 0 </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="FUN">
+        <cmd> retVal = bs_lmodFin(&amp;lobj, iMObj) </cmd>
+        <desc>" Finalise the lmod object with syslog. "</desc>
+        <cond> retVal </cond>
+        <err> retVal </err>
+        <errStr> ec2ES(retVal) </errStr>
+        <flags> 0 </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="FUN">
+        <cmd> retVal = bs_lmodInit(&amp;lobj, false, true, true, NULL, iMObj) </cmd>
+        <desc>" Initialize the lmod object with quite and verbose flag. "</desc>
+        <cond> retVal </cond>
+        <err> retVal </err>
+        <errStr> ec2ES(retVal) </errStr>
+        <flags> 0 </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="FUN">
+        <cmd> retVal = bs_lmodFin(&amp;lobj, iMObj) </cmd>
+        <desc>" Finalise the lmod object with quite and verbose flag set. "</desc>
+        <cond> retVal </cond>
+        <err> retVal </err>
+        <errStr> ec2ES(retVal) </errStr>
+        <flags> 0 </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="FUN">
+        <cmd> retVal = bs_lmodInit(&amp;lobj, true, true, true, NULL, iMObj) </cmd>
+        <desc>" Initialize the lmod object with quite, verbose and syslog flag set. "</desc>
+        <cond> retVal </cond>
+        <err> retVal </err>
+        <errStr> ec2ES(retVal) </errStr>
+        <flags> 0 </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="FUN">
+        <cmd> retVal = bs_lmodFin(&amp;lobj, iMObj) </cmd>
+        <desc>" Finalise the lmod object with all flags set. "</desc>
+        <cond> retVal </cond>
+        <err> retVal </err>
+        <errStr> ec2ES(retVal) </errStr>
+        <flags> 0 </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="FUN">
+        <cmd> retVal = bs_fmodInit(&amp;rdwrF, iMObj) </cmd>
+        <desc>" Initialize a file object. "</desc>
+        <cond> retVal </cond>
+        <err> retVal </err>
+        <errStr> ec2ES(retVal) </errStr>
+        <flags> 0 </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="FUN">
+        <cmd> retVal = bs_fCreate(rdwrF, TEST_FILE, 0755) </cmd>
+        <desc>" Finalise the fmod object. "</desc>
+        <cond> retVal </cond>
+        <err> retVal </err>
+        <errStr> ec2ES(retVal) </errStr>
+        <flags> 0 </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="FUN">
+        <cmd> retVal = bs_lmodInit(&amp;lobj, true, true, true, rdwrF, iMObj) </cmd>
+        <desc>" Initialize the lmod object with all flags and a file object. "</desc>
+        <cond> retVal </cond>
+        <err> retVal </err>
+        <errStr> ec2ES(retVal) </errStr>
+        <flags> 0 </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_log(lobj, LVL_INFO, PO_LOG, "%s", "\nTest info message VQ") </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_log(lobj, LVL_DEBUG, PO_LOG, "%s", "\nTest debug message VQ") </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_log(lobj, LVL_ERROR, PO_LOG, "%s", "\nTest err message VQ") </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_unsetVerbose(lobj) </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_log(lobj, LVL_INFO, PO_LOG, "%s", "\nTest info message NVQ") </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_log(lobj, LVL_DEBUG, PO_LOG, "%s", "\nTest debug message NVQ") </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_log(lobj, LVL_ERROR, PO_LOG, "%s", "\nTest err message NVQ") </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_setVerbose(lobj) </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_unsetQuite(lobj) </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_log(lobj, LVL_INFO, PO_LOG, "%s", "\nTest info message VNQ") </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_log(lobj, LVL_DEBUG, PO_LOG, "%s", "\nTest debug message VNQ") </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_log(lobj, LVL_ERROR, PO_LOG, "%s", "\nTest err message VNQ") </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_setQuite(lobj) </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_unsetVerbose(lobj) </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_unsetQuite(lobj) </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_log(lobj, LVL_INFO, PO_LOG, "%s", "\nTest info message NVNQ") </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_log(lobj, LVL_DEBUG, PO_LOG, "%s", "\nTest debug message NVNQ") </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_log(lobj, LVL_ERROR, PO_LOG, "%s", "\nTest err message NVNQ") </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_setVerbose(lobj) </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_setQuite(lobj) </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_log(lobj, LVL_INFO, PF_LOG, "%s", "\nTest info message VQ") </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_log(lobj, LVL_DEBUG, PF_LOG, "%s", "\nTest debug message VQ") </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_log(lobj, LVL_ERROR, PF_LOG, "%s", "\nTest err message VQ") </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_unsetVerbose(lobj) </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_log(lobj, LVL_INFO, PF_LOG, "%s", "\nTest info message NVQ") </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_log(lobj, LVL_DEBUG, PF_LOG, "%s", "\nTest debug message NVQ") </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_log(lobj, LVL_ERROR, PF_LOG, "%s", "\nTest err message NVQ") </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_setVerbose(lobj) </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_unsetQuite(lobj) </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_log(lobj, LVL_INFO, PF_LOG, "%s", "\nTest info message VNQ") </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_log(lobj, LVL_DEBUG, PF_LOG, "%s", "\nTest debug message VNQ") </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_log(lobj, LVL_ERROR, PF_LOG, "%s", "\nTest err message VNQ") </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_setQuite(lobj) </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_unsetVerbose(lobj) </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_unsetQuite(lobj) </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_log(lobj, LVL_INFO, PF_LOG, "%s", "\nTest info message NVNQ") </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_log(lobj, LVL_DEBUG, PF_LOG, "%s", "\nTest debug message NVNQ") </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="ST">
+        <cmd>bs_log(lobj, LVL_ERROR, PF_LOG, "%s", "\nTest err message NVNQ") </cmd>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> </cmd>
+        <desc>" "</desc>
+        <cond> </cond>
+        <err> </err>
+        <errStr> </errStr>
+        <flags> </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+      <testCase typ="FUN">
+        <cmd> retVal = bs_lmodFin(&amp;lobj, iMObj) </cmd>
+        <desc>" Finalise the lmod object with all flags and the file object. "</desc>
+        <cond> retVal </cond>
+        <err> retVal </err>
+        <errStr> ec2ES(retVal) </errStr>
+        <flags> 0 </flags>
+      </testCase>
+      <testCase typ="ST"><cmd> </cmd></testCase>
+    </testMod>
+
+  </testSUT>
+</testType>

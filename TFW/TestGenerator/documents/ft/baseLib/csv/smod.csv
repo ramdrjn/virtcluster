@@ -1,0 +1,5 @@
+ST1 # CMD # DESC # COND # ERR # errStr # Flags # ST2
+# retVal = bs_smodInit(&sObj, iMObj) # Initialize the signal module # retVal # retVal # ec2ES(retVal) # 0 #
+# retVal = bs_registerHandler(sObj, SIGUSR1, sigHndlr, 0) # Register a signal handler and verify signal # retVal # retVal # ec2ES(retVal) # 0 #
+# retVal = raisesignal() # Raise a signal and check handler # retVal # retVal # ec2ES(retVal) # 0 #
+# retVal = bs_smodFin(&sObj, iMObj) # Finalise the signal module # retVal # retVal # ec2ES(retVal) # 0 #

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<testType type="FT">
+  <testSUT lib="baseLib" version="1.0">
+
+    <testMod mod="smod">
+
+      <include>"_proto.h"</include>
+      <include>"../../../../Src/baseLib/inc/_smod.h"</include>
+
+      <code>
+        int sig_test_var = false;
+
+        void sigHndlr(int signum)
+        {
+        sig_test_var = true;
+        }
+
+        genErr_t raisesignal(void)
+        {
+        /*raise a sigusr1.*/
+        raise(SIGUSR1);
+        if(sig_test_var == true)
+        return SUCCESS;
+        else return FAILURE;
+        }
+      </code>
+
+      <variable>bs_smodCls sObj = NULL</variable>
+
+      <testCase typ="FUN">
+        <cmd> retVal = bs_smodInit(&amp;sObj, iMObj) </cmd>
+        <desc>" Initialize the signal module "</desc>
+        <cond> retVal </cond>
+        <err> retVal </err>
+        <errStr> ec2ES(retVal) </errStr>
+        <flags> 0 </flags>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> retVal = bs_registerHandler(sObj, SIGUSR1, &amp;sigHndlr, 0) </cmd>
+        <desc>" Register a signal handler and verify signal "</desc>
+        <cond> retVal </cond>
+        <err> retVal </err>
+        <errStr> ec2ES(retVal) </errStr>
+        <flags> 0 </flags>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> retVal = raisesignal() </cmd>
+        <desc>" Raise a signal and check handler "</desc>
+        <cond> retVal </cond>
+        <err> retVal </err>
+        <errStr> ec2ES(retVal) </errStr>
+        <flags> 0 </flags>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> retVal = bs_smodFin(&amp;sObj, iMObj) </cmd>
+        <desc>" Finalise the signal module "</desc>
+        <cond> retVal </cond>
+        <err> retVal </err>
+        <errStr> ec2ES(retVal) </errStr>
+        <flags> 0 </flags>
+      </testCase>
+
+    </testMod>
+
+  </testSUT>
+</testType>

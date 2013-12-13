@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<testType type="FT">
+  <testSUT lib="baseLib" version="1.0">
+
+    <testMod mod="omod">
+
+      <include>"_proto.h"</include>
+      <include>"../../../../Src/baseLib/inc/_omod.h"</include>
+
+      <code>
+        genErr_t userParseFun(bs_e_optionsType optType, char a, char *b, void *userdata)
+        {
+        printf("i am neing called %d", opts);
+        printf("\n%c and %s", a, b);
+        return SUCCESS;
+        }
+      </code>
+
+      <variable>bs_lmodCls oObj = NULL</variable>
+      <variable>
+        struct bs_optsType opts[]={
+        {MANDATORY, "mandatory string", "ttest", 't'},
+        {OPTIONAL, "optional string", "vtest", 'v'},
+        {SUB_COMMAND, "sub command -header-", 0, 0},
+        {OPTIONAL, "optional sub cmd string", "stest", 's'},
+        {NO_OPTIONS, "nooptions sub cmd string", "notest", 'n'},
+        {OPTIONAL, "optional sub cmd string and no long", 0, 'x'}}
+      </variable>
+      <variable>char *args[]={"EXE", "-t", "test"}</variable>
+      <variable>char *userDoc = "User document"</variable>
+      <variable>char *helpDoc = "Help \v document"</variable>
+      <variable>char *userData = "User Data"</variable>
+      <variable>int cnt = 3</variable>
+
+      <testCase typ="FUN">
+        <cmd> retVal = bs_omodInit(&amp;oObj, userDoc, helpDoc, opts, &amp;userParseFun, mObj) </cmd>
+        <desc>" Initialize the options module "</desc>
+        <cond> retVal </cond>
+        <err> retVal </err>
+        <errStr> ec2ES(retVal) </errStr>
+        <flags> 0 </flags>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> retVal = bs_parseOpts(oObj, cnt, args, userData) </cmd>
+        <desc>" Start parsing the options "</desc>
+        <cond> retVal </cond>
+        <err> retVal </err>
+        <errStr> ec2ES(retVal) </errStr>
+        <flags> 0 </flags>
+      </testCase>
+      <testCase typ="FUN">
+        <cmd> retVal = bs_omodFin(&amp;oObj, mObj) </cmd>
+        <desc>" Finalise the options module "</desc>
+        <cond> retVal </cond>
+        <err> retVal </err>
+        <errStr> ec2ES(retVal) </errStr>
+        <flags> 0 </flags>
+      </testCase>
+
+    </testMod>
+
+  </testSUT>
+</testType>

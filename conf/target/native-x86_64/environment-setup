@@ -1,0 +1,8 @@
+export CC=gcc
+export LD=gcc
+export STRIP=strip
+export RANLIB=ranlib
+export AR=ar
+export CFLAGS=""
+export LDFLAGS=""
+export ARCH=x86_64

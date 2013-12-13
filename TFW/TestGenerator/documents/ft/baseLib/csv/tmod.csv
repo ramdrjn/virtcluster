@@ -1,0 +1,5 @@
+ST1 # CMD # DESC # COND # ERR # errStr # Flags # ST2
+# retVal = bs_tmodInit(&tObj, iMObj) # Initialize the timer module # retVal # retVal # ec2ES(retVal) # 0 #
+# retVal = bs_registerTimerHandler(tObj, 1000000, tstTmrHndlr, 0) # Register a timer handler. # retVal # retVal # ec2ES(retVal) # 0 #
+# retVal = testTimer() # Check the periodicty of the timer (Not Proper) # retVal # retVal # ec2ES(retVal) # 0 #
+# retVal = bs_tmodFin(&tObj, iMObj) # Finalise the timer module # retVal # retVal # ec2ES(retVal) # 0 #

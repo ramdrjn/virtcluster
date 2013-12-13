@@ -1,0 +1,7 @@
+TAGS
+tags
+cscope*
+__pycache__
+*.pyc
+*.pyo
+init_env.sh
