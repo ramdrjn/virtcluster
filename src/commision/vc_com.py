@@ -49,6 +49,12 @@ def smart_install(l):
         cmd = "smart install {0} -y".format(rpm)
         out=common.exec_command(cmd)
         logger.info(out)
+        if 'utLib' in rpm:
+            logger.info("Running ldconfig after utLib installation")
+            out=common.exec_command("/sbin/ldconfig")
+            if out:
+                logger.info(out)
+    logger.debug("Installation of packages done")
 
 def prep():
     global logger
