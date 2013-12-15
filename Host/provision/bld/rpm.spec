@@ -31,7 +31,7 @@ tar zxvf ./dist/provisioning-1.0.linux-x86_64.tar.gz -C %{virtcluster_br}
 rm -vrf ./dist
 
 %files -n py-scripts-common -f ./bld/py-scripts-common.files
-%virtcluster_host_scripts_perm
+%virtcluster_scripts_perm
 
 %files -f ./bld/provisioning.files
-%virtcluster_host_scripts_perm
+%virtcluster_scripts_perm

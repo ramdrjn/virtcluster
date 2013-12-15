@@ -13,13 +13,13 @@ utLib shared library.
 
 %install
 %virtcluster_rm_br
-%virtcluster_c_lib_p
+%virtcluster_c_host_lib_p
 
-cp ./lib/libutLib.so %{virtcluster_lib}
+cp ./lib/libutLib.so %{virtcluster_host_lib}
 
 %clean
 %virtcluster_rm_br
 
 %files
 %virtcluster_lib_perm
-%{_libdir}/libutLib.so
+%{_hostlibdir}/libutLib.so

@@ -24,7 +24,7 @@ cp ./images/virtcluster-image-*.tgz %{virtcluster_image_dir}
 %virtcluster_rm_br
 
 %files
-%virtcluster_host_scripts_perm
+%virtcluster_scripts_perm
 %{_hostdir}/images/manifest
 %{_hostdir}/images/virtcluster-image-*.tgz
 
