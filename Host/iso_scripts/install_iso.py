@@ -31,7 +31,7 @@ def repo_setup():
       main_p=os.path.join(repo_p, "main")
       os.mkdir(main_p)
       os.mkdir(os.path.join(repo_p, "updates"))
-      for f in glob.glob("x86/*"):
+      for f in glob.glob("x86/*.rpm"):
             shutil.copy(f, main_p)
       common.exec_cmd(["createrepo", "-v", main_p])
 

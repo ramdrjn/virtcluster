@@ -18,8 +18,14 @@ end
 
 sleep 20
 
-domain
-  commision domain x86vm0 pkg-mgmt smart pm-url http://192.168.100.1:8000/main
+commision
+  package group iso-ins
+    manager smart
+    main   url file:///media/cdrom0/x86 iso file:///tmp/virtcluster-x86.iso
+#    main   url file:///media/cdrom0/x86 dev /dev/sr0
+    update url http://192.168.100.1:8000/update
+  end
+  initialize domain x86vm0 pkg-group iso-ins
 end
 
 list

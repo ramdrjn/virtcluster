@@ -16,6 +16,13 @@ get_json_val()
     val="$(awk -F ":" -v RS="," '$1~/'${key}'/ {print $2}' $json_file|sed -e 's/[{}]//g' -e 's/\"//g')"
 }
 
+get_pkg_grp_json_val()
+{
+    local pg_json_file=$1
+    local key=$2
+    val="$(awk -F ":" -v RS="," '$1~/'${key}'/ {print $2}' $pg_json_file|sed -e 's/[{}]//g' -e 's/\"//g')"
+}
+
 setup_smart()
 {
     smart channel --add $1 -y >>$STAGE1_LOG 2>&1
@@ -27,13 +34,13 @@ setup_smart()
         log "Smart channel added"
     fi
 
-    smart update >>$STAGE1_LOG 2>&1
+    smart update main >>$STAGE1_LOG 2>&1
     if [ $? -ne 0 ]
     then
-        log "Failed smart update"
+        log "Failed smart update for main channel"
         exit 1
     else
-        log "Smart update done"
+        log "Smart update done for main channel"
     fi
 }
 
@@ -41,7 +48,7 @@ setup_pm()
 {
     if [ "$1" = "smart" ]
     then
-        setup_smart $PM_CONFIG_FILE
+        setup_smart $2
     else
         log "No PM configured"
         exit 1
@@ -92,32 +99,74 @@ start_2nd_stage_commision()
     fi
 }
 
-mkdir -p $LOGS_DIR
-log "Stage 1 commision initiated at `date`"
+check_mount_iso()
+{
+    log "Mounting cdrom"
 
-get_json_val "pkg-mgmt"
-PKG_MGMT=$val
-if [ ! -z "$PKG_MGMT" ]
-then
-    log "Pkg mgmt $PKG_MGMT"
-else
-    log "Pkg mgmt not defined"
-    exit 1
-fi
+    echo "/dev/hdc  /media/cdrom0  iso9660  ro,noauto  0  0">>/etc/fstab
 
-get_json_val "pm-config-file"
-PM_CONFIG_FILE=$val
-if [ ! -z "$PM_CONFIG_FILE" ]
-then
-    log "Pkg config file $PM_CONFIG_FILE"
-else
-    log "Pkg config not defined"
-    exit 1
-fi
+    mkdir /media/cdrom0
+    if [ $? -ne 0 ]
+    then
+        log "Failed creating /media/cdrom0 directory"
+        exit 1
+    else
+        log "/media/cdrom0 directory done"
+    fi
 
-setup_pm $PKG_MGMT $PM_CONFIG_FILE
+    mount /media/cdrom0
+    if [ $? -ne 0 ]
+    then
+        log "Failed mouting cdrom0"
+        exit 1
+    else
+        log "cdrom0 mouting done"
+    fi
+}
 
-setup_init_pkg $PKG_MGMT
+main()
+{
+    mkdir -p $LOGS_DIR
+    log "Stage 1 commision initiated at `date`"
 
-start_2nd_stage_commision
-log "Stage1 done"
+    get_json_val "pm-group-file"
+    PM_GRP_FILE=$val
+    if [ ! -z "$PM_GRP_FILE" ]
+    then
+        log "Pkg group $PM_GRP_FILE"
+    else
+        log "Pkg group not defined"
+        exit 1
+    fi
+
+    get_json_val "pm-config-file"
+    PM_CONFIG_FILE=$val
+    if [ ! -z "$PM_CONFIG_FILE" ]
+    then
+        log "Pkg config file $PM_CONFIG_FILE"
+    else
+        log "Pkg config not defined"
+        exit 1
+    fi
+
+    get_pkg_grp_json_val $PM_GRP_FILE "manager"
+    PKG_MGR=$val
+    if [ ! -z "$PKG_MGR" ]
+    then
+        log "Pkg manager $PKG_MGR"
+    else
+        log "Pkg manager not defined"
+        exit 1
+    fi
+
+    check_mount_iso
+
+    setup_pm $PKG_MGR $PM_CONFIG_FILE
+
+    setup_init_pkg $PKG_MGR
+
+    start_2nd_stage_commision
+    log "Stage1 done"
+}
+
+main

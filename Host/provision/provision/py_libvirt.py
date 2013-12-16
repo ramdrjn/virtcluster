@@ -135,6 +135,9 @@ def _hp_set_dev(dom, xml):
 def _nhp_set_dev(dom, xml):
     _set_dev(dom, xml, 0)
 
+def _hp_cdrom(dom, xml):
+    dom.updateDeviceFlags(xml, 0)
+
 '''               Interfaces'''
 
 def _def_interface(dom, xml, flags=0):
@@ -369,6 +372,26 @@ def attach_raw_disk_nhp(dom, path):
  </disk>\
  ".format(path)
     _nhp_set_dev(dom, xml)
+
+def attach_cdrom_hp(dom, path):
+    xml="\
+ <disk type='file' device='cdrom'>\
+   <source file='{0}'/>\
+   <target dev='hdc'/>\
+   <readonly/>\
+ </disk>\
+ ".format(path)
+    _hp_cdrom(dom, xml)
+
+def attach_cdrom_dev_hp(dom, dev):
+    xml="\
+ <disk type='block' device='cdrom'>\
+   <source dev='{0}'/>\
+   <target dev='hdc'/>\
+   <readonly/>\
+ </disk>\
+ ".format(path)
+    _hp_cdrom(dom, xml)
 
 def list_storage_vol(con):
     if not _validate_con(con):

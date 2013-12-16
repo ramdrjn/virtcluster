@@ -30,3 +30,9 @@ class VCCli(cmd.Cmd):
             return True
       def help_quit(self, args):
             print("Quit session")
+      def precmd(self, line):
+            newline=line.strip()
+            is_cmt=newline.startswith('#')
+            if is_cmt:
+                  return ('')
+            return (line)

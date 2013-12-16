@@ -17,6 +17,10 @@ def prep(iso_dir):
       shutil.rmtree(iso_dir, True)
       os.mkdir(iso_dir)
 
+def _create_arch_repo(arch_dir):
+      logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+      common.exec_cmd(["createrepo", "-v", arch_dir])
+
 def prep_dir(iso_dir, arch, rpm_lst, cwd):
       logger.debug("In Function {0}".format(inspect.stack()[0][3]))
 
@@ -28,6 +32,7 @@ def prep_dir(iso_dir, arch, rpm_lst, cwd):
                   rpmf=(os.path.join(cwd,rpm)).strip("\n")
                   logger.info( "rpm file: {0}".format(rpmf))
                   shutil.copy(rpmf, arch_dir)
+      _create_arch_repo(arch_dir)
 
 def prep_host_dir(iso_dir, arch, rpm_lst, cwd):
       logger.debug("In Function {0}".format(inspect.stack()[0][3]))

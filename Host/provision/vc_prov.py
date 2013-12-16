@@ -13,6 +13,7 @@ import json
 import shutil
 import logging
 import logging.handlers
+import urlparse
 
 logger=None
 
@@ -68,6 +69,23 @@ def error_log_print(msg):
     logger.error(msg)
     print(msg)
 
+def _iso_prep(dom, pm_group):
+    logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+    logger.info("Packgage group file {0}".format(pm_group))
+
+    d={}
+    with open(pm_group) as f:
+        d=json.load(f)
+    if not 'main' in d:
+        raise provisionError("'main' repository not defined in package group")
+    main_d=d['main']
+    if 'iso' in main_d:
+        logger.info("Attaching iso to dom")
+        py_libvirt.attach_cdrom_hp(dom, main_d['iso'])
+    elif 'dev' in main_d:
+        logger.info("Attaching cdrom device to dom")
+        py_libvirt.attach_cdrom_dev_hp(dom, main_d['dev'])
+
 class provCLI(cli_fmwk.VCCli):
     def __init__(self):
         logger.debug("Initialized {0} class".format(self.__class__))
@@ -96,6 +114,15 @@ class provCLI(cli_fmwk.VCCli):
     def help_network(self):
         logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         print("     Network subcommands    ")
+
+    def do_commision(self, args):
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+        com_cli=provCLI_commision(self._con)
+        com_cli.cmdloop()
+
+    def help_commision(self):
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+        print("     Commision subcommands    ")
 
     def do_info(self, args):
         logger.debug("In Function {0}".format(inspect.stack()[0][3]))
@@ -225,6 +252,10 @@ class provCLI_domain(cli_fmwk.VCCli):
                   <source file='$rootfs'/>\
                   <target dev='hda' bus='ide'/>\
                 </disk>\
+                <disk type='block' device='cdrom'>\
+                  <target dev='hdc' bus='ide' tray='open'/>\
+                  <readonly/>\
+                </disk>\
                 <interface type='network'>\
                   <mac address='$fab0_dom_mac'/>\
                   <source network='$fab0_net_name'/>\
@@ -332,41 +363,6 @@ class provCLI_domain(cli_fmwk.VCCli):
         print("     Define domain <domain name>    ")
 
     def complete_define(self, text, line, begidx, endidx):
-        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
-        return complete_dom(text, line, begidx, endidx)
-
-    def do_commision(self, args):
-        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
-
-        logger.debug("Commision args {0}".format(args))
-
-        arg_lst=args.split()
-        arg_d = dict(zip(arg_lst[::2], [arg_lst[i]
-                                        for i in range(1, len(arg_lst), 2)]))
-        dom_name=arg_d['domain']
-        if dom_name:
-            dom = py_libvirt.dom_lookup(self._con, dom_name)
-            if not dom:
-                error_log_print("Domain not defined")
-                return
-            s=py_libvirt.info_domain(dom)
-            if not "State: running" in s:
-                error_log_print("Domain not running")
-                return
-        else:
-            print("Enter domain ")
-            return
-
-        comi_dir=os.path.join(os.getcwd(), "commisioned_domain")
-        net_dir=os.path.join(os.getcwd(), "net")
-        logger.debug("Commision start")
-        vc_commision.start(comi_dir, net_dir, arg_d)
-
-    def help_commision(self):
-        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
-        print("     Start domain <domain name>  ")
-
-    def complete_commision(self, text, line, begidx, endidx):
         logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         return complete_dom(text, line, begidx, endidx)
 
@@ -860,6 +856,174 @@ class provCLI_network(cli_fmwk.VCCli):
         logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         return complete_network(text, line, begidx, endidx)
 
+class provCLI_package(cli_fmwk.VCCli):
+    def __init__(self, arg_d):
+        logger.debug("Initialized {0} class".format(self.__class__))
+
+        self.arg_d=arg_d
+        cli_fmwk.VCCli.__init__(self, intro="Package group subcommands")
+        self.prompt = self.prompt[:-1]+':pkg-grp {0})'.format(arg_d['group'])
+
+    def __del__(self):
+        logger.debug("Finalized {0} class".format(self.__class__))
+
+    def do_manager(self, args):
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("Manager args {0}".format(args))
+
+        self.arg_d['manager']=args.strip()
+        logger.info("Package Manager {0}".format(self.arg_d['manager']))
+
+    def help_manager(self, args):
+        pass
+    def complete_manager(self, args):
+        pass
+
+    def do_main(self, args):
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("Package main args {0}".format(args))
+
+        t_dict=args.split()
+        t_dict = dict(zip(t_dict[::2], [t_dict[i]
+                                        for i in range(1, len(t_dict), 2)]))
+
+        main_dict={}
+
+        url=urlparse.urlparse(t_dict['url'])
+        if url.scheme == 'file':
+            main_dict['url']=url.path
+
+            if 'iso' in t_dict:
+                iso_url=urlparse.urlparse(t_dict['iso'])
+                if iso_url.scheme == 'file':
+                    main_dict['iso']=iso_url.path
+                else:
+                    main_dict['iso']=t_dict['iso']
+                logger.info("ISO url {0}".format(main_dict['iso']))
+
+            if 'dev' in t_dict:
+                main_dict['dev']=t_dict['dev']
+                logger.info("Dev {0}".format(main_dict['dev']))
+        else:
+            main_dict['url']=t_dict['url']
+
+        self.arg_d['main']=main_dict
+
+        logger.info("Main url {0}".format(main_dict['url']))
+
+    def help_main(self, args):
+        pass
+    def complete_main(self, args):
+        pass
+
+    def do_update(self, args):
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("Package update args {0}".format(args))
+
+        t_dict=args.split()
+        t_dict = dict(zip(t_dict[::2], [t_dict[i]
+                                        for i in range(1, len(t_dict), 2)]))
+
+        update_dict={}
+
+        url=urlparse.urlparse(t_dict['url'])
+        if url.scheme == 'file':
+            update_dict['url']=url.path
+
+            if 'iso' in t_dict:
+                iso_url=urlparse.urlparse(t_dict['iso'])
+                if iso_url.scheme == 'file':
+                    update_dict['iso']=iso_url.path
+                else:
+                    update_dict['iso']=t_dict['iso']
+                logger.info("ISO url {0}".format(update_dict['iso']))
+
+            if 'dev' in t_dict:
+                update_dict['dev']=t_dict['dev']
+                logger.info("Dev {0}".format(update_dict['dev']))
+        else:
+            update_dict['url']=t_dict['url']
+
+        self.arg_d['update']=update_dict
+
+        logger.info("Update url {0}".format(update_dict['url']))
+
+    def help_update(self, args):
+        pass
+    def complete_update(self, args):
+        pass
+
+class provCLI_commision(cli_fmwk.VCCli):
+    def __init__(self, con):
+        logger.debug("Initialized {0} class".format(self.__class__))
+        cli_fmwk.VCCli.__init__(self, intro="Commisioning")
+        self.prompt = self.prompt[:-1]+':Commision)'
+        self._con=con
+
+    def do_initialize(self, args):
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+
+        logger.debug("Initialize args {0}".format(args))
+
+        arg_lst=args.split()
+        arg_d = dict(zip(arg_lst[::2], [arg_lst[i]
+                                        for i in range(1, len(arg_lst), 2)]))
+        dom=None
+        dom_name=arg_d['domain']
+        if dom_name:
+            dom = py_libvirt.dom_lookup(self._con, dom_name)
+            if not dom:
+                error_log_print("Domain not defined")
+                return
+            s=py_libvirt.info_domain(dom)
+            if not "State: running" in s:
+                error_log_print("Domain not running")
+                return
+        else:
+            print("Enter domain ")
+            return
+
+        comi_dir=os.path.join(os.getcwd(), "commisioned_domain")
+        dat_dir = os.path.join(comi_dir, "dat")
+        net_dir=os.path.join(os.getcwd(), "net")
+
+        pm_group_fname="{0}.pg".format(arg_d['pkg-group'])
+        pm_group=os.path.join(dat_dir, pm_group_fname)
+        if not os.path.isfile(pm_group):
+            error_log_print("Package group not defined")
+            return
+        _iso_prep(dom, pm_group)
+
+        logger.debug("Commision start")
+
+        vc_commision.start(comi_dir, net_dir, arg_d)
+
+    def help_initialize(self, args):
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+        print("     Initialize domain <domain name>  ")
+
+    def complete_initialize(self, args):
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+        return complete_dom(text, line, begidx, endidx)
+
+    def do_package(self, args):
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+
+        arg_lst=args.split()
+        arg_d = dict(zip(arg_lst[::2], [arg_lst[i]
+                                        for i in range(1, len(arg_lst), 2)]))
+
+        pkg_cli=provCLI_package(arg_d)
+        pkg_cli.cmdloop()
+
+        comi_dir=os.path.join(os.getcwd(), "commisioned_domain")
+        vc_commision.pkg_config_add(comi_dir, arg_d)
+
+    def help_package(self, args):
+        pass
+    def complete_package(self, args):
+        pass
+
 def prep_provision():
     global logger
 
@@ -902,6 +1066,8 @@ def main():
         logger.info("provisioned_domain directory created")
         os.mkdir("commisioned_domain")
         logger.info("commisioned_domain directory created")
+        os.mkdir("commisioned_domain/dat")
+        logger.info("commisioned_domain/dat directory created")
         os.mkdir("net")
         logger.info("net directory created")
     except OSError:
