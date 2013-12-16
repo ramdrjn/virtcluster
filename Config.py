@@ -4,27 +4,24 @@
 from inc.scripts.py import common
 import os
 import argparse
-import time
 import shutil
 import inspect
 import json
+import logging
 
 currdir=""
-log_file=""
+logger=""
 conf_dir=""
 
 class configCls:
       def __init__(self, filename):
-            common.log(common.debug,
-                       "Initialized {0} class".format(self.__class__))
+            logger.debug("Initialized {0} class".format(self.__class__))
             self.__f = open(filename, "a")
       def __del__(self):
-            common.log(common.debug,
-                       "Finalized {0} class".format(self.__class__))
+            logger.debug("Finalized {0} class".format(self.__class__))
             self.__f.close()
       def sendConf(self, conf):
-            common.log(common.debug,
-                       "In Function {0}".format(inspect.stack()[0][3]))
+            logger.debug("In Function {0}".format(inspect.stack()[0][3]))
             self.__f.write(conf)
 
 class confighCls(configCls):
@@ -38,30 +35,26 @@ class configbldCls(configCls):
 
 class initEnvCls():
       def __init__(self, filename):
-            common.log(common.debug,
-                       "Initialized {0} class".format(self.__class__))
+            logger.debug("Initialized {0} class".format(self.__class__))
             self.__f = open(filename, "w+")
             self.__f.write("#!/bin/sh\n")
       def __del__(self):
-            common.log(common.debug,
-                       "Finalized {0} class".format(self.__class__))
+            logger.debug("Finalized {0} class".format(self.__class__))
             self.__f.write("\necho \"Starting dev shell. 'exit' to quit\"")
             self.__f.write("\nbash")
             self.__f.write("\necho \"Existing dev shell\"")
             self.__f.close()
       def sendData(self, conf):
-            common.log(common.debug,
-                       "In Function {0}".format(inspect.stack()[0][3]))
+            logger.debug("In Function {0}".format(inspect.stack()[0][3]))
             self.__f.write(conf)
 
 def args_actions(args):
-      global conf_dir
-      global currdir
+      logger.debug("In Function {0}".format(inspect.stack()[0][3]))
 
       if args.verbosity:
-            common.set_debug_lvl(args.verbosity)
+            logger.setLevel(logging.DEBUG)
       if args.quiet:
-            common.set_debug_lvl(common.error)
+            logger.setLevel(logging.ERROR)
 
       configh = confighCls(os.path.join(conf_dir, "config.h"))
       configmk = configmkCls(os.path.join(conf_dir, "config.mk"))
@@ -70,40 +63,32 @@ def args_actions(args):
 
       if args.sa:
             configmk.sendConf("\nSA={0}".format(args.sa))
-            common.log([common.info, common.screen_file, log_file],
-                       "\nSA flag set as SA={0}".format(args.sa))
+            logger.info("SA flag set as SA={0}".format(args.sa))
       if args.debug:
             configmk.sendConf("\nDEBUG_FLAG=-g")
-            common.log([common.info, common.screen_file, log_file],
-                       "\nDEBUG flag (-g) set.")
+            logger.info("DEBUG flag (-g) set.")
       if args.production:
             configmk.sendConf("\nPROD_FLAG=-O{0}".format(args.production))
-            common.log([common.info, common.screen_file, log_file],
-                       "\nOptimization -O{0} set".format(args.production))
+            logger.info("Optimization -O{0} set".format(args.production))
       if not args.static:
             configmk.sendConf("\nLIBTYPE=shared")
-            common.log([common.info, common.screen_file, log_file],
-                       "\nUsing shared library")
+            logger.info("Using shared library")
       else:
             configmk.sendConf("\nLIBTYPE=static")
-            common.log([common.info, common.screen_file, log_file],
-                       "\nUsing static library")
+            logger.info("Using static library")
       if args.gprof:
             configmk.sendConf("\nGPROF_FLAGS=-pg")
-            common.log([common.info, common.screen_file, log_file],
-                       "\nGPROF_FLAGS = -pg")
+            logger.info("GPROF_FLAGS = -pg")
       if args.gcov:
             configmk.sendConf("\nGCOV_FLAGS=-ftest-coverage -fprofile-arcs")
-            common.log([common.info, common.screen_file, log_file],
-                       "\nGCOV_FLAGS= -ftest-coverage -fprofile-arcs")
+            logger.info("GCOV_FLAGS= -ftest-coverage -fprofile-arcs")
       if args.host:
             tdir=os.path.join(conf_dir, "host")
             host_dir=os.path.join(tdir, args.host)
             filename=os.path.join(host_dir, "host.desc")
             with open(filename) as infile:
                   host_desc = json.load(infile)
-            common.log([common.info, common.screen_file, log_file],
-                       "\nSelecting host as {0}".format(args.host))
+            logger.info("Selecting host as {0}".format(args.host))
             if host_desc["environment_setup_script"]:
                   sdk=host_desc["environment_setup_script"]
                   initenv.sendData("\n . "+sdk)
@@ -117,8 +102,7 @@ def args_actions(args):
             filename=os.path.join(target_dir, "target.desc")
             with open(filename) as infile:
                   target_desc = json.load(infile)
-            common.log([common.info, common.screen_file, log_file],
-                       "\nSelecting target as {0}".format(args.target))
+            logger.info("Selecting target as {0}".format(args.target))
             if target_desc["environment_setup_script"]:
                   sdk=target_desc["environment_setup_script"]
                   initenv.sendData("\n . "+sdk)
@@ -128,6 +112,8 @@ def args_actions(args):
             initenv.sendData("\nexport TARGET_TYPE="+args.target)
 
 def process_cmd_args():
+      logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+
       parser = argparse.ArgumentParser(description="Configuration script")
 
       ################## - SA - ##################
@@ -169,47 +155,62 @@ def process_cmd_args():
       if args:
             args_actions(args)
 
-def prep(logf):
+def prep():
       global currdir
-      global log_file
+      global logger
       global conf_dir
+
       currdir = os.getcwd()
       conf_dir = os.path.join(currdir, "conf")
-      log_file = open(os.path.join(currdir, logf), 'w')
 
-      common.log([common.info, common.lfile, log_file],
-                 "\nConfiguration Started at {0}\n".format(time.asctime()))
+      # create logger
+      logger = logging.getLogger('config')
+      logger.setLevel(logging.INFO)
+
+      # create file handler and set level to debug
+      fh = logging.FileHandler("output/logs/config.log")
+
+      fh.setLevel(logging.DEBUG)
+
+      # create formatter
+      formatter = logging.Formatter('%(asctime)s-%(levelname)s- %(message)s')
+
+      # add formatter to ch
+      fh.setFormatter(formatter)
+
+      # add fh to logger
+      logger.addHandler(fh)
+
+      logger.info('Configuration started')
+
       shutil.copy(os.path.join(conf_dir, "def_configs/config.h.def"),\
                         os.path.join(conf_dir, "config.h"))
-      common.log([common.info, common.lfile, log_file],
-                 "Copied default configs {0}\n".format("config.h"))
+      logger.info("Copied default configs {0}".format("config.h"))
       shutil.copy(os.path.join(conf_dir, "def_configs/config.mk.def"),\
                         os.path.join(conf_dir, "config.mk"))
-      common.log([common.info, common.lfile, log_file],
-                 "Copied default configs {0}\n".format("config.mk"))
+      logger.info("Copied default configs {0}".format("config.mk"))
       shutil.copy(os.path.join(conf_dir, "def_configs/config.bld.def"),\
                         os.path.join(conf_dir, "config.bld"))
-      common.log([common.info, common.lfile, log_file],
-                 "Copied default configs {0}\n".format("config.bld"))
+      logger.info("Copied default configs {0}".format("config.bld"))
 
 def cleanup():
-      global currdir
-      global log_file
-      common.log([common.info, common.lfile, log_file],
-                 "\nEnded at {0}\n".format(time.asctime()))
-      log_file.close()
+      logger.info("Configuration Ended")
 
 def exec_new_dev_shell():
-      global currdir
+      logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+
       exec_file=os.path.join(currdir, "init_env.sh")
       common.exec_cmd(["chmod", "+x", exec_file])
       common.exec_cmd(exec_file)
 
 def main():
-      prep("output/logs/config.log")
+      prep()
       process_cmd_args()
       cleanup()
       exec_new_dev_shell()
 
 if __name__=='__main__':
-      main()
+      try:
+            main()
+      except:
+            logger.exception("Error during configuration")

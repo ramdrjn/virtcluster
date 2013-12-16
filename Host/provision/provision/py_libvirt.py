@@ -7,7 +7,8 @@ from common import common
 '''               Utility functions'''
 
 def _debug(msg):
-    common.log(common.debug, msg)
+#    print (msg)
+    pass
 
 def _validate_dom(dom):
     if not dom:
@@ -211,6 +212,12 @@ def dumpxml_network(nwk):
         return ""
     return ("\nNetwork xml\n"+nwk.XMLDesc(0))
 
+def list_network(con):
+    if not _validate_con(con):
+        return ""
+    return ("\nRunning Network\n" + str(con.listNetworks()) +
+            "\nDefined Network\n" + str(con.listDefinedNetworks()))
+
 '''               Domain information'''
 
 def dom_lookup(con, name):
@@ -287,7 +294,9 @@ def dom_pause(dom):
 def list_domains(con):
     if not _validate_con(con):
         return ""
-    return ("\nRunning domains\n" + str(con.listDomainsID()) +
+    id_list=con.listDomainsID()
+    dom_list=[con.lookupByID(id_val).name() for id_val in id_list]
+    return ("\nRunning domains\n" + str(dom_list) +
             "\nDefined domains\n" + str(con.listDefinedDomains()))
 
 state_names = { libvirt.VIR_DOMAIN_RUNNING  : "running",
@@ -361,6 +370,12 @@ def attach_raw_disk_nhp(dom, path):
  ".format(path)
     _nhp_set_dev(dom, xml)
 
+def list_storage_vol(con):
+    if not _validate_con(con):
+        return ""
+    return ("\nRunning Storage Volume\n" + str(con.listStoragePools()) +
+            "\nDefined Storage Volume\n" + str(con.listDefinedStoragePools()))
+
 '''          nwk interface'''
 def attach_interface(dom, mac, nwk_name, net_dev_name):
 #portgroup='{2}'/>\
@@ -375,7 +390,13 @@ def attach_interface(dom, mac, nwk_name, net_dev_name):
  ".format(mac, nwk_name, net_dev_name)
     _nhp_set_dev(dom, xml)
 
+def list_interfaces(con):
+    if not _validate_con(con):
+        return ""
+    return ("\nRunning Interfaces\n" + str(con.listInterfaces()) +
+            "\nDefined Interfaces\n" + str(con.listDefinedInterfaces()))
+
 '''               Other interfaces'''
-def get_fabric_ip(dom):
-    '''Get the fabric ip address of the domain.'''
-    return (('192.168.100.128','ip'))
+def get_vncport(dom_name):
+    op=common.exec_cmd_op(["virsh", "vncdisplay", dom_name])
+    return ("VNC port number: {0}".format(op))

@@ -7,12 +7,12 @@ network
       host name x86vm1 mac 52:54:00:d7:2a:31 ip 192.168.100.129
     end
   end
-  start network virtcluster_fabric0
+  start network fabric
 end
 
 domain
   define domain x86vm0 image yocto-x86 memory 524288 vcpu 2 arch i686
-  start domain x86vm0
+  start  domain x86vm0
   resume domain x86vm0
 end
 

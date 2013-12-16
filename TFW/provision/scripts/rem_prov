@@ -1,11 +1,11 @@
 network
-  stop network virtcluster_fabric0
-  undefine network virtcluster_fabric0
+  stop     network fabric
+  undefine network fabric
 end
 
 domain
-  shut domain x86vm0
-  stop domain x86vm0
+  shut     domain x86vm0
+  stop     domain x86vm0
   undefine domain x86vm0
 end
 

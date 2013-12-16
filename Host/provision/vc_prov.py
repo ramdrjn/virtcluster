@@ -70,7 +70,7 @@ def error_log_print(msg):
 
 class provCLI(cli_fmwk.VCCli):
     def __init__(self):
-        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("Initialized {0} class".format(self.__class__))
         cli_fmwk.VCCli.__init__(self, intro="virtcluster provision cli")
         self.def_comp_lst=['domain', 'network']
 
@@ -115,6 +115,8 @@ class provCLI(cli_fmwk.VCCli):
                 return
             s=py_libvirt.info_domain(dom)
             print(s)
+            s=py_libvirt.get_vncport(dom_name)
+            print(s)
         else:
             print("Enter domain")
             return
@@ -129,9 +131,23 @@ class provCLI(cli_fmwk.VCCli):
 
     def do_list(self, args):
         logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+        print ("\nDomain:")
+        print ("-------")
         s = py_libvirt.list_domains(self._con)
         print (s)
-        #network
+        print ("\nNetwork:")
+        print ("--------")
+        s = py_libvirt.list_network(self._con)
+        new_s=s.replace('virtcluster_fabric0', 'fabric')
+        print (new_s)
+        print ("\nInterfaces:")
+        print ("-----------")
+        s = py_libvirt.list_interfaces(self._con)
+        print (s)
+        print ("\nStorage Volume:")
+        print ("---------------")
+        s = py_libvirt.list_storage_vol(self._con)
+        print (s)
     def help_list(self):
         logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         print("     List domains    ")
@@ -179,7 +195,7 @@ class provCLI(cli_fmwk.VCCli):
 
 class provCLI_domain(cli_fmwk.VCCli):
     def __init__(self, con):
-        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("Initialized {0} class".format(self.__class__))
         cli_fmwk.VCCli.__init__(self, intro="Domain subcommands")
         self.prompt = self.prompt[:-1]+':Domain)'
         self.def_comp_lst=['domain']
@@ -562,7 +578,7 @@ class provCLI_domain(cli_fmwk.VCCli):
 
 class provCLI_dhcp(cli_fmwk.VCCli):
     def __init__(self, arg_d):
-        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("Initialized {0} class".format(self.__class__))
         self.arg_d=arg_d
         cli_fmwk.VCCli.__init__(self, intro="DHCP subcommands")
         self.prompt = self.prompt[:-1]+':dhcp)'
@@ -621,7 +637,7 @@ class provCLI_dhcp(cli_fmwk.VCCli):
 
 class provCLI_network_define(cli_fmwk.VCCli):
     def __init__(self, arg_d):
-        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("Initialized {0} class".format(self.__class__))
         self.arg_d=arg_d
         cli_fmwk.VCCli.__init__(self, intro="Network define subcommands")
         self.prompt = self.prompt[:-1]+':Network {0})'.format(arg_d['network'])
@@ -682,7 +698,7 @@ class provCLI_network_define(cli_fmwk.VCCli):
 
 class provCLI_network(cli_fmwk.VCCli):
     def __init__(self, con):
-        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("Initialized {0} class".format(self.__class__))
         cli_fmwk.VCCli.__init__(self, intro="Network subcommands")
         self.prompt = self.prompt[:-1]+':Network)'
         self.def_comp_lst=['network']
@@ -755,6 +771,9 @@ class provCLI_network(cli_fmwk.VCCli):
 
         if comp_type==['network']:
             nwk_name=arg_lst[1]
+            if nwk_name=='fabric':
+                nwk_name='virtcluster_fabric0'
+                logger.debug("Fabric network")
             nwk = py_libvirt.network_lookup(self._con, nwk_name)
             if not nwk:
                 error_log_print("Network not defined")
@@ -786,6 +805,9 @@ class provCLI_network(cli_fmwk.VCCli):
 
         if comp_type==['network']:
             nwk_name=arg_lst[1]
+            if nwk_name=='fabric':
+                nwk_name='virtcluster_fabric0'
+                logger.debug("Fabric network")
             nwk = py_libvirt.network_lookup(self._con, nwk_name)
             if not nwk:
                 error_log_print("Network not defined")
@@ -817,6 +839,9 @@ class provCLI_network(cli_fmwk.VCCli):
 
         if comp_type==['network']:
             nwk_name=arg_lst[1]
+            if nwk_name=='fabric':
+                nwk_name='virtcluster_fabric0'
+                logger.debug("Fabric network")
             nwk = py_libvirt.network_lookup(self._con, nwk_name)
             if not nwk:
                 error_log_print("Network not defined")
