@@ -22,7 +22,7 @@ def install_host_rpm():
 
 def install_images():
       _log("In Function {0}".format(inspect.stack()[0][3]))
-      common.exec_cmd(["rpm", "-ivh", "x86/virtcluster_image*.rpm"])
+      common.exec_cmd(["rpm", "-ivh", "x86/virtcluster-image*.rpm"])
 
 def repo_setup():
       _log("In Function {0}".format(inspect.stack()[0][3]))

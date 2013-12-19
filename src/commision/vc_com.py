@@ -15,7 +15,7 @@ def parse_pkg_grp_json(fname):
     buf=""
     main=""
     update=""
-    with open(json) as f:
+    with open(fname) as f:
         line=f.readline()
         while line:
             buf=buf+line.strip("\n")

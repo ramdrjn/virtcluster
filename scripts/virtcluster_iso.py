@@ -58,9 +58,12 @@ def prep_host_scripts(iso_dir, cwd):
       logger.info( "Install scripts copied to ISO dir")
 
 def make_iso(iso_dir, iso_name):
+      '''-J is for Joliet format, -f is for follow symbolic links
+      -r is for rockridge extensions. Needed to preserve permissions'''
       logger.debug("In Function {0}".format(inspect.stack()[0][3]))
 
-      cmd=["genisoimage", "-l", "-debug", "-v", "-o", "{0}".format(iso_name),
+      cmd=["genisoimage", "-J", "-r", "-f", "-debug", "-v", "-o",
+           "{0}".format(iso_name),
            "{0}".format(iso_dir)]
       op = common.exec_cmd_op(cmd)
       logger.info(op)
