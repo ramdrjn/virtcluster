@@ -259,7 +259,6 @@ class provCLI_domain(cli_fmwk.VCCli):
                 <interface type='network'>\
                   <mac address='$fab0_dom_mac'/>\
                   <source network='$fab0_net_name'/>\
-                  <target dev='$fab0_net_dev'/>\
                   <model type='virtio'/>\
                 </interface>\
                 <graphics type='vnc' port='$vnc_port' autoport='yes'/>\
@@ -315,13 +314,11 @@ class provCLI_domain(cli_fmwk.VCCli):
             j_dict=json.load(f)
 
         arg_d['fab0_net_name']=j_dict['fab0_net_name']
-        arg_d['fab0_net_dev']=j_dict['fab0_net_dev']
 
         #Request for vnc port auto allocation
         arg_d['vnc_port']='-1'
 
-        logger.info("Domain net {0} dev {1}".format(arg_d['fab0_net_name'],
-                                                     arg_d['fab0_net_dev']))
+        logger.info("Domain net {0}".format(arg_d['fab0_net_name']))
 
         img_name=arg_d['image']
         logger.info("Image name {0} ".format(img_name))
@@ -665,7 +662,6 @@ class provCLI_network_define(cli_fmwk.VCCli):
         j_dict={}
         j_dict['fab0_net_name']=self.arg_d['network']
         j_dict['fab0_host_net_ip']=t_dict['ip']
-        j_dict['fab0_net_dev']='vfab0'
 
         if self.is_fabric:
             net_fname="fab0_host.net"
@@ -1084,6 +1080,8 @@ def main():
             IOError,
             OSError) as e:
         logger.exception("Error {0}".format(str(e)))
+    except:
+        logger.exception("Error")
 
     cleanup_provision()
 

@@ -7,6 +7,9 @@ domain
   shut     domain x86vm0
   stop     domain x86vm0
   undefine domain x86vm0
+  shut     domain x86vm1
+  stop     domain x86vm1
+  undefine domain x86vm1
 end
 
 list
