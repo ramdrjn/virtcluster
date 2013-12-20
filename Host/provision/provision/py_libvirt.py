@@ -393,6 +393,15 @@ def attach_cdrom_dev_hp(dom, dev):
  ".format(path)
     _hp_cdrom(dom, xml)
 
+def detach_cdrom_dev_hp(dom):
+    xml="\
+ <disk type='block' device='cdrom'>\
+ <target dev='hdc' bus='ide' tray='open'/>\
+ <readonly/>\
+ </disk>\
+ "
+    _hp_cdrom(dom, xml)
+
 def list_storage_vol(con):
     if not _validate_con(con):
         return ""

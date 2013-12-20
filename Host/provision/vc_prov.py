@@ -86,6 +86,10 @@ def _iso_prep(dom, pm_group):
         logger.info("Attaching cdrom device to dom")
         py_libvirt.attach_cdrom_dev_hp(dom, main_d['dev'])
 
+def _cdrom_eject(dom):
+    logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+    py_libvirt.detach_cdrom_dev_hp(dom)
+
 class provCLI(cli_fmwk.VCCli):
     def __init__(self):
         logger.debug("Initialized {0} class".format(self.__class__))
@@ -993,6 +997,11 @@ class provCLI_commision(cli_fmwk.VCCli):
         logger.debug("Commision start")
 
         vc_commision.start(comi_dir, net_dir, arg_d)
+
+        logger.info("Ejecting cdrom")
+        _cdrom_eject(dom)
+
+        logger.debug("Exiting Commision")
 
     def help_initialize(self, args):
         logger.debug("In Function {0}".format(inspect.stack()[0][3]))

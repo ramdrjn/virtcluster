@@ -119,6 +119,11 @@ def prep():
 def cleanup():
     logger.debug('Commisioning stage 2 cleanup')
 
+    logger.info("Unmounting the cdrom after commision")
+    out=common.exec_command("umount /media/cdrom0")
+    if out:
+        logger.info(out)
+
 def main():
 
     prep()
