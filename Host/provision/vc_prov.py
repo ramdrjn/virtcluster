@@ -573,6 +573,38 @@ class provCLI_domain(cli_fmwk.VCCli):
         logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         return complete_dom(text, line, begidx, endidx)
 
+    def do_interface(self, args):
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+
+        logger.debug("Domain add interface args {0}".format(args))
+
+        arg_lst=args.split()
+        if len(arg_lst) != 6:
+            self.help_interface()
+            return
+
+        arg_d = dict(zip(arg_lst[::2], [arg_lst[i]
+                                        for i in range(1, len(arg_lst), 2)]))
+
+        dom_name=arg_d['domain']
+        if dom_name:
+            dom = py_libvirt.dom_lookup(self._con, dom_name)
+            if not dom:
+                error_log_print("Domain not defined")
+                return
+            py_libvirt.attach_interface(dom, arg_d['mac'], arg_d['dev'])
+        else:
+            print("Enter domain")
+            return
+
+    def help_interface(self):
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+        print("     Interface add to domain <domain name>    ")
+
+    def complete_interface(self, text, line, begidx, endidx):
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+        return complete_dom(text, line, begidx, endidx)
+
 class provCLI_dhcp(cli_fmwk.VCCli):
     def __init__(self, arg_d):
         logger.debug("Initialized {0} class".format(self.__class__))

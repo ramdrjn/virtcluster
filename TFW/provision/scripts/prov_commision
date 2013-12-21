@@ -12,12 +12,14 @@ end
 
 domain
   define domain x86vm0 image yocto-x86 memory 524288 vcpu 2 arch i686
+  interface domain x86vm0 mac 00:16:3e:20:b0:10 dev eth0
   start  domain x86vm0
   resume domain x86vm0
 end
 
 domain
   define domain x86vm1 image yocto-x86 memory 524288 vcpu 2 arch i686
+  interface domain x86vm1 mac 00:16:3e:20:b0:11 dev eth0
   start  domain x86vm1
   resume domain x86vm1
 end

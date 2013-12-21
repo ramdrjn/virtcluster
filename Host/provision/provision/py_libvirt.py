@@ -141,7 +141,7 @@ def _hp_cdrom(dom, xml):
 '''               Interfaces'''
 
 def _def_interface(dom, xml, flags=0):
-    dom.interfaceDefineXML(xml, flags)
+    dom.attachDeviceFlags(xml, flags)
 
 
 '''               Events & Features'''
@@ -409,18 +409,17 @@ def list_storage_vol(con):
             "\nDefined Storage Volume\n" + str(con.listDefinedStoragePools()))
 
 '''          nwk interface'''
-def attach_interface(dom, mac, nwk_name, net_dev_name):
+def attach_interface(dom, mac, dev_name):
 #portgroup='{2}'/>\
-
+#    <model type='virtio'/>
     xml="\
-  <interface type='network'>\
+  <interface type='direct'>\
     <mac address='{0}'/>\
-    <source network='{1}'/>\
-    <target dev='{2}'/>\
+    <source dev='{1}' mode='bridge'/>\
     <model type='virtio'/>\
   </interface>\
- ".format(mac, nwk_name, net_dev_name)
-    _nhp_set_dev(dom, xml)
+ ".format(mac, dev_name)
+    _def_interface(dom, xml)
 
 def list_interfaces(con):
     if not _validate_con(con):
