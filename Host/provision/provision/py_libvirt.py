@@ -7,7 +7,8 @@ from common import common
 '''               Utility functions'''
 
 def _debug(msg):
-    common.log(common.debug, msg)
+#    print (msg)
+    pass
 
 def _validate_dom(dom):
     if not dom:
@@ -134,10 +135,13 @@ def _hp_set_dev(dom, xml):
 def _nhp_set_dev(dom, xml):
     _set_dev(dom, xml, 0)
 
+def _hp_cdrom(dom, xml):
+    dom.updateDeviceFlags(xml, 0)
+
 '''               Interfaces'''
 
 def _def_interface(dom, xml, flags=0):
-    dom.interfaceDefineXML(xml, flags)
+    dom.attachDeviceFlags(xml, flags)
 
 
 '''               Events & Features'''
@@ -210,6 +214,12 @@ def dumpxml_network(nwk):
     if not _validate_nwk(nwk):
         return ""
     return ("\nNetwork xml\n"+nwk.XMLDesc(0))
+
+def list_network(con):
+    if not _validate_con(con):
+        return ""
+    return ("\nRunning Network\n" + str(con.listNetworks()) +
+            "\nDefined Network\n" + str(con.listDefinedNetworks()))
 
 '''               Domain information'''
 
@@ -287,7 +297,9 @@ def dom_pause(dom):
 def list_domains(con):
     if not _validate_con(con):
         return ""
-    return ("\nRunning domains\n" + str(con.listDomainsID()) +
+    id_list=con.listDomainsID()
+    dom_list=[con.lookupByID(id_val).name() for id_val in id_list]
+    return ("\nRunning domains\n" + str(dom_list) +
             "\nDefined domains\n" + str(con.listDefinedDomains()))
 
 state_names = { libvirt.VIR_DOMAIN_RUNNING  : "running",
@@ -361,21 +373,61 @@ def attach_raw_disk_nhp(dom, path):
  ".format(path)
     _nhp_set_dev(dom, xml)
 
-'''          nwk interface'''
-def attach_interface(dom, mac, nwk_name, net_dev_name):
-#portgroup='{2}'/>\
-
+def attach_cdrom_hp(dom, path):
     xml="\
-  <interface type='network'>\
+ <disk type='file' device='cdrom'>\
+   <source file='{0}'/>\
+   <target dev='hdc'/>\
+   <readonly/>\
+ </disk>\
+ ".format(path)
+    _hp_cdrom(dom, xml)
+
+def attach_cdrom_dev_hp(dom, dev):
+    xml="\
+ <disk type='block' device='cdrom'>\
+   <source dev='{0}'/>\
+   <target dev='hdc'/>\
+   <readonly/>\
+ </disk>\
+ ".format(path)
+    _hp_cdrom(dom, xml)
+
+def detach_cdrom_dev_hp(dom):
+    xml="\
+ <disk type='block' device='cdrom'>\
+ <target dev='hdc' bus='ide' tray='open'/>\
+ <readonly/>\
+ </disk>\
+ "
+    _hp_cdrom(dom, xml)
+
+def list_storage_vol(con):
+    if not _validate_con(con):
+        return ""
+    return ("\nRunning Storage Volume\n" + str(con.listStoragePools()) +
+            "\nDefined Storage Volume\n" + str(con.listDefinedStoragePools()))
+
+'''          nwk interface'''
+def attach_interface(dom, mac, dev_name):
+#portgroup='{2}'/>\
+#    <model type='virtio'/>
+    xml="\
+  <interface type='direct'>\
     <mac address='{0}'/>\
-    <source network='{1}'/>\
-    <target dev='{2}'/>\
+    <source dev='{1}' mode='bridge'/>\
     <model type='virtio'/>\
   </interface>\
- ".format(mac, nwk_name, net_dev_name)
-    _nhp_set_dev(dom, xml)
+ ".format(mac, dev_name)
+    _def_interface(dom, xml)
+
+def list_interfaces(con):
+    if not _validate_con(con):
+        return ""
+    return ("\nRunning Interfaces\n" + str(con.listInterfaces()) +
+            "\nDefined Interfaces\n" + str(con.listDefinedInterfaces()))
 
 '''               Other interfaces'''
-def get_fabric_ip(dom):
-    '''Get the fabric ip address of the domain.'''
-    return (('192.168.100.128','ip'))
+def get_vncport(dom_name):
+    op=common.exec_cmd_op(["virsh", "vncdisplay", dom_name])
+    return ("VNC port number: {0}".format(op))

@@ -7,21 +7,37 @@ network
       host name x86vm1 mac 52:54:00:d7:2a:31 ip 192.168.100.129
     end
   end
-  start network virtcluster_fabric0
+  start network fabric
 end
 
 domain
   define domain x86vm0 image yocto-x86 memory 524288 vcpu 2 arch i686
-  start domain x86vm0
+  interface domain x86vm0 mac 00:16:3e:20:b0:10 dev eth0
+  start  domain x86vm0
   resume domain x86vm0
+end
+
+domain
+  define domain x86vm1 image yocto-x86 memory 524288 vcpu 2 arch i686
+  interface domain x86vm1 mac 00:16:3e:20:b0:11 dev eth0
+  start  domain x86vm1
+  resume domain x86vm1
 end
 
 sleep 20
 
-domain
-  commision domain x86vm0 pkg-mgmt smart pm-url http://192.168.100.1:8000/main
+commision
+  package group iso-ins
+    manager smart
+    main   url file:///media/cdrom0/x86 iso file:///tmp/virtcluster-x86.iso
+#    main   url file:///media/cdrom0/x86 dev /dev/sr0
+    update url http://192.168.100.1:8000/update
+  end
+  initialize domain x86vm0 pkg-group iso-ins
+  initialize domain x86vm1 pkg-group iso-ins
 end
 
 list
 info domain x86vm0
+info domain x86vm1
 quit

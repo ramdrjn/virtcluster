@@ -8,6 +8,42 @@ import inspect
 
 logger=None
 
+def parse_pkg_grp_json(fname):
+    logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+
+    d={}
+    buf=""
+    main=""
+    update=""
+    with open(fname) as f:
+        line=f.readline()
+        while line:
+            buf=buf+line.strip("\n")
+            line=f.readline()
+        if '"main": {' in buf:
+            t_list=buf.split('"main": {', 1)
+            t_buf=t_list[0]
+            t_list=t_list[1].split('}', 1)
+            main=t_list[0]
+            buf=t_buf+t_list[1]
+        if '"update": {' in buf:
+            t_list=buf.split('"update": {', 1)
+            t_buf=t_list[0]
+            t_list=t_list[1].split('}', 1)
+            update=t_list[0]
+            buf=t_buf+t_list[1]
+        buf=buf.replace("{", "")
+        buf=buf.replace("}", "")
+        buf=buf.replace('"', "")
+        buf=buf.replace(" ", "")
+        llist=buf.split(",")
+        for ele in llist:
+            if not ele:
+                continue
+            tlist=ele.split(":")
+            d[tlist[0]]=tlist[1]
+    return (d)
+
 def parse_json(fname):
     logger.debug("In Function {0}".format(inspect.stack()[0][3]))
 
@@ -83,13 +119,20 @@ def prep():
 def cleanup():
     logger.debug('Commisioning stage 2 cleanup')
 
+    logger.info("Unmounting the cdrom after commision")
+    out=common.exec_command("umount /media/cdrom0")
+    if out:
+        logger.info(out)
+
 def main():
 
     prep()
 
     try:
         d=parse_json("/opt/x86vm/conf/commision.conf")
-        pkg_mgmt=d['pkg-mgmt']
+        pkg_grp_file=d['pm-group-file']
+        j=parse_pkg_grp_json(pkg_grp_file)
+        pkg_mgmt=j['manager']
         l=get_rpms("/opt/x86vm/conf/rpm.install")
         if pkg_mgmt == "smart":
             smart_install(l)
