@@ -2,20 +2,16 @@
 # Makefile                                                                  #
 #############################################################################
 
-target:$(MODULE)
+target:all
 
-.PHONY:utLib
-utLib:
-	$(MAKE) -C ./utLib/ $(TARGET)
-
-.PHONY:commision
-commision:
-	$(MAKE) -C ./commision/ $(TARGET)
+.PHONY:cpackgen-cli
+cpackgen-cli:
+	$(MAKE) -C ./cpackgen-cli/ $(TARGET)
 
 .PHONY:cpackgen
 cpackgen:
-	$(MAKE) -C ./cpackgen/ all TARGET=$(TARGET)
+	$(MAKE) -C ./cpackgen/ $(TARGET)
 
-all:utLib commision cpackgen
+all:cpackgen cpackgen-cli
 
 ##############################################################################
