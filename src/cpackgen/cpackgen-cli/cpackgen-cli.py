@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import sys
+sys.path.append('/opt/x86vm/')
+
 from common import common
 import inspect
 
