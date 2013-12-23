@@ -1,7 +1,4 @@
-try:
-      import subprocess
-except ImportError:
-      import commands
+import subprocess
 
 import inspect
 
@@ -31,12 +28,3 @@ def exec_cmd_op(cmd):
                   errstr=errstr+"Output {0}\n".format(e.output)
             raise execCmdError(errstr)
       return (out)
-
-def exec_command(cmd):
-
-      try:
-            (status, op)=commands.getstatusoutput(cmd)
-      except:
-            raise execCmdError("Cmd failed returned {0} output {1}".format(
-                        status, op))
-      return (op)

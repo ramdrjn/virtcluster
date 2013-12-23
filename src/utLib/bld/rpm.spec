@@ -20,7 +20,7 @@ cp ./lib/libutLib.so %{virtcluster_host_lib}
 %clean
 %virtcluster_rm_br
 
-%pre
+%post
 if [ "$1" = "1" ]; then
     #Install
     echo "%{_hostlibdir}" >>/etc/ld.so.conf

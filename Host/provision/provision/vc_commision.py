@@ -112,6 +112,9 @@ def start(comi_dir, net_dir, arg_d):
     conf['pm-group-file']=os.path.join(rmt_conf_dir, pm_grp_fname)
     conf['pm-config-file']=os.path.join(rmt_conf_dir, pm_config_fname)
 
+    #Add rpm.install file location
+    conf['rpm_install']="/opt/x86vm/conf/rpm.install"
+
     comm_fname="commision.conf"
     rem_comm_file = os.path.join(rmt_conf_dir, comm_fname)
     comm_conf = os.path.join(domain_dir, comm_fname)

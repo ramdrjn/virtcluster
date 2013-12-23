@@ -5,6 +5,7 @@ import sys
 sys.path.append('/opt/x86vm/')
 
 from common import common
+from common import cli_fmwk
 import inspect
 
 def start():
