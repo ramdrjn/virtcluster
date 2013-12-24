@@ -1,12 +1,10 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import sys
 sys.path.append('/opt/x86vm/')
 
 from common import common
 from common import cli_fmwk
-import gen-rcv-com as grc
+import grc
 import json
 import cmd
 import inspect
