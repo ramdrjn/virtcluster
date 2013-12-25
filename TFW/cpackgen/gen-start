@@ -1,0 +1,12 @@
+generator
+  parameter
+    count max 10
+    duration max 10
+#    rate pps 50
+    rate bps 5 KBps
+  end
+  start
+#  pause
+#  resume
+  stop
+end

@@ -132,23 +132,28 @@ class genParams_cli(cli_fmwk.VCCli):
         grc.debug("In Function {0}".format(inspect.stack()[0][3]))
 
         r_list=args.split()
-        if r_list[1]=='pps':
-            if not r_list[2]:
+
+        if len(r_list) < 2:
+            self.help_rate()
+            return
+
+        if r_list[0]=='pps':
+            if not r_list[1]:
                 self.help_rate()
                 return
-            self.param_dict['rate_pps']=r_list[2]
-        elif r_list[1]=='bps':
-            if not r_list[2]:
+            self.param_dict['rate_pps']=r_list[1]
+        elif r_list[0]=='bps':
+            if not r_list[1]:
                 self.help_rate()
                 return
-            bps=r_list[2]
-            if r_list[3]:
-                if r_list[3]=='KBPS':
-                    bps=bps*1024
-                if r_list[3]=='MBPS':
-                    bps=bps*1024*1024
-                if r_list[3]=='GBPS':
-                    bps=bps*1024*1024*1024
+            bps=int(r_list[1])
+            if r_list[2]:
+                if r_list[2]=='KBps':
+                    bps=bps*1024*8
+                if r_list[2]=='MBps':
+                    bps=bps*1024*1024*8
+                if r_list[2]=='GBps':
+                    bps=bps*1024*1024*1024*8
             self.param_dict['rate_bps']=bps
         else:
             self.help_rate()
@@ -165,11 +170,16 @@ class genParams_cli(cli_fmwk.VCCli):
         grc.debug("In Function {0}".format(inspect.stack()[0][3]))
 
         r_list=args.split()
-        if r_list[1]=='count':
-            if not r_list[2]:
+
+        if len(r_list) < 2:
+            self.help_count()
+            return
+
+        if r_list[0]=='max':
+            if not r_list[1]:
                 self.help_count()
                 return
-            self.param_dict['count']=r_list[2]
+            self.param_dict['max_count']=r_list[1]
         else:
             self.help_count()
             return
@@ -177,17 +187,22 @@ class genParams_cli(cli_fmwk.VCCli):
     def help_count(self):
         grc.debug("In Function {0}".format(inspect.stack()[0][3]))
         print ("     Packet count     ")
-        print ("          count <val> ")
+        print ("          count max <val> ")
 
     def do_duration(self, args):
         grc.debug("In Function {0}".format(inspect.stack()[0][3]))
 
         r_list=args.split()
-        if r_list[1]=='duration':
-            if not r_list[2]:
+
+        if len(r_list) < 2:
+            self.help_duration()
+            return
+
+        if r_list[0]=='max':
+            if not r_list[1]:
                 self.help_duration()
                 return
-            self.param_dict['duration']=r_list[2]
+            self.param_dict['duration_max']=r_list[1]
         else:
             self.help_duration()
             return
