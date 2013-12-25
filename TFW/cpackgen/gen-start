@@ -6,7 +6,4 @@ generator
     rate bps 5 KBps
   end
   start
-#  pause
-#  resume
-  stop
 end
