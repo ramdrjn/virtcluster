@@ -1,48 +1,10 @@
 
-import sys
-sys.path.append('/opt/x86vm/')
-
 from common import common
 from common import cli_fmwk
 import grc
-import json
+import pkt
 import cmd
 import inspect
-
-class l2_cli(cli_fmwk.VCCli):
-    def __init__(self, d):
-        grc.debug("Initialized {0} class".format(self.__class__))
-        cli_fmwk.VCCli.__init__(self, intro="Layer 2 packet definitions",
-                                prompt="(cpackgen:L2)")
-        self.param_dict=d
-
-class l3_cli(cli_fmwk.VCCli):
-    def __init__(self, d):
-        grc.debug("Initialized {0} class".format(self.__class__))
-        cli_fmwk.VCCli.__init__(self, intro="Layer 3 packet definitions",
-                                prompt="(cpackgen:L3)")
-        self.param_dict=d
-
-class l4_cli(cli_fmwk.VCCli):
-    def __init__(self, d):
-        grc.debug("Initialized {0} class".format(self.__class__))
-        cli_fmwk.VCCli.__init__(self, intro="Layer 4 packet definitions",
-                                prompt="(cpackgen:L4)")
-        self.param_dict=d
-
-class l7_cli(cli_fmwk.VCCli):
-    def __init__(self, d):
-        grc.debug("Initialized {0} class".format(self.__class__))
-        cli_fmwk.VCCli.__init__(self, intro="Layer 7 packet definitions",
-                                prompt="(cpackgen:L7)")
-        self.param_dict=d
-
-class customPkt_cli(cli_fmwk.VCCli):
-    def __init__(self, d):
-        grc.debug("Initialized {0} class".format(self.__class__))
-        cli_fmwk.VCCli.__init__(self, intro="Custom packet definitions",
-                                prompt="(cpackgen:Custom Packet)")
-        self.param_dict=d
 
 class genPkt_cli(cli_fmwk.VCCli):
     def __init__(self, d):
@@ -55,7 +17,7 @@ class genPkt_cli(cli_fmwk.VCCli):
         grc.debug("In Function {0}".format(inspect.stack()[0][3]))
         l_dict={}
 
-        p_cli=l2_cli(l_dict)
+        p_cli=pkt.l2_cli(l_dict)
         p_cli.cmdloop()
 
         j_dict={}
@@ -69,7 +31,7 @@ class genPkt_cli(cli_fmwk.VCCli):
         grc.debug("In Function {0}".format(inspect.stack()[0][3]))
         l_dict={}
 
-        p_cli=l3_cli(l_dict)
+        p_cli=pkt.l3_cli(l_dict)
         p_cli.cmdloop()
 
         j_dict={}
@@ -83,7 +45,7 @@ class genPkt_cli(cli_fmwk.VCCli):
         grc.debug("In Function {0}".format(inspect.stack()[0][3]))
         l_dict={}
 
-        p_cli=l4_cli(l_dict)
+        p_cli=pkt.l4_cli(l_dict)
         p_cli.cmdloop()
 
         j_dict={}
@@ -97,7 +59,7 @@ class genPkt_cli(cli_fmwk.VCCli):
         grc.debug("In Function {0}".format(inspect.stack()[0][3]))
         l_dict={}
 
-        p_cli=l7_cli(l_dict)
+        p_cli=pkt.l7_cli(l_dict)
         p_cli.cmdloop()
 
         j_dict={}
@@ -111,7 +73,7 @@ class genPkt_cli(cli_fmwk.VCCli):
         grc.debug("In Function {0}".format(inspect.stack()[0][3]))
         l_dict={}
 
-        p_cli=customPkt_cli(l_dict)
+        p_cli=pkt.customPkt_cli(l_dict)
         p_cli.cmdloop()
 
         j_dict={}
@@ -212,68 +174,11 @@ class genParams_cli(cli_fmwk.VCCli):
         print ("     Packet generation duration     ")
         print ("          duration <val>            ")
 
-class generator_cli(cli_fmwk.VCCli):
+class generator_cli(grc.comCls):
     def __init__(self):
         grc.debug("Initialized {0} class".format(self.__class__))
-        cli_fmwk.VCCli.__init__(self, intro="Generator subcommands")
-        self.prompt='cpackgen:Generator)'
-
-    def postloop(self):
-        grc.debug("In Function {0}".format(inspect.stack()[0][3]))
-
-        self.p_ref.poll()
-        if self.p_ref.returncode != None:
-            self.p_ref.terminate()
-        self.p_ref.poll()
-        if self.p_ref.returncode != None:
-            self.p_ref.kill()
-
-    def preloop(self):
-        grc.debug("In Function {0}".format(inspect.stack()[0][3]))
-
-        self.p_ref=grc.start_proc('generator')
-
-    def do_start(self, args):
-        grc.debug("In Function {0}".format(inspect.stack()[0][3]))
-        json.dump('start', self.p_ref.stdin)
-
-    def help_start(self):
-        grc.debug("In Function {0}".format(inspect.stack()[0][3]))
-        print ("     Start Generator     ")
-
-    def do_stop(self, args):
-        grc.debug("In Function {0}".format(inspect.stack()[0][3]))
-        json.dump('stop', self.p_ref.stdin)
-        return True
-
-    def help_stop(self):
-        grc.debug("In Function {0}".format(inspect.stack()[0][3]))
-        print ("     Stop Generator     ")
-
-    def do_stats(self, args):
-        grc.debug("In Function {0}".format(inspect.stack()[0][3]))
-        json.dump('stats', self.p_ref.stdin)
-        grc.process_stats(self.p_ref.stdout)
-
-    def help_stats(self):
-        grc.debug("In Function {0}".format(inspect.stack()[0][3]))
-        print ("     Display stats    ")
-
-    def do_pause(self, args):
-        grc.debug("In Function {0}".format(inspect.stack()[0][3]))
-        json.dump('pause', self.p_ref.stdin)
-
-    def help_pause(self):
-        grc.debug("In Function {0}".format(inspect.stack()[0][3]))
-        print ("     Pause Generator     ")
-
-    def do_resume(self, args):
-        grc.debug("In Function {0}".format(inspect.stack()[0][3]))
-        json.dump('resume', self.p_ref.stdin)
-
-    def help_resume(self):
-        grc.debug("In Function {0}".format(inspect.stack()[0][3]))
-        print ("     Resume Generator     ")
+        grc.comCls.__init__(self, "Generator subcommands",
+                            'cpackgen:Generator)', 'generator')
 
     def do_parameter(self, args):
         grc.debug("In Function {0}".format(inspect.stack()[0][3]))
@@ -286,7 +191,7 @@ class generator_cli(cli_fmwk.VCCli):
         j_dict={}
         j_dict['generator_parameter']=param_dict
         #Send the parameters to generator process
-        json.dump(j_dict, self.p_ref.stdin)
+        grc.jdump(j_dict, self.p_ref.stdin)
 
     def help_parameter(self):
         grc.debug("In Function {0}".format(inspect.stack()[0][3]))
@@ -303,7 +208,7 @@ class generator_cli(cli_fmwk.VCCli):
         j_dict={}
         j_dict['generator_packet']=pkt_dict
         #Send the packet definitions to generator process
-        json.dump(j_dict, self.p_ref.stdin)
+        grc.jdump(j_dict, self.p_ref.stdin)
 
     def help_packet(self):
         grc.debug("In Function {0}".format(inspect.stack()[0][3]))
