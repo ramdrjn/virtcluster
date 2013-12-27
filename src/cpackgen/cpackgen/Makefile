@@ -6,6 +6,10 @@ target:rpm
 
 include $(CURR_DIR)/src/com_inc/make_inc.mk
 
+LIBS += -lutLib -lpthread -lrt
+
+LFLAGS += -L$(COM_LIB_DIR)
+
 vpath %.c $(SRC_DIR)
 
 CPACKGEN_RPM = $(RPM_DIR)/cpackgen*.rpm

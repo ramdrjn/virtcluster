@@ -11,5 +11,13 @@
 #include "generr.h"
 #include "gentypes.h"
 
+#include "utLib/mmod.h"
+#include "utLib/fmod.h"
+#include "utLib/lmod.h"
+
+#define debug(fmt, ...) bs_log(lObj, LVL_DEBUG, PF_LOG, "\n"fmt, __VA_ARGS__)
+#define info(fmt, ...) bs_log(lObj, LVL_INFO, PF_LOG, "\n"fmt, __VA_ARGS__)
+#define error(fmt, ...) bs_log(lObj, LVL_ERROR, PF_LOG, "\n"fmt, __VA_ARGS__)
+
 /****************************************************************************/
 #endif /*_CPACKGEN_H_*/
