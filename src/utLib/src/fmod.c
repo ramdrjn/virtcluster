@@ -319,8 +319,16 @@ bs_fObjectify (int fd, bs_fmodCls fObjPtr)
 {
   validateObj (fObjPtr);
 
-  fObjPtr->_fd = fd;
-  fObjPtr->_type = F_SPECIAL;
+  if (fd >=2)
+    {
+      fObjPtr->_fd = fd;
+      fObjPtr->_type = F_SPECIAL;
+    }
+  else
+    {
+      fObjPtr->_fd = fd;
+      fObjPtr->_type = F_BINARY;
+    }
 
   return SUCCESS;
 }

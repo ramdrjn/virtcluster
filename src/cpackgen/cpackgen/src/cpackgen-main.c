@@ -27,18 +27,30 @@ void _exit_cleanup(bs_mmodCls mObj, bs_fmodCls fObj, bs_lmodCls lObj)
   bs_mmodFin (&mObj);
 }
 
+#define INPUT_JSON_BUFFER_SIZE 1024
+
 /**
  * Main
  */
 int main(int argc, char *argv[])
 {
   genErr_t retVal;
+  cmd_e_type cmd;
+  int ret_cnt=-1;
   char *input = NULL;
+  void *jobj = NULL;
   char *mode = NULL;
   bs_mmodCls mObj = NULL;
   bs_fmodCls fObj = NULL;
   bs_lmodCls lObj = NULL;
+  bs_fmodCls input_fObj = NULL;
   const char *debug_fname = "/tmp/cpackgen-debug";
+  t_bool run_flag = true;
+
+  if (argc < 2)
+    return (-1);
+
+  mode = argv[1];
 
   retVal = bs_mmodInit (&mObj);
   if (retVal != SUCCESS)
@@ -52,11 +64,14 @@ int main(int argc, char *argv[])
     }
 
   retVal = bs_fCreate (fObj, debug_fname, 0644);
-  if (retVal != SUCCESS)
+  /*
+    Ignore file creation errors.
+    if (retVal != SUCCESS)
     {
       _exit_cleanup(mObj, fObj, lObj);
       return (retVal);
     }
+  */
 
   retVal = bs_fOpen (fObj, debug_fname, F_ASCII, FA_WR);
   if (retVal != SUCCESS)
@@ -76,8 +91,26 @@ int main(int argc, char *argv[])
     return (retVal);
 
   debug ("%s", "Starting cpackgen");
+  info ("%s %s", "Starting in mode:", mode);
 
-  retVal = bs_allocMem(mObj, 1024, (void *)&input);
+  retVal = bs_fmodInit (&input_fObj, mObj);
+  if (retVal != SUCCESS)
+    {
+      error ("%s", "Allocation memory for input file object failed");
+      _exit_cleanup(mObj, input_fObj, lObj);
+      return (retVal);
+    }
+
+  /*0 is for stdin*/
+  retVal = bs_fObjectify (0, input_fObj);
+  if (retVal != SUCCESS)
+    {
+      error ("%s", "STDIN open failed failed");
+      _exit_cleanup(mObj, input_fObj, lObj);
+      return (retVal);
+    }
+
+  retVal = bs_allocMem(mObj, INPUT_JSON_BUFFER_SIZE, (void *)&input);
   if (retVal != SUCCESS)
     {
       error ("%s", "Allocation memory for json input failed");
@@ -85,8 +118,47 @@ int main(int argc, char *argv[])
       return (retVal);
     }
 
-  mode = argv[1];
-  info ("%s %s", "Starting in mode:", mode);
+  while (run_flag)
+    {
+      retVal = bs_fRead (input_fObj, (void *)input,
+                         INPUT_JSON_BUFFER_SIZE, &ret_cnt);
+      if (retVal != SUCCESS)
+        {
+          error ("%s", "STDIN read failed failed");
+          _exit_cleanup(mObj, input_fObj, lObj);
+          return (retVal);
+        }
+
+      debug("json input received %s", input);
+
+      retVal = parse_json(input, &jobj, lObj);
+      if (retVal != SUCCESS)
+        {
+          error ("%s", "JSON parse fail");
+          _exit_cleanup(mObj, fObj, lObj);
+          return (retVal);
+        }
+
+      cmd = get_cmd_from_json(jobj, lObj);
+
+      debug("%s %d" "Command received: ", cmd);
+
+      debug("%s", "Freeing json object");
+      free_json_obj(jobj);
+      jobj = NULL;
+
+      if (cmd == STOP)
+        {
+          info("%s", "Stopping due to JSON command");
+          run_flag = false;
+          break;
+        }
+    }
+
+  if (input_fObj != NULL)
+    {
+      bs_fmodFin (&input_fObj, mObj);
+    }
 
   retVal = bs_freeMem(mObj, (void *)&input);
   if (retVal != SUCCESS)

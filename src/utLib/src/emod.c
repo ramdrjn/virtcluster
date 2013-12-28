@@ -22,6 +22,7 @@ const char *_errStrings[MAX_ERR_STRING_SIZE] = {
   "Address Not Set",
   "Address Info Failed",
   "Timeout",
+  "JSON parse failed",
   "Invalid error code value"
 };
 

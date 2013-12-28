@@ -15,9 +15,24 @@
 #include "utLib/fmod.h"
 #include "utLib/lmod.h"
 
+/**@enum cmd_type
+ * Commands definitions.*/
+typedef enum
+  {
+    START,
+    STOP,
+    PAUSE,
+    RESUME,
+    NIL
+  } cmd_e_type;
+
 #define debug(fmt, ...) bs_log(lObj, LVL_DEBUG, PF_LOG, "\n"fmt, __VA_ARGS__)
 #define info(fmt, ...) bs_log(lObj, LVL_INFO, PF_LOG, "\n"fmt, __VA_ARGS__)
 #define error(fmt, ...) bs_log(lObj, LVL_ERROR, PF_LOG, "\n"fmt, __VA_ARGS__)
+
+genErr_t parse_json(const char *input, void **jobj_ref, bs_lmodCls lObj);
+void free_json_obj(void *jobj_ref);
+cmd_e_type get_cmd_from_json(void *jobj_ref, bs_lmodCls lObj);
 
 /****************************************************************************/
 #endif /*_CPACKGEN_H_*/

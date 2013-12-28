@@ -72,6 +72,7 @@ char *bs_ec2ES_r (genErr_t err, char *buf, size_t size);
 #define ADDR_NOT_SET        -(ERR_BASE_VALUE+11)
 #define ADDRINFO_FAIL       -(ERR_BASE_VALUE+12)
 #define TIMEOUT             -(ERR_BASE_VALUE+13)
+#define JSON_PARSE_FAIL     -(ERR_BASE_VALUE+14)
 /*Define new error codes before this.*/
 #define INVALID_ERROR_CODE  -(ERR_BASE_VALUE+MAX_ERR_STRING_SIZE-1)
 
