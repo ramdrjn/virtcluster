@@ -200,7 +200,7 @@ _log (bs_lmodCls lObj, bs_e_logLvl logLevel, bs_e_logMode mode)
         fprintf (stdout, "%s", lObj->_buffer);
     }
 
-  if (mode == PF_LOG)
+  if ((mode == PF_LOG) || (mode == FO_LOG))
     {
       int cnt;
       if (lObj->_syslogFlag)

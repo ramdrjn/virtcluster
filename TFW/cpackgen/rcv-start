@@ -1,3 +1,9 @@
 receiver
   start
 end
+
+receiver
+#  pause
+#  resume
+  stop
+end

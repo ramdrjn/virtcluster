@@ -33,7 +33,7 @@ parse_json(const char *input, void **jobj_ref, bs_lmodCls lObj)
       return (JSON_PARSE_FAIL);
     }
 
-  debug("%s\n", json_object_to_json_string(jobj));
+  debug("%s", json_object_to_json_string(jobj));
 
   *jobj_ref=jobj;
 

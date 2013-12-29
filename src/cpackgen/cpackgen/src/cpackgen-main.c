@@ -27,7 +27,7 @@ void _exit_cleanup(bs_mmodCls mObj, bs_fmodCls fObj, bs_lmodCls lObj)
   bs_mmodFin (&mObj);
 }
 
-#define INPUT_JSON_BUFFER_SIZE 1024
+#define INPUT_JSON_BUFFER_SIZE 4096
 
 /**
  * Main
@@ -68,8 +68,8 @@ int main(int argc, char *argv[])
     Ignore file creation errors.
     if (retVal != SUCCESS)
     {
-      _exit_cleanup(mObj, fObj, lObj);
-      return (retVal);
+    _exit_cleanup(mObj, fObj, lObj);
+    return (retVal);
     }
   */
 
@@ -101,8 +101,7 @@ int main(int argc, char *argv[])
       return (retVal);
     }
 
-  /*0 is for stdin*/
-  retVal = bs_fObjectify (0, input_fObj);
+  retVal = bs_fObjectify_ascii (stdin, input_fObj);
   if (retVal != SUCCESS)
     {
       error ("%s", "STDIN open failed failed");
@@ -120,16 +119,15 @@ int main(int argc, char *argv[])
 
   while (run_flag)
     {
-      retVal = bs_fRead (input_fObj, (void *)input,
-                         INPUT_JSON_BUFFER_SIZE, &ret_cnt);
+      retVal = bs_fLineRead(input_fObj, (void *)input, INPUT_JSON_BUFFER_SIZE);
       if (retVal != SUCCESS)
         {
-          error ("%s", "STDIN read failed failed");
+          error ("%s", "STDIN read failed");
           _exit_cleanup(mObj, input_fObj, lObj);
           return (retVal);
         }
 
-      debug("json input received %s", input);
+      debug("json input received %s size %d", input, ret_cnt);
 
       retVal = parse_json(input, &jobj, lObj);
       if (retVal != SUCCESS)

@@ -7,3 +7,11 @@ generator
   end
   start
 end
+
+sleep 10
+
+generator
+#  pause
+#  resume
+  stop
+end

@@ -319,15 +319,40 @@ bs_fObjectify (int fd, bs_fmodCls fObjPtr)
 {
   validateObj (fObjPtr);
 
-  if (fd >=2)
+   fObjPtr->_fd = fd;
+   if (fd >=2)
+     {
+       fObjPtr->_type = F_SPECIAL;
+     }
+   else
+     {
+       fObjPtr->_type = F_BINARY;
+     }
+
+  return SUCCESS;
+}
+
+/**
+ * Returns a fobj for the passed file pointer.
+ * @param fp The file pointer.
+ * @param fObjPtr Reference of the file object which will be updated
+ * @note bs_fmodInit should be called before the fObjPtr is passed.
+ * @return The \c error-code if any error during the file operatoin.
+ */
+genErr_t
+bs_fObjectify_ascii (FILE *fp, bs_fmodCls fObjPtr)
+{
+  validateObj (fObjPtr);
+
+  fObjPtr->_fp = fp;
+
+  if ((fp == stdin) || (fp == stdout) || (fp == stderr))
     {
-      fObjPtr->_fd = fd;
-      fObjPtr->_type = F_SPECIAL;
+      fObjPtr->_type = F_ASCII;
     }
   else
     {
-      fObjPtr->_fd = fd;
-      fObjPtr->_type = F_BINARY;
+      fObjPtr->_type = F_SPECIAL;
     }
 
   return SUCCESS;
@@ -443,6 +468,64 @@ bs_fWrite (bs_fmodCls fObj, const void *buffer, int size, int *retCount)
       retVal = INVALID_FILETYP;
     }
   return retVal;
+}
+
+/**
+ * Read a line from a file and store contents in buffer.
+ * @param fObj Reference of the file object.
+ * @param buffer The memory storage area where the read contents are stored.
+ * @param size Request to read this amount of data from channel.
+ * @return The \c error-code if any error during the file creation.
+ * @note The function is only for ascii files.
+ */
+genErr_t
+bs_fLineRead (bs_fmodCls fObj, void *buffer, int size)
+{
+  validateObj (fObj);
+
+  genErr_t retStatus = SUCCESS;
+
+  if (fObj->_type == F_ASCII)
+    {
+      fgets(buffer, size, fObj->_fp);
+      if (ferror (fObj->_fp))
+        {
+          retStatus = errno2EC (errno);
+          clearerr (fObj->_fp);
+        }
+    }
+  else
+    retStatus = INVALID_FILETYP;
+
+  return retStatus;
+}
+
+/**
+ * Write a line from a file and store contents in buffer.
+ * @param fObj Reference of the file object.
+ * @param buffer The memory storage area where the contents are stored.
+ * @return The \c error-code if any error during the file operation.
+ * @note The function is only for ascii files.
+ */
+genErr_t
+bs_fLineWrite (bs_fmodCls fObj, void *buffer)
+{
+  validateObj (fObj);
+  int retVal = -1;
+  genErr_t retStatus = SUCCESS;
+
+  if (fObj->_type == F_ASCII)
+    {
+      retVal = fputs(buffer, fObj->_fp);
+      if (retVal == EOF)
+        {
+          retStatus = errno2EC (errno);
+        }
+    }
+  else
+    retStatus = INVALID_FILETYP;
+
+  return retStatus;
 }
 
 /**
