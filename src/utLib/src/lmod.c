@@ -192,10 +192,13 @@ _retSyslogLvl (bs_e_logLvl logLevel)
 PRIVATE inline void
 _log (bs_lmodCls lObj, bs_e_logLvl logLevel, bs_e_logMode mode)
 {
-  if (logLevel == LVL_ERROR)
-    fprintf (stderr, "%s", lObj->_buffer);
-  else
-    fprintf (stdout, "%s", lObj->_buffer);
+  if (mode != FO_LOG)
+    {
+      if (logLevel == LVL_ERROR)
+        fprintf (stderr, "%s", lObj->_buffer);
+      else
+        fprintf (stdout, "%s", lObj->_buffer);
+    }
 
   if (mode == PF_LOG)
     {

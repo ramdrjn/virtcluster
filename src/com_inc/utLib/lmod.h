@@ -21,11 +21,14 @@ typedef enum
   } bs_e_logLvl;
 
 /**@enum bs_e_logMode
- * Log modes- print screen only or log in file also.*/
+ * Log modes- print screen only or log in file also.
+ * New mode FO that only logs in file, Even stderr included.
+ */
 typedef enum
   {
     PO_LOG = 1,
-    PF_LOG = 2
+    PF_LOG = 2,
+    FO_LOG = 3
   } bs_e_logMode;
 
 /*Prototypes*/
