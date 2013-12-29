@@ -487,11 +487,17 @@ bs_fLineRead (bs_fmodCls fObj, void *buffer, int size)
 
   if (fObj->_type == F_ASCII)
     {
-      fgets(buffer, size, fObj->_fp);
-      if (ferror (fObj->_fp))
+      char *status=NULL;
+      status = fgets(buffer, size, fObj->_fp);
+      if (status == NULL)
         {
-          retStatus = errno2EC (errno);
-          clearerr (fObj->_fp);
+          /*status == null is a case when the EOF is received or
+            and error has occurred. In case of error the errno would
+            have been set with a valid errno.*/
+          if (errno >0)
+            {
+              retStatus = errno2EC (errno);
+            }
         }
     }
   else
@@ -519,7 +525,13 @@ bs_fLineWrite (bs_fmodCls fObj, void *buffer)
       retVal = fputs(buffer, fObj->_fp);
       if (retVal == EOF)
         {
-          retStatus = errno2EC (errno);
+          /*No differentiation between eof and error.
+            The only way now is to check the errno value. If this is
+            greater than 0 and error has occurred.*/
+          if (errno >0)
+            {
+              retStatus = errno2EC (errno);
+            }
         }
     }
   else

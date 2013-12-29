@@ -36,7 +36,6 @@ int main(int argc, char *argv[])
 {
   genErr_t retVal;
   cmd_e_type cmd;
-  int ret_cnt=-1;
   char *input = NULL;
   void *jobj = NULL;
   char *mode = NULL;
@@ -122,12 +121,12 @@ int main(int argc, char *argv[])
       retVal = bs_fLineRead(input_fObj, (void *)input, INPUT_JSON_BUFFER_SIZE);
       if (retVal != SUCCESS)
         {
-          error ("%s", "STDIN read failed");
+          error ("%s %s", "STDIN read failed ", ec2ES(retVal));
           _exit_cleanup(mObj, input_fObj, lObj);
           return (retVal);
         }
 
-      debug("json input received %s size %d", input, ret_cnt);
+      debug("json input received %s length %d", input, strlen(input));
 
       retVal = parse_json(input, &jobj, lObj);
       if (retVal != SUCCESS)
@@ -136,6 +135,7 @@ int main(int argc, char *argv[])
           _exit_cleanup(mObj, fObj, lObj);
           return (retVal);
         }
+      input[0]=0;
 
       cmd = get_cmd_from_json(jobj, lObj);
 
