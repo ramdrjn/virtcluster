@@ -494,9 +494,13 @@ bs_fLineRead (bs_fmodCls fObj, void *buffer, int size)
           /*status == null is a case when the EOF is received or
             and error has occurred. In case of error the errno would
             have been set with a valid errno.*/
-          if (errno >0)
+          if (errno > 0)
             {
               retStatus = errno2EC (errno);
+            }
+          else
+            {
+              retStatus = EOF_REACHED;
             }
         }
     }
@@ -531,6 +535,10 @@ bs_fLineWrite (bs_fmodCls fObj, void *buffer)
           if (errno >0)
             {
               retStatus = errno2EC (errno);
+            }
+          else
+            {
+              retStatus = EOF_REACHED;
             }
         }
     }

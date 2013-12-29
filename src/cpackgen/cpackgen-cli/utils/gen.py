@@ -180,6 +180,10 @@ class generator_cli(grc.comCls):
         grc.comCls.__init__(self, "Generator subcommands",
                             'cpackgen:Generator)', 'generator')
 
+    def __del__(self):
+        grc.debug("Finalized {0} class".format(self.__class__))
+        grc.comCls.__del__(self)
+
     def do_parameter(self, args):
         grc.debug("In Function {0}".format(inspect.stack()[0][3]))
 
@@ -192,6 +196,11 @@ class generator_cli(grc.comCls):
         j_dict['generator_parameter']=param_dict
         #Send the parameters to generator process
         grc.jdump(j_dict, self.p_ref.stdin)
+        self.p_ref.poll()
+        if self.p_ref.returncode != None:
+            grc.error("Generator process terminated")
+        else:
+            grc.debug("Generator process still active")
 
     def help_parameter(self):
         grc.debug("In Function {0}".format(inspect.stack()[0][3]))
@@ -209,6 +218,11 @@ class generator_cli(grc.comCls):
         j_dict['generator_packet']=pkt_dict
         #Send the packet definitions to generator process
         grc.jdump(j_dict, self.p_ref.stdin)
+        self.p_ref.poll()
+        if self.p_ref.returncode != None:
+            grc.error("Generator process terminated")
+        else:
+            grc.debug("Generator process still active")
 
     def help_packet(self):
         grc.debug("In Function {0}".format(inspect.stack()[0][3]))

@@ -10,6 +10,8 @@ def debug(msg):
     pass
 
 def start_proc(mod):
+    debug("In Function {0}".format(inspect.stack()[0][3]))
+
     p_ref=None
     if mod == 'generator':
         p_ref=subprocess.Popen(["/opt/cpackgen.exe", "generator"],
@@ -33,30 +35,36 @@ class comCls(cli_fmwk.VCCli):
         debug("Initialized {0} class".format(self.__class__))
         cli_fmwk.VCCli.__init__(self, intro=intro)
         self.prompt=prompt
-        self._ftype=ftype
+        self.ftype=ftype
+
+    def __del__(self):
+        debug("Finalized {0} class".format(self.__class__))
 
     def postloop(self):
         debug("In Function {0}".format(inspect.stack()[0][3]))
 
-        self.p_ref.poll()
-        if self.p_ref.returncode != None:
-            self.p_ref.terminate()
-        self.p_ref.poll()
-        if self.p_ref.returncode != None:
-            self.p_ref.kill()
+        if self.p_ref:
+            self.p_ref.poll()
+            if self.p_ref.returncode != None:
+                self.p_ref.terminate()
 
     def preloop(self):
         debug("In Function {0}".format(inspect.stack()[0][3]))
 
-        self.p_ref=start_proc(self._ftype)
+        self.p_ref=start_proc(self.ftype)
 
     def do_start(self, args):
         debug("In Function {0}".format(inspect.stack()[0][3]))
         jdump('start', self.p_ref.stdin)
+        self.p_ref.poll()
+        if self.p_ref.returncode != None:
+            error("Generator process terminated")
+        else:
+            debug("Generator process still active")
 
     def help_start(self):
         debug("In Function {0}".format(inspect.stack()[0][3]))
-        print ("     Start {0}     ".format(self._ftype))
+        print ("     Start    ")
 
     def do_stop(self, args):
         debug("In Function {0}".format(inspect.stack()[0][3]))
@@ -65,7 +73,7 @@ class comCls(cli_fmwk.VCCli):
 
     def help_stop(self):
         debug("In Function {0}".format(inspect.stack()[0][3]))
-        print ("     Stop {0}     ".format(self._ftype))
+        print ("     Stop     ")
 
     def do_stats(self, args):
         debug("In Function {0}".format(inspect.stack()[0][3]))
@@ -79,15 +87,25 @@ class comCls(cli_fmwk.VCCli):
     def do_pause(self, args):
         debug("In Function {0}".format(inspect.stack()[0][3]))
         jdump('pause', self.p_ref.stdin)
+        self.p_ref.poll()
+        if self.p_ref.returncode != None:
+            error("Generator process terminated")
+        else:
+            debug("Generator process still active")
 
     def help_pause(self):
         debug("In Function {0}".format(inspect.stack()[0][3]))
-        print ("     Pause {0}     ".format(self._ftype))
+        print ("     Pause     ")
 
     def do_resume(self, args):
         debug("In Function {0}".format(inspect.stack()[0][3]))
         jdump('resume', self.p_ref.stdin)
+        self.p_ref.poll()
+        if self.p_ref.returncode != None:
+            error("Generator process terminated")
+        else:
+            debug("Generator process still active")
 
     def help_resume(self):
         debug("In Function {0}".format(inspect.stack()[0][3]))
-        print ("     Resume {0}     ".format(self._ftype))
+        print ("     Resume     ")

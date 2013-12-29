@@ -11,6 +11,10 @@ class receiver_cli(grc.comCls):
         grc.comCls.__init__(self, "Receiver subcommands",
                             'cpackgen:Receiver)', 'receiver')
 
+    def __del__(self):
+        grc.debug("Finalized {0} class".format(self.__class__))
+        grc.comCls.__del__(self)
+
     def do_filter(self, args):
         grc.debug("In Function {0}".format(inspect.stack()[0][3]))
         grc.jdump('filter', self.p_ref.stdin)

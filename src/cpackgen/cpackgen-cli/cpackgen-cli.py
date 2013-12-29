@@ -20,6 +20,7 @@ class cpackgen_cli(cli_fmwk.VCCli):
 
     def do_generator(self, args):
         grc.debug("In Function {0}".format(inspect.stack()[0][3]))
+
         gen_cli=gen.generator_cli()
         gen_cli.cmdloop()
 
@@ -29,6 +30,7 @@ class cpackgen_cli(cli_fmwk.VCCli):
 
     def do_receiver(self, args):
         grc.debug("In Function {0}".format(inspect.stack()[0][3]))
+
         rcv_cli=rcv.receiver_cli()
         rcv_cli.cmdloop()
 
