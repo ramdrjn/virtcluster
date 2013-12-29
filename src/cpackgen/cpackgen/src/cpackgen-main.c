@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
 
       cmd = get_cmd_from_json(jobj, lObj);
 
-      debug("%s %d" "Command received: ", cmd);
+      debug("Command received: %d", cmd);
 
       debug("%s", "Freeing json object");
       free_json_obj(jobj);
