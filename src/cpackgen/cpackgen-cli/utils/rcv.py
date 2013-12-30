@@ -1,7 +1,7 @@
 
 from common import common
 from common import cli_fmwk
-import grc
+from utils import grc
 import json
 import inspect
 

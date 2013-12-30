@@ -1,8 +1,8 @@
 
 from common import common
 from common import cli_fmwk
-import grc
-import pkt
+from utils import grc
+from utils import pkt
 import cmd
 import inspect
 

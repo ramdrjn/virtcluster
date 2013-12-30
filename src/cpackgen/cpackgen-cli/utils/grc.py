@@ -28,7 +28,9 @@ def process_stats(fd):
 
 def jdump(data, fd):
     debug("In Function {0}".format(inspect.stack()[0][3]))
-    json.dump(data, fd)
+    s=json.dumps(data)
+    cnt=fd.write(bytes(s))
+    debug("Written {0}".format(cnt))
 
 class comCls(cli_fmwk.VCCli):
     def __init__(self, intro, prompt, ftype):
