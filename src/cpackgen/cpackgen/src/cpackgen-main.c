@@ -148,14 +148,44 @@ int main(int argc, char *argv[])
 
       debug("Command received: %d", cmd);
 
+      if (cmd == STOP)
+        {
+          info("%s", "Stopping due to JSON command");
+          debug("%s", "Freeing json object");
+          free_json_obj(jobj);
+          jobj = NULL;
+          run_flag = false;
+          break;
+        }
+
+      /*Process json object and get values*/
+      if (cmd == NIL)
+        {
+          void *njobj = NULL;
+          njobj=get_val_from_key(jobj, "generator_parameter", lObj);
+          if(njobj)
+            {
+              /*Process as generator parameter*/
+              free_json_obj(njobj);
+              njobj = NULL;
+            }
+          njobj=get_val_from_key(jobj, "generator_packet", lObj);
+          if(njobj)
+            {
+              /*Process as generator packet*/
+              free_json_obj(njobj);
+              njobj = NULL;
+            }
+        }
+
       debug("%s", "Freeing json object");
       free_json_obj(jobj);
       jobj = NULL;
 
-      if (cmd == STOP)
+      if (cmd == START)
         {
-          info("%s", "Stopping due to JSON command");
-          run_flag = false;
+          info("%s", "Starting on JSON command");
+          run_flag = true;
           break;
         }
     }

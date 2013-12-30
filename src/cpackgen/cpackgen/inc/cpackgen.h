@@ -33,6 +33,7 @@ typedef enum
 genErr_t parse_json(const char *input, void **jobj_ref, bs_lmodCls lObj);
 void free_json_obj(void *jobj_ref);
 cmd_e_type get_cmd_from_json(void *jobj_ref, bs_lmodCls lObj);
+void * get_val_from_key(void *jobj_ref, const char *key, bs_lmodCls lObj);
 
 /****************************************************************************/
 #endif /*_CPACKGEN_H_*/

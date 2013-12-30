@@ -102,4 +102,24 @@ cmd_e_type get_cmd_from_json(void *jobj_ref, bs_lmodCls lObj)
   return (cmd);
 }
 
+/**
+ * Get object value for a given key
+ * @param jobj_ref json object returned on successful parse
+ * @param key String value that will be searched in the jobj.
+ * @param lObj logger reference
+ * @return The new jobj or null on error
+ */
+void * get_val_from_key(void *jobj_ref, const char *key, bs_lmodCls lObj)
+{
+  debug ("In function %s", __FUNCTION__);
+
+  struct json_object *jobj = (struct json_object *jobj)jobj_ref;
+  struct json_object *njobj = NULL;
+
+  njobj = json_object_object_get(jobj, key);
+  debug ("New object returned %s", json_object_to_json_string(njobj));
+
+  return (njobj);
+}
+
 /****************************************************************************/
