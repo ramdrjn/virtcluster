@@ -1,2 +1,6 @@
 /opt/x86vm/cpackgen/utils/__init__.py
+/opt/x86vm/cpackgen/utils/grc.py
+/opt/x86vm/cpackgen/utils/rcv.py
+/opt/x86vm/cpackgen/utils/gen.py
+/opt/x86vm/cpackgen/utils/pkt.py
 /opt/x86vm/cpackgen/cpackgen-cli.py
