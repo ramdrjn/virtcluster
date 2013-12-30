@@ -45,11 +45,6 @@ class comCls(cli_fmwk.VCCli):
     def postloop(self):
         debug("In Function {0}".format(inspect.stack()[0][3]))
 
-        if self.p_ref:
-            self.p_ref.poll()
-            if self.p_ref.returncode != None:
-                self.p_ref.terminate()
-
     def preloop(self):
         debug("In Function {0}".format(inspect.stack()[0][3]))
 

@@ -45,6 +45,7 @@ int main(int argc, char *argv[])
   bs_fmodCls input_fObj = NULL;
   const char *debug_fname = "/tmp/cpackgen-debug";
   t_bool run_flag = true;
+  int ret_cnt=-1;
 
   if (argc < 2)
     return (-1);
@@ -86,9 +87,6 @@ int main(int argc, char *argv[])
       return (retVal);
     }
 
-  if (lObj == NULL)
-    return (retVal);
-
   debug ("%s", "Starting cpackgen");
   info ("%s %s", "Starting in mode:", mode);
 
@@ -100,10 +98,10 @@ int main(int argc, char *argv[])
       return (retVal);
     }
 
-  retVal = bs_fObjectify_ascii (stdin, input_fObj);
+  retVal = bs_fObjectify (0, input_fObj);
   if (retVal != SUCCESS)
     {
-      error ("%s", "STDIN open failed failed");
+      error ("%s", "STDIN open failed");
       _exit_cleanup(mObj, input_fObj, lObj);
       return (retVal);
     }
@@ -118,7 +116,8 @@ int main(int argc, char *argv[])
 
   while (run_flag)
     {
-      retVal = bs_fLineRead(input_fObj, (void *)input, INPUT_JSON_BUFFER_SIZE);
+      retVal = bs_fRead(input_fObj, (void *)input,
+                        INPUT_JSON_BUFFER_SIZE, &ret_cnt);
       if (retVal != SUCCESS)
         {
           error ("%s %s", "STDIN read failed ", ec2ES(retVal));
@@ -127,6 +126,14 @@ int main(int argc, char *argv[])
         }
 
       debug("json input received %s length %d", input, strlen(input));
+
+      if (ret_cnt <= 0)
+        {
+          error ("%s", "Exiting on 0 read");
+          _exit_cleanup(mObj, input_fObj, lObj);
+          return (EOF_REACHED);
+        }
+      input[ret_cnt]=0;
 
       retVal = parse_json(input, &jobj, lObj);
       if (retVal != SUCCESS)
