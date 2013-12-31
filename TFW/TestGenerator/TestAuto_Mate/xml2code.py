@@ -151,6 +151,11 @@ class commiter:
                 cmd="\n  "+h['cmd']+";\n  EXEC_TSTCASE(&tstCase,"+h['desc']+","
                 cmd+=h['cond']+","+h['err']+","+h['errStr']+","+h['flags']+");"
                 return cmd
+        def IT_Fmt(self, h):
+                log(1, "Inside IT_Fmt")
+                cmd="\n  "+h['cmd']+";\n  EXEC_TSTCASE(&tstCase,"+h['desc']+","
+                cmd+=h['cond']+","+h['err']+","+h['errStr']+","+h['flags']+");"
+                return cmd
         def SH_Fmt(self, h):
                 log(1, "Inside SH_Fmt")
                 cmd="\n  EXEC_SH(&tstCase,\""+h['cmd']+"\","+h['desc']+","

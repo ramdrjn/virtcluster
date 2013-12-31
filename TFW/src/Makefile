@@ -7,6 +7,7 @@ rpm:
 	$(MAKE) -C st/baseLib/ 	$(TARGET)
 	$(MAKE) -C st/dsLib/ 		$(TARGET)
 	$(MAKE) -C st/msgLib/ 	$(TARGET)
+	$(MAKE) -C it/utLib/ 	  $(TARGET)
 
 .PHONY:cleanall
 cleanall:
@@ -14,9 +15,11 @@ cleanall:
 	$(MAKE) -C st/baseLib/ 	tfclean
 	$(MAKE) -C st/dsLib/ 		tfclean
 	$(MAKE) -C st/msgLib/ 	tfclean
+	$(MAKE) -C it/utLib/ 	  tfclean
 	$(MAKE) -C common/ 			$(TARGET)
 	$(MAKE) -C ft/baseLib/ 	$(TARGET)
 	$(MAKE) -C ft/dsLib/ 		$(TARGET)
 	$(MAKE) -C st/baseLib/ 	$(TARGET)
 	$(MAKE) -C st/dsLib/ 		$(TARGET)
 	$(MAKE) -C st/msgLib/ 	$(TARGET)
+	$(MAKE) -C it/utLib/ 	  $(TARGET)

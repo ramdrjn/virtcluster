@@ -9,7 +9,8 @@ XML_DESC := ../src/st/baseLib/_proto.h\
  ../src/ft/dsLib/_proto.h\
  ../src/st/dsLib/_proto.h\
  ../src/st/msgLib/S/_proto_Srv.h\
- ../src/st/msgLib/C/_proto_Cli.h
+ ../src/st/msgLib/C/_proto_Cli.h\
+ ../src/it/utLib/_proto.h
 
 
 xml:$(XML_DESC)
@@ -29,6 +30,9 @@ xml:$(XML_DESC)
 
 ../src/st/msgLib/C/_proto_Cli.h:./documents/st/msgLib/msgLib-Cli.xml
 	$(XML2CODE) $< ../src/st/msgLib/C/
+
+../src/it/utLib/_proto.h:./documents/it/utLib/utLib-IT.xml
+	$(XML2CODE) $< ../src/it/utLib/
 
 rpm:xml
 	@echo

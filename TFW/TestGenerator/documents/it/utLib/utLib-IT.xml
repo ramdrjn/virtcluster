@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<testType type="IT">
+  <testSUT lib="utLib" version="1.0">
+
+    <testMod mod="_proto.h">
+
+      <include>"main.h"</include>
+
+      <codeMod>
+        <statement>void test_dsLib_ST(void);</statement>
+      </codeMod>
+
+    </testMod>
+
+    <testMod mod="main">
+
+      <include>"_proto.h"</include>
+
+      <codeMod func="int main(void)">
+        <statement>
+          init();
+          hdr("Starting to run the test cases.");
+
+          test_dsLib_ST();
+
+          hdr("Test case run finished execution.");
+          fin();
+          return(0);
+        </statement>
+      </codeMod>
+
+    </testMod>
+
+    <testMod mod="utLib_IT">
+
+      <include>"_proto.h"</include>
+
+      <codeMod func="ds_packetContainer* travCB(void *arg, ds_packetContainer* node)">
+        <statement>
+          (void)arg;
+          if (node)
+          data("%d", ds_getKey(node));
+          return NULL;
+        </statement>
+      </codeMod>
+
+      <currMod>
+
+        <lvariable>unsigned int cnt = 0</lvariable>
+        <lvariable>unsigned int key = 0</lvariable>
+
+        <testCase typ="IT">
+          <cmd> retVal = ds_st_init(&amp;sPtr, iMObj) </cmd>
+          <desc>" init stack. "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+      </currMod>
+
+    </testMod>
+
+  </testSUT>
+</testType>
