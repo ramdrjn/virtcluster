@@ -206,8 +206,7 @@ int main(int argc, char *argv[])
       if (retVal != SUCCESS)
         {
           error ("%s %s", "STDIN read failed ", ec2ES(retVal));
-          _exit_cleanup(mObj, input_fObj, lObj);
-          return (retVal);
+          break;
         }
 
       debug("json input received %s length %d", input, strlen(input));
@@ -215,8 +214,7 @@ int main(int argc, char *argv[])
       if (ret_cnt <= 0)
         {
           error ("%s", "Exiting on 0 read");
-          _exit_cleanup(mObj, input_fObj, lObj);
-          return (EOF_REACHED);
+          break;
         }
       input[ret_cnt]=0;
 
@@ -224,8 +222,7 @@ int main(int argc, char *argv[])
       if (retVal != SUCCESS)
         {
           error ("%s", "JSON parse fail");
-          _exit_cleanup(mObj, fObj, lObj);
-          return (retVal);
+          break;
         }
       input[0]=0;
 
@@ -284,8 +281,6 @@ int main(int argc, char *argv[])
   if (retVal != SUCCESS)
     {
       error ("%s", "Memory free for json input failed");
-      _exit_cleanup(mObj, fObj, lObj);
-      return (retVal);
     }
 
   _exit_cleanup(mObj, fObj, lObj);

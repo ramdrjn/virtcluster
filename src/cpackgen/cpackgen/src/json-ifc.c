@@ -65,7 +65,7 @@ cmd_e_type get_cmd_from_json(void *jobj_ref, bs_lmodCls lObj)
   json_type typ;
   struct json_object *jobj = (struct json_object *)jobj_ref;
   cmd_e_type cmd = NIL;
-  char *cmd_str = NULL;
+  char const *cmd_str = NULL;
 
   if (!jobj)
     {
