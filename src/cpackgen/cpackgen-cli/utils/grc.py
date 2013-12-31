@@ -14,7 +14,7 @@ def start_proc(mod):
 
     p_ref=None
     if mod == 'generator':
-        p_ref=subprocess.Popen(["/opt/cpackgen.exe", "generator"],
+        p_ref=subprocess.Popen(["./cpackgen.exe", "generator"],
                                stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                stderr=subprocess.STDOUT, close_fds=True)
     elif mod == 'receiver':
