@@ -103,7 +103,7 @@ class genParams_cli(cli_fmwk.VCCli):
             if not r_list[1]:
                 self.help_rate()
                 return
-            self.param_dict['rate_pps']=r_list[1]
+            self.param_dict['rate_pps']=int(r_list[1])
         elif r_list[0]=='bps':
             if not r_list[1]:
                 self.help_rate()
@@ -141,7 +141,7 @@ class genParams_cli(cli_fmwk.VCCli):
             if not r_list[1]:
                 self.help_count()
                 return
-            self.param_dict['max_count']=r_list[1]
+            self.param_dict['max_count']=int(r_list[1])
         else:
             self.help_count()
             return
@@ -164,7 +164,7 @@ class genParams_cli(cli_fmwk.VCCli):
             if not r_list[1]:
                 self.help_duration()
                 return
-            self.param_dict['duration_max']=r_list[1]
+            self.param_dict['duration_max']=int(r_list[1])
         else:
             self.help_duration()
             return

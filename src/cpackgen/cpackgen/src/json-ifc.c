@@ -113,13 +113,33 @@ void * get_val_from_key(void *jobj_ref, const char *key, bs_lmodCls lObj)
 {
   debug ("In function %s", __FUNCTION__);
 
-  struct json_object *jobj = (struct json_object *jobj)jobj_ref;
+  struct json_object *jobj = (struct json_object *)jobj_ref;
   struct json_object *njobj = NULL;
 
   njobj = json_object_object_get(jobj, key);
   debug ("New object returned %s", json_object_to_json_string(njobj));
 
   return (njobj);
+}
+
+/**
+ * Get interger value from the object
+ * @param jobj_ref json object returned on successful parse
+ * @param lObj logger reference
+ * @return The interger value stored in the object.
+ */
+int get_int(void *jobj_ref, bs_lmodCls lObj)
+{
+  debug ("In function %s", __FUNCTION__);
+
+  int val=-1;
+  struct json_object *jobj = (struct json_object *)jobj_ref;
+
+  val = json_object_get_int(jobj);
+
+  debug ("Integer value returned %d", val);
+
+  return (val);
 }
 
 /****************************************************************************/

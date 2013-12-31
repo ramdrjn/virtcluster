@@ -8,6 +8,8 @@
 #include "cpackgen.h"
 
 void _exit_cleanup(bs_mmodCls mObj, bs_fmodCls fObj, bs_lmodCls lObj);
+genErr_t
+process_gen_param(void *njobj, struct gen_param_t *gen_param, bs_lmodCls lObj);
 
 /**
  * Called before exit. Cleanup of all objects.
@@ -25,6 +27,72 @@ void _exit_cleanup(bs_mmodCls mObj, bs_fmodCls fObj, bs_lmodCls lObj)
       bs_fmodFin (&fObj, mObj);
     }
   bs_mmodFin (&mObj);
+}
+
+/**
+ * Process generator parameters
+ * @param njobj New json object cotaining parameters.
+ * @param gen_param Generator parameter structure that will be populated
+ * from the njobj
+ * @param lObj Reference of the log object.
+ * @return The \c error-code if any error else success is returned.
+ */
+genErr_t
+process_gen_param(void *njobj, struct gen_param_t *gen_param, bs_lmodCls lObj)
+{
+  debug ("In function %s", __FUNCTION__);
+
+  void *tjobj = NULL;
+
+  tjobj=get_val_from_key(njobj, "rate_bps", lObj);
+  if(tjobj)
+    {
+      gen_param->rate_bps=get_int(tjobj, lObj);
+      debug ("rate_bps value %d", gen_param->rate_bps);
+      free_json_obj(tjobj);
+    }
+  else
+    {
+      debug ("%s", "rate_bps not available");
+    }
+
+  tjobj=get_val_from_key(njobj, "rate_pps", lObj);
+  if(tjobj)
+    {
+      gen_param->rate_pps=get_int(tjobj, lObj);
+      debug ("rate_pps value %d", gen_param->rate_pps);
+      free_json_obj(tjobj);
+    }
+  else
+    {
+      debug ("%s", "rate_pps not available");
+    }
+
+  tjobj=get_val_from_key(njobj, "max_count", lObj);
+  if(tjobj)
+    {
+      gen_param->max_count=get_int(tjobj, lObj);
+      debug ("max_count value %d", gen_param->max_count);
+      free_json_obj(tjobj);
+    }
+  else
+    {
+      debug ("%s", "max_count not available");
+    }
+
+  tjobj=get_val_from_key(njobj, "duration_max", lObj);
+  if(tjobj)
+    {
+      gen_param->duration_max=get_int(tjobj, lObj);
+      debug ("duration_max value %d", gen_param->duration_max);
+      free_json_obj(tjobj);
+    }
+  else
+    {
+      debug ("%s", "duration_max not available");
+    }
+
+  return (SUCCESS);
 }
 
 #define INPUT_JSON_BUFFER_SIZE 4096
@@ -46,6 +114,8 @@ int main(int argc, char *argv[])
   const char *debug_fname = "/tmp/cpackgen-debug";
   t_bool run_flag = true;
   int ret_cnt=-1;
+
+  struct conf_t conf;
 
   if (argc < 2)
     return (-1);
@@ -89,6 +159,21 @@ int main(int argc, char *argv[])
 
   debug ("%s", "Starting cpackgen");
   info ("%s %s", "Starting in mode:", mode);
+  if (strncmp(mode, "generator", 9) ==0)
+    {
+      conf.mode = GENERATOR;
+    }
+  else if (strncmp(mode, "receiver", 8) ==0)
+    {
+      conf.mode = RECEIVER;
+    }
+  else
+    {
+      error ("%s", "No mode set");
+      _exit_cleanup(mObj, input_fObj, lObj);
+      return (FAILURE);
+    }
+  conf._validFlag = true;
 
   retVal = bs_fmodInit (&input_fObj, mObj);
   if (retVal != SUCCESS)
@@ -166,6 +251,7 @@ int main(int argc, char *argv[])
           if(njobj)
             {
               /*Process as generator parameter*/
+              process_gen_param(njobj, &conf.gen_params, lObj);
               free_json_obj(njobj);
               njobj = NULL;
             }
@@ -186,7 +272,6 @@ int main(int argc, char *argv[])
         {
           info("%s", "Starting on JSON command");
           run_flag = true;
-          break;
         }
     }
 
