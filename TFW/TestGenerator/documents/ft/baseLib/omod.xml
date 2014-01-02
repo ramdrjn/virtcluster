@@ -94,7 +94,8 @@
         {MANDATORY, "mandatory string", 0, 'i'},
         {OPTIONAL, "optional string", 0, 'j'},
         {NO_OPTIONS, "no options string", 0, 'k'},
-        {OPTIONAL, "optional string", 0, 'l'}}
+        {OPTIONAL, "optional string", 0, 'l'},
+        {0}}
       </variable>
 
       <variable>char *args[]={"EXE", "--atest", "a1", "-b", "a2", "--ctest", "-d", "a3", "scmd1", "--etest", "a4", "-a", "a5", "-g", "-h", "a6", "scmd2", "-i", "a7", "-j", "a8", "-k", "-l", "a9", "a10"}</variable>

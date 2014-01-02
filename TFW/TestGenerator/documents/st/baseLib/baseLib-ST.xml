@@ -261,7 +261,7 @@
         <lvariable>bs_smodCls sObj = NULL</lvariable>
         <lvariable>bs_tmodCls tObj = NULL</lvariable>
         <lvariable>void *ptr=NULL</lvariable>
-        <lvariable>bs_opts opts[]={{MANDATORY, "file name", "fname", 'f'}, {MANDATORY, "Userdata", 0, 'u'}}</lvariable>
+        <lvariable>bs_opts opts[]={{MANDATORY, "file name", "fname", 'f'}, {MANDATORY, "Userdata", 0, 'u'}, {0}}</lvariable>
         <lvariable>char *args[]={"ST-EXE", "--fname", "/tmp/baseLib-ST.tst", "-u", "Base Library User Data"}</lvariable>
 
         <testCase typ="ST">
@@ -310,7 +310,7 @@
         </statement>
 
         <testCase typ="ST">
-          <cmd> retVal = 1;(void)args;strcpy(filename, "/tmp/baseLib-ST.tst");strcpy(userData, "hello");//bs_parseOpts(oObj, 5, args, NULL) </cmd>
+          <cmd> retVal = 1;(void)args;strcpy(filename, "/tmp/baseLib-ST.tst");strcpy(userData, "hello");bs_parseOpts(oObj, 5, args, NULL) </cmd>
           <desc>" Start parsing the options "</desc>
           <cond> retVal </cond>
           <err> retVal </err>

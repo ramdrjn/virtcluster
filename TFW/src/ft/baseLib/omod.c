@@ -102,7 +102,8 @@ test_omod (void)
 						     "no options string", 0,
 						     'k'}, {OPTIONAL,
 							    "optional string",
-							    0, 'l'} };
+                        0, 'l'},
+      {0} };
   char *args[] =
     { "EXE", "--atest", "a1", "-b", "a2", "--ctest", "-d", "a3", "scmd1",
 "--etest", "a4", "-a", "a5", "-g", "-h", "a6", "scmd2", "-i", "a7", "-j", "a8", "-k",
@@ -118,7 +119,7 @@ test_omod (void)
   EXEC_TSTCASE (&tstCase, " Initialize the options module ", retVal, retVal,
 		ec2ES (retVal), 0);
 
-  //  retVal = bs_parseOpts (oObj, cnt, args, userData);
+  retVal = bs_parseOpts (oObj, cnt, args, userData);
   EXEC_TSTCASE (&tstCase, " Start parsing the options ", retVal, retVal,
 		ec2ES (retVal), 0);
 
