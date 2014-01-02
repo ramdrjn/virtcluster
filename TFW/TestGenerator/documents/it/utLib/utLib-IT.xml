@@ -6,9 +6,15 @@
     <testMod mod="_proto.h">
 
       <include>"main.h"</include>
+      <include>"utLib/packet_container.h"</include>
+      <include>"utLib/dsbase.h"</include>
+      <include>"utLib/tskmod.h"</include>
 
       <codeMod>
         <statement>void test_utLib_IT(void);</statement>
+        <statement>genErr_t execThndlr(bs_tskmodCls tskObjPtr, char*argv[]);</statement>
+        <gvariable>ds_queue qPtr</gvariable>
+        <gvariable>ds_packetContainer pptr</gvariable>
       </codeMod>
 
     </testMod>
@@ -36,14 +42,113 @@
 
       <include>"_proto.h"</include>
 
+      <codeMod func="genErr_t execThndlr(bs_tskmodCls tskObjPtr, char*argv[])">
+        <statement>
+          (void)tskObjPtr;
+          (void)argv;
+          SET_ZERO(pptr);
+        </statement>
+        <testCase typ="IT">
+          <cmd> retVal = ds_packetContainerInit(&amp;pptr) </cmd>
+          <desc>" init a packet container "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="IT">
+          <cmd> retVal = ds_qu_insert(qPtr, &amp;pptr) </cmd>
+          <desc>" Insert a packet container "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <statement>
+          return SUCCESS;
+        </statement>
+      </codeMod>
+
       <currMod>
 
-        <lvariable>unsigned int cnt = 0</lvariable>
-        <lvariable>unsigned int key = 0</lvariable>
+        <lvariable>bs_tskmodCls tskObj = NULL</lvariable>
+        <lvariable>bs_tskmodCls tskNewObj = NULL</lvariable>
+        <lvariable>ds_packetContainer *pptr</lvariable>
+        <lvariable>int ret</lvariable>
 
         <testCase typ="IT">
-          <cmd> retVal = ds_st_init(&amp;sPtr, iMObj) </cmd>
-          <desc>" init stack. "</desc>
+          <cmd> retVal = bs_tskmodInit(&amp;tskObj, iMObj) </cmd>
+          <desc>" Initialize the task module."</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="IT">
+          <cmd> retVal = ds_qu_init(&amp;qPtr, iMObj) </cmd>
+          <desc>" init queue "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="IT">
+          <cmd>tskNewObj = bs_spawnLW(tskObj,iMObj, &amp;execThndlr,NULL)</cmd>
+          <desc>" Spawn a new LW process"</desc>
+          <cond>(tskNewObj != NULL)</cond>
+          <err>(tskNewObj == NULL)</err>
+          <errStr> 0</errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <statement>sleep(1);</statement>
+
+        <statement>sleep(1);</statement>
+        <testCase typ="IT">
+          <cmd> pptr = ds_qu_remove(qPtr) </cmd>
+          <desc>" Remove a packet container "</desc>
+          <cond> (pptr != NULL) </cond>
+          <err> 0 </err>
+          <errStr> "NULL returned on remove" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="IT">
+          <cmd> retVal = ds_packetContainerFin(pptr) </cmd>
+          <desc>" Fin a packet container "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+
+        <testCase typ="IT">
+          <cmd> retVal = bs_wait(tskNewObj, &amp;ret) </cmd>
+          <desc>" Wait for the new process"</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="IT">
+          <cmd> retVal = bs_tskmodFin(&amp;tskNewObj, iMObj) </cmd>
+          <desc>" Finalise the New task module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+
+        <testCase typ="IT">
+          <cmd> retVal = ds_qu_fin(&amp;qPtr, iMObj) </cmd>
+          <desc>" fin queue "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+
+        <testCase typ="IT">
+          <cmd> retVal = bs_tskmodFin(&amp;tskObj, iMObj) </cmd>
+          <desc>" Finalise the task module "</desc>
           <cond> retVal </cond>
           <err> retVal </err>
           <errStr> ec2ES(retVal) </errStr>
