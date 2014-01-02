@@ -8,7 +8,7 @@
       <include>"main.h"</include>
 
       <codeMod>
-        <statement>void test_dsLib_ST(void);</statement>
+        <statement>void test_utLib_IT(void);</statement>
       </codeMod>
 
     </testMod>
@@ -22,7 +22,7 @@
           init();
           hdr("Starting to run the test cases.");
 
-          test_dsLib_ST();
+          test_utLib_IT();
 
           hdr("Test case run finished execution.");
           fin();
@@ -35,15 +35,6 @@
     <testMod mod="utLib_IT">
 
       <include>"_proto.h"</include>
-
-      <codeMod func="ds_packetContainer* travCB(void *arg, ds_packetContainer* node)">
-        <statement>
-          (void)arg;
-          if (node)
-          data("%d", ds_getKey(node));
-          return NULL;
-        </statement>
-      </codeMod>
 
       <currMod>
 
