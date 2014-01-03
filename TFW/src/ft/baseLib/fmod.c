@@ -110,14 +110,14 @@ test_fmod (void)
   EXEC_TSTCASE (&tstCase, "RD: Check read for a written file.", retVal,
 		retCount, ec2ES (retVal), 0);
 
-  retVal = bs_fRead (rdF, &testBuffer, TEST_STRING_SIZE, &retCount);
+  //
   EXEC_TSTCASE (&tstCase, "RD: Check the returned buffer count size.",
 		(retCount == TEST_STRING_SIZE), retCount,
 		"retCount not matching.", 0);
 
-  retVal = strlen (testBuffer);
+  retCount = strlen (testBuffer);
   EXEC_TSTCASE (&tstCase, "RD: Check the returned buffer content size.",
-		(retVal == TEST_STRING_SIZE), retVal,
+		(retCount == TEST_STRING_SIZE), retVal,
 		"Buffer size not valid.", 0);
 
   retVal = strcmp (testBuffer, TEST_STRING);

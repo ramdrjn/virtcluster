@@ -57,6 +57,10 @@ test_lmod (void)
   EXEC_TSTCASE (&tstCase, " Finalise the fmod object. ", retVal, retVal,
 		ec2ES (retVal), 0);
 
+  retVal = bs_fOpen (rdwrF, TEST_FILE, F_ASCII, FA_WR);
+  EXEC_TSTCASE (&tstCase, " Opening the log file ", retVal, retVal,
+		ec2ES (retVal), 0);
+
   retVal = bs_lmodInit (&lobj, true, true, true, rdwrF, iMObj);
   EXEC_TSTCASE (&tstCase,
 		" Initialize the lmod object with all flags and a file object. ",
