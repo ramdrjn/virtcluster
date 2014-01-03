@@ -9,6 +9,7 @@
       <include>"utLib/packet_container.h"</include>
       <include>"utLib/dsbase.h"</include>
       <include>"utLib/tskmod.h"</include>
+      <include>"utLib/msg.h"</include>
 
       <codeMod>
         <statement>void test_utLib_IT(void);</statement>
@@ -43,14 +44,105 @@
       <include>"_proto.h"</include>
 
       <codeMod func="genErr_t execThndlr(bs_tskmodCls tskObjPtr, char*argv[])">
+        <lvariable>msg_base msg = 0</lvariable>
+        <lvariable>msg_base msg_peer = 0</lvariable>
+        <lvariable>struct msg_addrType self, peer</lvariable>
+        <lvariable>int cnt = 0</lvariable>
+        <lvariable>void *ptr = NULL</lvariable>
+        <lvariable>char *userData = NULL</lvariable>
+        <lvariable>struct vec_ioType vec</lvariable>
+        <lvariable>struct iovec iov[1]</lvariable>
         <statement>
           (void)tskObjPtr;
           (void)argv;
           SET_ZERO(pptr);
+          SET_ZERO(self);
+          SET_ZERO(peer);
+          strcpy(self.nodeID, "0.0.0.0");
+          strcpy(self.appID, "5000");
+          vec.ioVecPtr = iov;
+          vec.vecCount = 1;
         </statement>
+        <testCase typ="IT">
+          <cmd> retVal = bs_allocMem(iMObj, 20, &amp;ptr) </cmd>
+          <desc>" Allocate the memory for the user data "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+          </testCase>
+          <statement>
+          userData = (char *)ptr;
+          iov[0].iov_base = userData;
+          iov[0].iov_len = 20;
+          </statement>
+          <testCase typ="IT">
+          <cmd> retVal = msg_baseInit(&amp;msg, iMObj) </cmd>
+          <desc> "Initializing the message base" </desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="IT">
+          <cmd> retVal = msg_setAddr(msg, MSG_STREAM, &amp;self, NULL) </cmd>
+          <desc> "Setting address (self)" </desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="IT">
+          <cmd> retVal = msg_setOptions(msg, MSG_REUSE_ADDR, true) </cmd>
+          <desc> "Setting address resuse" </desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="IT">
+          <cmd> retVal = msg_bind(msg) </cmd>
+          <desc> "Binding address (self)" </desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="IT">
+          <cmd> retVal = msg_listen(msg, 2) </cmd>
+          <desc> "listening on self address " </desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="IT">
+          <cmd> retVal = msg_accept(msg, &amp;msg_peer, &amp;peer) </cmd>
+          <desc> "Accepting new connections" </desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
         <testCase typ="IT">
           <cmd> retVal = ds_packetContainerInit(&amp;pptr) </cmd>
           <desc>" init a packet container "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="IT">
+          <cmd> retVal = msg_recvVec(msg_peer, &amp;cnt, &amp;vec) </cmd>
+          <desc> "Receving new message" </desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="IT">
+          <cmd> retVal = ds_setPayLoadData(&amp;pptr, userData) </cmd>
+          <desc>" Set payload"</desc>
           <cond> retVal </cond>
           <err> retVal </err>
           <errStr> ec2ES(retVal) </errStr>
@@ -64,6 +156,14 @@
           <errStr> ec2ES(retVal) </errStr>
           <flags> 0 </flags>
         </testCase>
+        <testCase typ="IT">
+          <cmd> retVal = msg_baseFin(&amp;msg, iMObj) </cmd>
+          <desc> "Finalizing the message base" </desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
         <statement>
           return SUCCESS;
         </statement>
@@ -71,13 +171,65 @@
 
       <currMod>
 
+        <lvariable>char *userDataPtr = NULL</lvariable>
+        <lvariable>bs_mmodCls mObj = NULL</lvariable>
+        <lvariable>bs_fmodCls fObj = NULL</lvariable>
+        <lvariable>bs_lmodCls lObj = NULL</lvariable>
         <lvariable>bs_tskmodCls tskObj = NULL</lvariable>
         <lvariable>bs_tskmodCls tskNewObj = NULL</lvariable>
         <lvariable>ds_packetContainer *pptr</lvariable>
         <lvariable>int ret</lvariable>
+        <lvariable>msg_base msg = 0</lvariable>
+        <lvariable>struct msg_addrType self, peer</lvariable>
+        <lvariable>int cnt = 0</lvariable>
+        <lvariable>char buf1[]="Hello"</lvariable>
+        <lvariable>struct vec_ioType vec</lvariable>
+        <lvariable>struct iovec iov[1]</lvariable>
+        <statement>
+          SET_ZERO(self);
+          SET_ZERO(peer);
+          strcpy(peer.nodeID, "127.0.0.1");
+          strcpy(peer.appID, "5000");
+          iov[0].iov_base =  buf1;
+          iov[0].iov_len = sizeof(buf1);
+          vec.ioVecPtr = iov;
+          vec.vecCount = 1;
+        </statement>
+        <testCase typ="IT">
+          <cmd> retVal = bs_mmodInit(&amp;mObj) </cmd>
+          <desc>" Initialize the memory module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="IT">
+          <cmd> retVal = bs_fmodInit(&amp;fObj, mObj) </cmd>
+          <desc>" Initialize the file module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="IT">
+          <cmd>retVal = bs_fOpen(fObj, "/tmp/it-test", F_ASCII, FA_WR)</cmd>
+          <desc>" Open the test file in WR only mode."</desc>
+          <cond>retVal</cond>
+          <err>retVal</err>
+          <errStr>ec2ES(retVal)</errStr>
+          <flags>0</flags>
+        </testCase>
+        <testCase typ="IT">
+          <cmd> retVal = bs_lmodInit(&amp;lObj, 1, 0, 1, fObj, mObj) </cmd>
+          <desc>" Initialize the log module."</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
 
         <testCase typ="IT">
-          <cmd> retVal = bs_tskmodInit(&amp;tskObj, iMObj) </cmd>
+          <cmd> retVal = bs_tskmodInit(&amp;tskObj, mObj) </cmd>
           <desc>" Initialize the task module."</desc>
           <cond> retVal </cond>
           <err> retVal </err>
@@ -85,7 +237,7 @@
           <flags> 0 </flags>
         </testCase>
         <testCase typ="IT">
-          <cmd> retVal = ds_qu_init(&amp;qPtr, iMObj) </cmd>
+          <cmd> retVal = ds_qu_init(&amp;qPtr, mObj) </cmd>
           <desc>" init queue "</desc>
           <cond> retVal </cond>
           <err> retVal </err>
@@ -93,27 +245,42 @@
           <flags> 0 </flags>
         </testCase>
         <testCase typ="IT">
-          <cmd>tskNewObj = bs_spawnLW(tskObj,iMObj, &amp;execThndlr,NULL)</cmd>
+          <cmd>tskNewObj = bs_spawnLW(tskObj, mObj, &amp;execThndlr,NULL)</cmd>
           <desc>" Spawn a new LW process"</desc>
           <cond>(tskNewObj != NULL)</cond>
           <err>(tskNewObj == NULL)</err>
           <errStr> 0</errStr>
           <flags> 0 </flags>
         </testCase>
-        <statement>sleep(1);</statement>
 
         <statement>sleep(1);</statement>
         <testCase typ="IT">
-          <cmd> pptr = ds_qu_remove(qPtr) </cmd>
-          <desc>" Remove a packet container "</desc>
-          <cond> (pptr != NULL) </cond>
-          <err> 0 </err>
-          <errStr> "NULL returned on remove" </errStr>
+          <cmd> retVal = msg_baseInit(&amp;msg, mObj) </cmd>
+          <desc> "Initializing the message base" </desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
           <flags> 0 </flags>
         </testCase>
         <testCase typ="IT">
-          <cmd> retVal = ds_packetContainerFin(pptr) </cmd>
-          <desc>" Fin a packet container "</desc>
+          <cmd> retVal = msg_setAddr(msg, MSG_STREAM, NULL, &amp;peer) </cmd>
+          <desc> "Setting address (peer)" </desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="IT">
+          <cmd> retVal = msg_connect(msg) </cmd>
+          <desc> "Connecting to address (peer)" </desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="IT">
+          <cmd> retVal = msg_sendVec(msg, &amp;cnt, &amp;vec) </cmd>
+          <desc> "Sending message" </desc>
           <cond> retVal </cond>
           <err> retVal </err>
           <errStr> ec2ES(retVal) </errStr>
@@ -129,7 +296,15 @@
           <flags> 0 </flags>
         </testCase>
         <testCase typ="IT">
-          <cmd> retVal = bs_tskmodFin(&amp;tskNewObj, iMObj) </cmd>
+          <cmd> retVal = msg_baseFin(&amp;msg, mObj) </cmd>
+          <desc> "Finalizing the message base" </desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="IT">
+          <cmd> retVal = bs_tskmodFin(&amp;tskNewObj, mObj) </cmd>
           <desc>" Finalise the New task module "</desc>
           <cond> retVal </cond>
           <err> retVal </err>
@@ -138,8 +313,36 @@
         </testCase>
 
         <testCase typ="IT">
-          <cmd> retVal = ds_qu_fin(&amp;qPtr, iMObj) </cmd>
-          <desc>" fin queue "</desc>
+          <cmd> pptr = ds_qu_remove(qPtr) </cmd>
+          <desc>" Remove a packet container "</desc>
+          <cond> (pptr != NULL) </cond>
+          <err> 0 </err>
+          <errStr> "NULL returned on remove" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="IT">
+          <cmd> userDataPtr =  ds_getPayLoadData (pptr) </cmd>
+          <desc>" Check null pointer for payload data "</desc>
+          <cond> (userDataPtr != NULL) </cond>
+          <err> 0 </err>
+          <errStr> "Non-Null pointer" </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="IT">
+          <cmd> retVal = ds_packetContainerFin(pptr) </cmd>
+          <desc>" Fin a packet container "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <statement>
+          bs_log(lObj, LVL_INFO, PF_LOG, "%s", userDataPtr);
+        </statement>
+
+        <testCase typ="IT">
+          <cmd> retVal =  bs_freeMem (iMObj, (void **)&amp;userDataPtr) </cmd>
+          <desc>" Free the userdata "</desc>
           <cond> retVal </cond>
           <err> retVal </err>
           <errStr> ec2ES(retVal) </errStr>
@@ -147,8 +350,40 @@
         </testCase>
 
         <testCase typ="IT">
-          <cmd> retVal = bs_tskmodFin(&amp;tskObj, iMObj) </cmd>
+          <cmd> retVal = ds_qu_fin(&amp;qPtr, mObj) </cmd>
+          <desc>" fin queue "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="IT">
+          <cmd> retVal = bs_lmodFin(&amp;lObj, mObj) </cmd>
+          <desc>" Finalise the log module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="IT">
+          <cmd> retVal = bs_fmodFin(&amp;fObj, mObj) </cmd>
+          <desc>" Finalise the file module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="IT">
+          <cmd> retVal = bs_tskmodFin(&amp;tskObj, mObj) </cmd>
           <desc>" Finalise the task module "</desc>
+          <cond> retVal </cond>
+          <err> retVal </err>
+          <errStr> ec2ES(retVal) </errStr>
+          <flags> 0 </flags>
+        </testCase>
+        <testCase typ="IT">
+          <cmd> retVal = bs_mmodFin(&amp;mObj) </cmd>
+          <desc>" Finalise the memory module "</desc>
           <cond> retVal </cond>
           <err> retVal </err>
           <errStr> ec2ES(retVal) </errStr>
