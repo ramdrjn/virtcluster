@@ -21,6 +21,7 @@ cp ./dsLib-FT.exe %{virtcluster_host_testbin}
 cp ./dsLib-ST.exe %{virtcluster_host_testbin}
 cp ./msgLib_Cli-ST.exe %{virtcluster_host_testbin}
 cp ./msgLib_Srv-ST.exe %{virtcluster_host_testbin}
+cp ./utLib-IT.exe %{virtcluster_host_testbin}
 
 %clean
 %virtcluster_rm_br
@@ -33,3 +34,4 @@ cp ./msgLib_Srv-ST.exe %{virtcluster_host_testbin}
 %{_hosttestbindir}/dsLib-ST.exe
 %{_hosttestbindir}/msgLib_Cli-ST.exe
 %{_hosttestbindir}/msgLib_Srv-ST.exe
+%{_hosttestbindir}/utLib-IT.exe

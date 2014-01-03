@@ -45,9 +45,8 @@
         <lvariable>struct msg_addrType self, peer</lvariable>
         <lvariable>int cnt = 0</lvariable>
         <lvariable>char buf1[10]</lvariable>
-        <lvariable>char buf2[10]</lvariable>
         <lvariable>struct vec_ioType vec</lvariable>
-        <lvariable>struct iovec iov[2]</lvariable>
+        <lvariable>struct iovec iov[1]</lvariable>
         <statement>
           SET_ZERO(self);
           SET_ZERO(peer);
@@ -55,8 +54,6 @@
           strcpy(self.appID, "5000");
           iov[0].iov_base = buf1;
           iov[0].iov_len = sizeof(buf1);
-          iov[1].iov_base = buf2;
-          iov[2].iov_len = sizeof(buf2);
           vec.ioVecPtr = iov;
           vec.vecCount = 1;
         </statement>

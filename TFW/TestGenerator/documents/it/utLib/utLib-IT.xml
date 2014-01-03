@@ -58,7 +58,7 @@
           SET_ZERO(pptr);
           SET_ZERO(self);
           SET_ZERO(peer);
-          strcpy(self.nodeID, "0.0.0.0");
+          strcpy(self.nodeID, "localhost");
           strcpy(self.appID, "5000");
           vec.ioVecPtr = iov;
           vec.vecCount = 1;
@@ -188,7 +188,7 @@
         <statement>
           SET_ZERO(self);
           SET_ZERO(peer);
-          strcpy(peer.nodeID, "127.0.0.1");
+          strcpy(peer.nodeID, "localhost");
           strcpy(peer.appID, "5000");
           iov[0].iov_base =  buf1;
           iov[0].iov_len = sizeof(buf1);
