@@ -5,6 +5,28 @@ generator
 #    rate pps 50
     rate bps 5 KBps
   end
+
+  packet
+    l2
+       ethernet smac 90:00:4e:77:71:c1 dmac 90:00:4e:77:71:c2
+#      ethernet smac 90:00:4e:77:71:c1 dmac 90:00:4e:77:71:c2 ethertype 0x0800 payload 0xdeabbeef
+    end
+    l3
+       ipv4 sip 192.168.1.1 dip 192.168.1.2
+#tcp       ipv4 sip 192.168.1.1 dip 192.168.1.2 ttl 5
+#udp       ipv4 sip 192.168.1.1 dip 192.168.1.2 protocol 0x11 payload 0xdeadbeef ttl 5 dscp 1
+    end
+    l4
+       udp sport 5000 dport 5001
+#tcp       tcp sport 5000 dport 5001
+    end
+    l7
+      payload value 0xdeadbeef
+#      payload value increment step 1 size 10
+#      payload value random size 11
+    end
+  end
+
   start
 
   sleep 10

@@ -11,7 +11,7 @@ class genPkt_cli(cli_fmwk.VCCli):
         grc.debug("Initialized {0} class".format(self.__class__))
         cli_fmwk.VCCli.__init__(self, intro="Generator packet definitions cli",
                                 prompt="(cpackgen:Generator:Packet)")
-        self.param_dict=d
+        self.pkt_dict=d
 
     def do_l2(self, args):
         grc.debug("In Function {0}".format(inspect.stack()[0][3]))
@@ -20,8 +20,7 @@ class genPkt_cli(cli_fmwk.VCCli):
         p_cli=pkt.l2_cli(l_dict)
         p_cli.cmdloop()
 
-        j_dict={}
-        j_dict['l2']=l_dict
+        self.pkt_dict['l2']=l_dict
 
     def help_l2(self):
         grc.debug("In Function {0}".format(inspect.stack()[0][3]))
@@ -34,8 +33,7 @@ class genPkt_cli(cli_fmwk.VCCli):
         p_cli=pkt.l3_cli(l_dict)
         p_cli.cmdloop()
 
-        j_dict={}
-        j_dict['l3']=l_dict
+        self.pkt_dict['l3']=l_dict
 
     def help_l3(self):
         grc.debug("In Function {0}".format(inspect.stack()[0][3]))
@@ -48,8 +46,7 @@ class genPkt_cli(cli_fmwk.VCCli):
         p_cli=pkt.l4_cli(l_dict)
         p_cli.cmdloop()
 
-        j_dict={}
-        j_dict['l4']=l_dict
+        self.pkt_dict['l4']=l_dict
 
     def help_l4(self):
         grc.debug("In Function {0}".format(inspect.stack()[0][3]))
@@ -62,8 +59,7 @@ class genPkt_cli(cli_fmwk.VCCli):
         p_cli=pkt.l7_cli(l_dict)
         p_cli.cmdloop()
 
-        j_dict={}
-        j_dict['l7']=l_dict
+        self.pkt_dict['l7']=l_dict
 
     def help_l7(self):
         grc.debug("In Function {0}".format(inspect.stack()[0][3]))
@@ -76,8 +72,7 @@ class genPkt_cli(cli_fmwk.VCCli):
         p_cli=pkt.customPkt_cli(l_dict)
         p_cli.cmdloop()
 
-        j_dict={}
-        j_dict['custom']=l_dict
+        self.pkt_dict['custom']=l_dict
 
     def help_custom(self):
         grc.debug("In Function {0}".format(inspect.stack()[0][3]))

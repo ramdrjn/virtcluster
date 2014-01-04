@@ -62,6 +62,8 @@ void free_json_obj(void *jobj_ref);
 cmd_e_type get_cmd_from_json(void *jobj_ref, bs_lmodCls lObj);
 void * get_val_from_key(void *jobj_ref, const char *key, bs_lmodCls lObj);
 int get_int(void *jobj_ref, bs_lmodCls lObj);
+genErr_t
+process_gen_param(void *jobj, struct gen_packet_t gen_pkt, bs_lmodCls lObj);
 
 /****************************************************************************/
 #endif /*_CPACKGEN_H_*/

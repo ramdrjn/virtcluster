@@ -256,6 +256,7 @@ int main(int argc, char *argv[])
           if(njobj)
             {
               /*Process as generator packet*/
+              process_gen_packet(njobj, &conf.gen_packets, lObj);
               free_json_obj(njobj);
               njobj = NULL;
             }
