@@ -7,7 +7,7 @@
 
 #include "cpackgen.h"
 #include "pkt-define.h"
-#include "_pkt.h"
+#include "pkt-form.h"
 
 static bs_mmodCls mObj = NULL;
 static bs_lmodCls lObj = NULL;
@@ -490,6 +490,8 @@ process_gen_packet(void *jobj_ref, struct gen_packet_t *gen_pkt_ref,
     {
       debug ("%s", "l7 not available");
     }
+
+  gen_packet_form(&gen_pkt_conf, gen_pkt_ref, lObj_ref, mObj_ref);
 
   return (SUCCESS);
 }
