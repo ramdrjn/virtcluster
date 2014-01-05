@@ -7,6 +7,24 @@
  * @date Sun Dec 22 15:08:17 IST 2013
  */
 
+
+/**@struct payload_t
+ * payload definitions */
+struct payload_t
+{
+  int payload_type;
+  int step;
+  int payload_size;
+  char *payload;
+};
+
+/**@struct l7_t
+ * Layer 7 packet definitions */
+struct l7_t
+{
+  struct payload_t payload;
+};
+
 /**@struct udp_t
  * UDP packet definitions */
 struct udp_t
@@ -78,6 +96,7 @@ struct gen_packet_t
   struct l2_t l2;
   struct l3_t l3;
   struct l4_t l4;
+  struct l7_t l7;
 };
 
 genErr_t process_gen_packet(void *jobj_ref, struct gen_packet_t *gen_pkt,

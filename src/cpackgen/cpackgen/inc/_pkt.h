@@ -22,6 +22,10 @@ genErr_t
 process_udp(void *jobj_ref, struct gen_packet_t *gen_pkt, bs_lmodCls lObj);
 genErr_t
 process_tcp(void *jobj_ref, struct gen_packet_t *gen_pkt, bs_lmodCls lObj);
+genErr_t
+process_l7(void *jobj_ref, struct gen_packet_t *gen_pkt, bs_lmodCls lObj);
+genErr_t
+process_payload(void *jobj_ref, struct gen_packet_t *gen_pkt, bs_lmodCls lObj);
 
 
 /****************************************************************************/

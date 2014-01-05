@@ -147,11 +147,17 @@ class l7_cli(cli_fmwk.VCCli):
         arg_d = dict(zip(arg_lst[::2],
                          [arg_lst[i] for i in range(1, len(arg_lst), 2)]))
 
-        j['value']=arg_d['value']
-        if 'step' in arg_d:
-            j['step']=arg_d['step']
+        if 'increment' == arg_d['value']:
+            j['value_type']=1
+            if 'step' in arg_d:
+                j['step']=int(arg_d['step'])
+        elif 'random' == arg_d['value']:
+            j['value_type']=2
+        else:
+            j['value']=arg_d['value']
+            j['value_type']=0
         if 'size' in arg_d:
-            j['size']=arg_d['size']
+            j['size']=int(arg_d['size'])
 
         self.l7_dict['payload']=j
 

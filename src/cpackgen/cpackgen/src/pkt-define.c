@@ -251,6 +251,100 @@ process_tcp(void *jobj_ref, struct gen_packet_t *gen_pkt, bs_lmodCls lObj)
 }
 
 genErr_t
+process_payload(void *jobj_ref, struct gen_packet_t *gen_pkt, bs_lmodCls lObj)
+{
+  debug ("In function %s", __FUNCTION__);
+  struct json_object *jobj = (struct json_object *)jobj_ref;
+  void *tjobj = NULL;
+
+  tjobj=get_val_from_key(jobj, "value_type", lObj);
+  if(tjobj)
+    {
+      gen_pkt->l7.payload.payload_type = get_int(tjobj, lObj);
+      debug ("payload type value %d", gen_pkt->l7.payload.payload_type);
+      free_json_obj(tjobj);
+    }
+  else
+    {
+      debug ("%s", "payload type not available");
+    }
+
+  if (gen_pkt->l7.payload.payload_type)
+    {
+      debug ("%s", "Size setting type");
+
+      tjobj=get_val_from_key(jobj, "size", lObj);
+      if(tjobj)
+        {
+          gen_pkt->l7.payload.payload_size = get_int(tjobj, lObj);
+          debug ("size value %d", gen_pkt->l7.payload.payload_size);
+          free_json_obj(tjobj);
+        }
+      else
+        {
+          debug ("%s", "size not available");
+        }
+    }
+
+  if (gen_pkt->l7.payload.payload_type == 1)
+    {
+      /*Increment*/
+      debug ("%s", "Increment type");
+      tjobj=get_val_from_key(jobj, "step", lObj);
+      if(tjobj)
+        {
+          gen_pkt->l7.payload.step = get_int(tjobj, lObj);
+          debug ("step value %d", gen_pkt->l7.payload.step);
+          free_json_obj(tjobj);
+        }
+      else
+        {
+          debug ("%s", "step not available");
+        }
+    }
+  else if (gen_pkt->l7.payload.payload_type == 2)
+    {
+      /*Random*/
+      debug ("%s", "Random type");
+    }
+  else
+    {
+      /*Fixed*/
+      debug ("%s", "Fixed type");
+
+      tjobj=get_val_from_key(jobj, "payload", lObj);
+      if(tjobj)
+        {
+          genErr_t retVal;
+          void *ptr = NULL;
+          const char *p_ptr = get_string(tjobj, lObj);
+
+          gen_pkt->l7.payload.payload_size = strlen(p_ptr);
+
+          retVal = bs_allocMem(mObj, gen_pkt->l7.payload.payload_size, &ptr);
+          if (retVal != SUCCESS)
+            {
+              error ("%s", "Allocation memory for l7 payload failed");
+              return (retVal);
+            }
+          gen_pkt->l7.payload.payload = (char *)ptr;
+
+          strncpy(gen_pkt->l7.payload.payload, p_ptr,
+                  gen_pkt->l7.payload.payload_size);
+          debug ("payload value %s and length %d", gen_pkt->l7.payload.payload,
+                 gen_pkt->l7.payload.payload_size);
+          free_json_obj(tjobj);
+        }
+      else
+        {
+          debug ("%s", "payload not available");
+        }
+    }
+
+  return (SUCCESS);
+}
+
+genErr_t
 process_l2(void *jobj_ref, struct gen_packet_t *gen_pkt, bs_lmodCls lObj)
 {
   debug ("In function %s", __FUNCTION__);
@@ -325,6 +419,27 @@ process_l4(void *jobj_ref, struct gen_packet_t *gen_pkt, bs_lmodCls lObj)
 }
 
 genErr_t
+process_l7(void *jobj_ref, struct gen_packet_t *gen_pkt, bs_lmodCls lObj)
+{
+  debug ("In function %s", __FUNCTION__);
+  struct json_object *jobj = (struct json_object *)jobj_ref;
+  void *tjobj = NULL;
+
+  tjobj=get_val_from_key(jobj, "payload", lObj);
+  if(tjobj)
+    {
+      process_payload(tjobj, gen_pkt, lObj);
+      free_json_obj(tjobj);
+    }
+  else
+    {
+      debug ("%s", "payload not available");
+    }
+
+  return (SUCCESS);
+}
+
+genErr_t
 process_gen_packet(void *jobj_ref, struct gen_packet_t *gen_pkt,
                    bs_lmodCls lObj, bs_mmodCls mObj_ref)
 {
@@ -366,6 +481,17 @@ process_gen_packet(void *jobj_ref, struct gen_packet_t *gen_pkt,
   else
     {
       debug ("%s", "l4 not available");
+    }
+
+  tjobj=get_val_from_key(jobj, "l7", lObj);
+  if(tjobj)
+    {
+      process_l7(tjobj, gen_pkt, lObj);
+      free_json_obj(tjobj);
+    }
+  else
+    {
+      debug ("%s", "l7 not available");
     }
 
   return (SUCCESS);
