@@ -5,7 +5,7 @@
  * @date Thu Dec 26 16:54:29 IST 2013
  */
 
-#include "cpackgen.h"
+#include "json-ifc.h"
 #include "json/json.h"
 
 /**
@@ -53,56 +53,6 @@ void free_json_obj(void *jobj_ref)
 }
 
 /**
- * Convert json command to internal command enum value.
- * @param jobj_ref json object returned on successful parse
- * @param lObj logger reference
- * @return The enum for the command.
- */
-cmd_e_type get_cmd_from_json(void *jobj_ref, bs_lmodCls lObj)
-{
-  debug ("In function %s", __FUNCTION__);
-
-  json_type typ;
-  struct json_object *jobj = (struct json_object *)jobj_ref;
-  cmd_e_type cmd = NIL;
-  char const *cmd_str = NULL;
-
-  if (!jobj)
-    {
-      error("%s", "Invalid json object");
-      return (cmd);
-    }
-
-  typ = json_object_get_type(jobj);
-  if (typ != json_type_string)
-    {
-      debug ("%s", "Type not string");
-      return (cmd);
-    }
-
-  cmd_str = json_object_get_string(jobj);
-  if ((!cmd_str) || !strlen(cmd_str))
-    {
-      debug ("%s", "Invalid comand string");
-      return (cmd);
-    }
-
-  if (strncmp(cmd_str, "start", 5) == 0)
-    cmd=START;
-  else if (strncmp(cmd_str, "stop", 4) == 0)
-    cmd=STOP;
-  else if (strncmp(cmd_str, "pause", 5) == 0)
-    cmd=PAUSE;
-  else if (strncmp(cmd_str, "resume", 6) == 0)
-    cmd=RESUME;
-  else
-    cmd=NIL;
-
-  debug ("Exit function %s", __FUNCTION__);
-  return (cmd);
-}
-
-/**
  * Get object value for a given key
  * @param jobj_ref json object returned on successful parse
  * @param key String value that will be searched in the jobj.
@@ -115,6 +65,12 @@ void * get_val_from_key(void *jobj_ref, const char *key, bs_lmodCls lObj)
 
   struct json_object *jobj = (struct json_object *)jobj_ref;
   struct json_object *njobj = NULL;
+
+  if (!jobj)
+    {
+      error("%s", "Invalid json object");
+      return (NULL);
+    }
 
   njobj = json_object_object_get(jobj, key);
   debug ("New object returned %s", json_object_to_json_string(njobj));
@@ -132,12 +88,60 @@ int get_int(void *jobj_ref, bs_lmodCls lObj)
 {
   debug ("In function %s", __FUNCTION__);
 
+  json_type typ;
   int val=-1;
   struct json_object *jobj = (struct json_object *)jobj_ref;
+
+  if (!jobj)
+    {
+      error("%s", "Invalid json object");
+      return (val);
+    }
+
+  typ = json_object_get_type(jobj);
+  if (typ != json_type_int)
+    {
+      debug ("%s", "Type not int");
+      return (val);
+    }
 
   val = json_object_get_int(jobj);
 
   debug ("Integer value returned %d", val);
+
+  return (val);
+}
+
+/**
+ * Get string value from the object
+ * @param jobj_ref json object returned on successful parse
+ * @param lObj logger reference
+ * @return The string value stored in the object.
+ */
+const char* get_string(void *jobj_ref, bs_lmodCls lObj)
+{
+  debug ("In function %s", __FUNCTION__);
+
+  json_type typ;
+  char const *val = NULL;
+  struct json_object *jobj = (struct json_object *)jobj_ref;
+
+  if (!jobj)
+    {
+      error("%s", "Invalid json object");
+      return (NULL);
+    }
+
+  typ = json_object_get_type(jobj);
+  if (typ != json_type_string)
+    {
+      debug ("%s", "Type not string");
+      return (NULL);
+    }
+
+  val = json_object_get_string(jobj);
+
+  debug ("String value returned %s", val);
 
   return (val);
 }

@@ -4,6 +4,8 @@ from common import cli_fmwk
 from utils import grc
 import cmd
 import inspect
+import socket
+import struct
 
 class l2_cli(cli_fmwk.VCCli):
     def __init__(self, d):
@@ -27,7 +29,7 @@ class l2_cli(cli_fmwk.VCCli):
         j['smac']=arg_d['smac']
         j['dmac']=arg_d['dmac']
         if 'ethertype' in arg_d:
-            j['ethertype']=arg_d['ethertype']
+            j['ethertype']=int(arg_d['ethertype'], 16)
         if 'payload' in arg_d:
             j['payload']=arg_d['payload']
         self.l2_dict['ethernet']=j
@@ -35,7 +37,7 @@ class l2_cli(cli_fmwk.VCCli):
     def help_ethernet(self, args):
         grc.debug("In Function {0}".format(inspect.stack()[0][3]))
         print ("Ethernet packet definitions")
-        print ("  ethernet smac <source mac> dmac <destination mac> [ethertype <ethertype> payload <payload value>]")
+        print ("  ethernet smac <source mac> dmac <destination mac> [ethertype <ethertype [in hex]> payload <payload value>]")
 
 class l3_cli(cli_fmwk.VCCli):
     def __init__(self, d):
@@ -56,16 +58,20 @@ class l3_cli(cli_fmwk.VCCli):
         arg_d = dict(zip(arg_lst[::2],
                          [arg_lst[i] for i in range(1, len(arg_lst), 2)]))
 
-        j['sip']=arg_d['sip']
-        j['dip']=arg_d['dip']
+        j['sip']=struct.unpack("@i",
+                               socket.inet_pton(socket.AF_INET,
+                                                arg_d['sip']))[0]
+        j['dip']=struct.unpack("@i",
+                               socket.inet_pton(socket.AF_INET,
+                                                arg_d['dip']))[0]
         if 'ttl' in arg_d:
-            j['ttl']=arg_d['ttl']
+            j['ttl']=int(arg_d['ttl'])
         if 'protocol' in arg_d:
-            j['protocol']=arg_d['protocol']
+            j['protocol']=int(arg_d['protocol'])
         if 'payload' in arg_d:
             j['payload']=arg_d['payload']
         if 'dscp' in arg_d:
-            j['dscp']=arg_d['dscp']
+            j['dscp']=int(arg_d['dscp'])
         self.l3_dict['ipv4']=j
 
     def help_ipv4(self, args):
@@ -92,8 +98,8 @@ class l4_cli(cli_fmwk.VCCli):
         arg_d = dict(zip(arg_lst[::2],
                          [arg_lst[i] for i in range(1, len(arg_lst), 2)]))
 
-        j['sport']=arg_d['sport']
-        j['dport']=arg_d['dport']
+        j['sport']=int(arg_d['sport'])
+        j['dport']=int(arg_d['dport'])
         self.l4_dict['udp']=j
 
     def help_udp(self, args):
@@ -113,8 +119,8 @@ class l4_cli(cli_fmwk.VCCli):
         arg_d = dict(zip(arg_lst[::2],
                          [arg_lst[i] for i in range(1, len(arg_lst), 2)]))
 
-        j['sport']=arg_d['sport']
-        j['dport']=arg_d['dport']
+        j['sport']=int(arg_d['sport'])
+        j['dport']=int(arg_d['dport'])
         self.l4_dict['tcp']=j
 
     def help_tcp(self, args):

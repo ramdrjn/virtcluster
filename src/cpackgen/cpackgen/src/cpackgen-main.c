@@ -10,6 +10,7 @@
 void _exit_cleanup(bs_mmodCls mObj, bs_fmodCls fObj, bs_lmodCls lObj);
 genErr_t
 process_gen_param(void *njobj, struct gen_param_t *gen_param, bs_lmodCls lObj);
+cmd_e_type get_cmd_from_json(void *jobj_ref, bs_lmodCls lObj);
 
 /**
  * Called before exit. Cleanup of all objects.
@@ -27,6 +28,41 @@ void _exit_cleanup(bs_mmodCls mObj, bs_fmodCls fObj, bs_lmodCls lObj)
       bs_fmodFin (&fObj, mObj);
     }
   bs_mmodFin (&mObj);
+}
+
+/**
+ * Convert json command to internal command enum value.
+ * @param jobj_ref json object returned on successful parse
+ * @param lObj logger reference
+ * @return The enum for the command.
+ */
+cmd_e_type get_cmd_from_json(void *jobj, bs_lmodCls lObj)
+{
+  debug ("In function %s", __FUNCTION__);
+
+  cmd_e_type cmd = NIL;
+  char const *cmd_str = NULL;
+
+  cmd_str = get_string(jobj, lObj);
+  if ((!cmd_str) || !strlen(cmd_str))
+    {
+      debug ("%s", "Invalid comand string");
+      return (cmd);
+    }
+
+  if (strncmp(cmd_str, "start", 5) == 0)
+    cmd=START;
+  else if (strncmp(cmd_str, "stop", 4) == 0)
+    cmd=STOP;
+  else if (strncmp(cmd_str, "pause", 5) == 0)
+    cmd=PAUSE;
+  else if (strncmp(cmd_str, "resume", 6) == 0)
+    cmd=RESUME;
+  else
+    cmd=NIL;
+
+  debug ("Exit function %s", __FUNCTION__);
+  return (cmd);
 }
 
 /**
@@ -256,7 +292,7 @@ int main(int argc, char *argv[])
           if(njobj)
             {
               /*Process as generator packet*/
-              process_gen_packet(njobj, &conf.gen_packets, lObj);
+              process_gen_packet(njobj, &conf.gen_packets, lObj, mObj);
               free_json_obj(njobj);
               njobj = NULL;
             }

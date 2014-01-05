@@ -7,13 +7,8 @@
  * @date Sun Dec 22 15:08:17 IST 2013
  */
 
-#include "gen.h"
-#include "generr.h"
-#include "gentypes.h"
-
-#include "utLib/mmod.h"
-#include "utLib/fmod.h"
-#include "utLib/lmod.h"
+#include "json-ifc.h"
+#include "pkt-define.h"
 
 /**@enum cmd_type
  * Commands definitions.*/
@@ -51,19 +46,8 @@ struct conf_t
   t_bool _validFlag;
   mode_e_type mode;
   struct gen_param_t gen_params;
+  struct gen_packet_t gen_packets;
 };
-
-#define debug(fmt, ...) bs_log(lObj, LVL_DEBUG, FO_LOG, "\n"fmt, __VA_ARGS__)
-#define info(fmt, ...) bs_log(lObj, LVL_INFO, FO_LOG, "\n"fmt, __VA_ARGS__)
-#define error(fmt, ...) bs_log(lObj, LVL_ERROR, FO_LOG, "\n"fmt, __VA_ARGS__)
-
-genErr_t parse_json(const char *input, void **jobj_ref, bs_lmodCls lObj);
-void free_json_obj(void *jobj_ref);
-cmd_e_type get_cmd_from_json(void *jobj_ref, bs_lmodCls lObj);
-void * get_val_from_key(void *jobj_ref, const char *key, bs_lmodCls lObj);
-int get_int(void *jobj_ref, bs_lmodCls lObj);
-genErr_t
-process_gen_param(void *jobj, struct gen_packet_t gen_pkt, bs_lmodCls lObj);
 
 /****************************************************************************/
 #endif /*_CPACKGEN_H_*/
