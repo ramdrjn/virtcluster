@@ -89,9 +89,9 @@ struct l2_t
   struct ethernet_t ethernet;
 };
 
-/**@struct gen_paacket_t
- * Generator packet definitions */
-struct gen_packet_t
+/**@struct gen_packet_conf_t
+ * Generator packet configurations */
+struct gen_packet_conf_t
 {
   struct l2_t l2;
   struct l3_t l3;
@@ -99,8 +99,18 @@ struct gen_packet_t
   struct l7_t l7;
 };
 
-genErr_t process_gen_packet(void *jobj_ref, struct gen_packet_t *gen_pkt,
-                            bs_lmodCls lObj, bs_mmodCls mObj);
+genErr_t process_l2(void *jobj_ref);
+genErr_t process_ethernet(void *jobj_ref);
+
+genErr_t process_l3(void *jobj_ref);
+genErr_t process_ipv4(void *jobj_ref);
+
+genErr_t process_l4(void *jobj_ref);
+genErr_t process_udp(void *jobj_ref);
+genErr_t process_tcp(void *jobj_ref);
+
+genErr_t process_l7(void *jobj_ref);
+genErr_t process_payload(void *jobj_ref);
 
 /****************************************************************************/
 #endif /*_PKT_DEFINE_H_*/

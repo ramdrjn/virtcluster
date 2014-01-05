@@ -8,7 +8,6 @@
  */
 
 #include "json-ifc.h"
-#include "pkt-define.h"
 
 /**@enum cmd_type
  * Commands definitions.*/
@@ -39,6 +38,13 @@ struct gen_param_t
   long duration_max;
 };
 
+/**@struct gen_packet_t
+ * Generator packet parameters */
+struct gen_packet_t
+{
+  int valid;
+};
+
 /**@struct conf_t
  * Configuration structure. */
 struct conf_t
@@ -48,6 +54,10 @@ struct conf_t
   struct gen_param_t gen_params;
   struct gen_packet_t gen_packets;
 };
+
+genErr_t
+process_gen_packet(void *jobj_ref, struct gen_packet_t *gen_pkt_ref,
+                   bs_lmodCls lObj_ref, bs_mmodCls mObj_ref);
 
 /****************************************************************************/
 #endif /*_CPACKGEN_H_*/
