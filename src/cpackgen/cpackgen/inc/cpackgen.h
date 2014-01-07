@@ -8,6 +8,7 @@
  */
 
 #include "json-ifc.h"
+#include "pkt-define.h"
 
 /**@enum cmd_type
  * Commands definitions.*/
@@ -36,13 +37,6 @@ struct gen_param_t
   long rate_bps;
   long max_count;
   long duration_max;
-};
-
-/**@struct gen_packet_t
- * Generator packet parameters */
-struct gen_packet_t
-{
-  int valid;
 };
 
 /**@struct conf_t
