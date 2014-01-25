@@ -4,4 +4,5 @@ src/commision/bld/rpm/x86_64/commision-1.0-1.x86_64.rpm
 src/utLib/bld/rpm/x86_64/utLib-1.0-1.x86_64.rpm
 src/cpackgen/cpackgen-cli/bld/rpm/x86_64/cpackgen-cli-1.0-1.x86_64.rpm
 src/cpackgen/cpackgen/bld/rpm/x86_64/cpackgen-1.0-1.x86_64.rpm
+src/cpackgen/cpackgen_kmod/bld/rpm/x86_64/cpackgen_kmod-1.0-1.x86_64.rpm
 TFW/Install_Dir/bld/rpm/x86_64/test_bin-1.0-1.x86_64.rpm

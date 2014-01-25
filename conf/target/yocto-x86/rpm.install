@@ -2,3 +2,4 @@ utLib
 test_bin
 cpackgen-cli
 cpackgen
+cpackgen_kmod

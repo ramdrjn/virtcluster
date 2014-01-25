@@ -68,6 +68,11 @@ endif
 %.exe:
 	$(LINK.exe) $^ $(LIBS) $(OUTPUT.exe)
 
+.PHONY:kmod
+kmod:
+	$(MAKE) -C $(SRC_DIR) KERNEL_SRC=$(K_SRC_DIR)\
+	 MOD_DIR=$(addsuffix $(subst .,,$(OBJ_DIR)), $(shell pwd))
+
 RPM_TARGET := $(OVERRIDE_RPM_TARGET)
 ifndef RPM_TARGET
 	RPM_TARGET := $(ARCH)-vc-linux
@@ -78,22 +83,31 @@ endif
 
 .PHONY:clean
 clean:
+ifeq ($(KERNEL_MAKEFILE),yes)
+	$(MAKE) -C $(SRC_DIR) KERNEL_SRC=$(K_SRC_DIR) clean
+else
 	rm -vf $(OBJ_DIR)/*.o
 	rm -vf $(OBJ_DIR)/*.d
 	rm -vf $(OBJ_DIR)/*.gcno
 	rm -vf $(OBJ_DIR)/*.gcda
+endif
 
 .PHONY:cleanall
 cleanall:
+ifeq ($(KERNEL_MAKEFILE),yes)
+	$(MAKE) -C $(SRC_DIR) KERNEL_SRC=$(K_SRC_DIR) clean
+	rm -vrf $(OBJ_DIR)/lib
+else
 	rm -vf $(OBJ_DIR)/*.o
 	rm -vf $(OBJ_DIR)/*.d
 	rm -vf $(BIN_DIR)/*.exe
 	rm -vf $(LIB_DIR)/*.so
 	rm -vf $(STATIC_LIB_DIR)/*.a
-	rm -vrf $(_RPM_DIR)/*
 	rm -vf $(OBJ_DIR)/*.gcno
 	rm -vf $(OBJ_DIR)/*.gcda
 	rm -vf $(OBJ_DIR)/*.sa
 	rm -vf $(OBJ_DIR)/*.sa.bkp
+endif
+	rm -vrf $(_RPM_DIR)/*
 
 #############################################################################

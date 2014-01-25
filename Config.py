@@ -109,6 +109,9 @@ def args_actions(args):
             if target_desc["extra_environment_setup_script"]:
                   sdk=target_desc["extra_environment_setup_script"]
                   initenv.sendData("\n . "+sdk)
+            if target_desc["kernel_src"]:
+                  src=target_desc["kernel_src"]
+                  initenv.sendData("\nexport K_SRC_DIR="+src)
             initenv.sendData("\nexport TARGET_TYPE="+args.target)
 
 def process_cmd_args():

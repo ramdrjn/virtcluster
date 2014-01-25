@@ -34,3 +34,4 @@
 %virtcluster_lib_perm %defattr(0644,root,root,0644)
 %virtcluster_bin_perm %defattr(0755,root,root,0755)
 %virtcluster_scripts_perm %defattr(0755,root,root,0755)
+%virtcluster_kmod_perm %defattr(0755,root,root,0755)

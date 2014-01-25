@@ -4,4 +4,5 @@ src/commision/bld/rpm/i586/commision-1.0-1.i586.rpm
 src/utLib/bld/rpm/i586/utLib-1.0-1.i586.rpm
 src/cpackgen/cpackgen-cli/bld/rpm/i586/cpackgen-cli-1.0-1.i586.rpm
 src/cpackgen/cpackgen/bld/rpm/i586/cpackgen-1.0-1.i586.rpm
+src/cpackgen/cpackgen_kmod/bld/rpm/i586/cpackgen_kmod-1.0-1.i586.rpm
 TFW/Install_Dir/bld/rpm/i586/test_bin-1.0-1.i586.rpm

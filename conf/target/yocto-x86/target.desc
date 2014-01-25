@@ -1,6 +1,7 @@
 {
   "environment_setup_script":"/opt/toolchain/x86vm/environment-setup-i586-poky-linux",
   "extra_environment_setup_script":"conf/target/yocto-x86/yocto-build-set",
+  "kernel_src":"/opt/toolchain/x86vm/sysroots/i586-poky-linux/usr/src/kernel/",
   "device_file":"",
   "fs_raw":"/Work/Contents/BuildArea/Yocto/Images/virtcluster-core-x86vm.ext3",
   "fs_tar":"",
