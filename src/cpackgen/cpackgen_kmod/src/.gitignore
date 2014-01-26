@@ -1,0 +1,12 @@
+.built-in.o.cmd
+.cpackgen.ko.cmd
+.cpackgen.mod.o.cmd
+.cpackgen.o.cmd
+.tmp_versions
+Module.symvers
+built-in.o
+cpackgen.ko
+cpackgen.mod.c
+cpackgen.mod.o
+cpackgen.o
+modules.order
