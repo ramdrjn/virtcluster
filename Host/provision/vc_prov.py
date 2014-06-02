@@ -90,6 +90,19 @@ def _cdrom_eject(dom):
     logger.debug("In Function {0}".format(inspect.stack()[0][3]))
     py_libvirt.detach_cdrom_dev_hp(dom)
 
+def _host_network_store(name, ip, mac):
+    #Store domain net configs in net directory
+    j_dict={}
+    j_dict['fab0_dom_name']=name
+    j_dict['fab0_dom_ip']=ip
+    j_dict['fab0_dom_mac']=mac
+
+    net_fname="{0}.net".format(name)
+    net_file = os.path.join("net", net_fname)
+    logger.info("Generating domain networking file {0}".format(net_file))
+    with open(net_file, 'w') as f:
+        json.dump(j_dict, f)
+
 class provCLI(cli_fmwk.VCCli):
     def __init__(self):
         logger.debug("Initialized {0} class".format(self.__class__))
@@ -646,18 +659,7 @@ class provCLI_dhcp(cli_fmwk.VCCli):
         else:
             self.arg_d['host']=hostT
         logger.debug("Full host enteries {0}".format(self.arg_d['host']))
-
-        #Store domain net configs in net directory
-        j_dict={}
-        j_dict['fab0_dom_name']=t_dict['name']
-        j_dict['fab0_dom_ip']=t_dict['ip']
-        j_dict['fab0_dom_mac']=t_dict['mac']
-
-        net_fname="{0}.net".format(t_dict['name'])
-        net_file = os.path.join("net", net_fname)
-        logger.info("Generating domain networking file {0}".format(net_file))
-        with open(net_file, 'w') as f:
-            json.dump(j_dict, f)
+        _host_network_store(t_dict['name'], t_dict['ip'], t_dict['mac'])
 
     def help_host(self, args):
         pass
@@ -680,11 +682,19 @@ class provCLI_network_define(cli_fmwk.VCCli):
 
         logger.debug("Bridge args {0}".format(args))
 
+        self.arg_d['vs']=False
+        if 'vs' in args:
+            args=args.replace('vs', '')
+            self.arg_d['vs']=True
+
         t_dict=args.split()
         t_dict = dict(zip(t_dict[::2], [t_dict[i]
                                         for i in range(1, len(t_dict), 2)]))
         if self.is_fabric:
-            self.arg_d['brname']='virfab0'
+            if self.arg_d['vs']:
+                self.arg_d['brname']=t_dict['name']
+            else:
+                self.arg_d['brname']='virfab0'
         else:
             self.arg_d['brname']=t_dict['name']
         self.arg_d['ip_addr']=t_dict['ip']
@@ -723,6 +733,19 @@ class provCLI_network_define(cli_fmwk.VCCli):
         pass
     def complete_dhcp(self, args):
         pass
+    def do_host(self, args):
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("Host args {0}".format(args))
+
+        t_dict=args.split()
+        t_dict = dict(zip(t_dict[::2], [t_dict[i]
+                                        for i in range(1, len(t_dict), 2)]))
+        _host_network_store(t_dict['name'], t_dict['ip'], t_dict['mac'])
+
+    def help_host(self, args):
+        pass
+    def complete_host(self, args):
+        pass
 
 class provCLI_network(cli_fmwk.VCCli):
     def __init__(self, con):
@@ -733,17 +756,27 @@ class provCLI_network(cli_fmwk.VCCli):
         self._con = con
 
     def _nwk_xml_comp(self, val):
-        xml="\
-           <network>\
-             <name>$network</name>\
-             <bridge name='$brname' stp='on' delay='0' />\
-             <ip address='$ip_addr' netmask='$netmask'>\
-               <dhcp>\
-                 <range start='$dhcp_start' end='$dhcp_end' />\
-                 $host \
-               </dhcp>\
-             </ip>\
-           </network>\
+        if val['vs']:
+            xml="\
+             <network>\
+               <name>$network</name>\
+               <forward mode='bridge'/>\
+               <bridge name='$brname' />\
+               <virtualport type='openvswitch'/>\
+             </network>\
+"
+        else:
+            xml="\
+             <network>\
+               <name>$network</name>\
+               <bridge name='$brname' stp='on' delay='0' />\
+               <ip address='$ip_addr' netmask='$netmask'>\
+                 <dhcp>\
+                   <range start='$dhcp_start' end='$dhcp_end' />\
+                   $host \
+                 </dhcp>\
+               </ip>\
+             </network>\
 "
         xmlT=string.Template(xml).substitute(val)
         return xmlT
