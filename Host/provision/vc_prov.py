@@ -314,8 +314,6 @@ class provCLI_domain(cli_fmwk.VCCli):
         #Request for vnc port auto allocation
         arg_d['vnc_port']='-1'
 
-        logger.info("Domain net {0}".format(arg_d['fab0_net_name']))
-
         img_name=arg_d['image']
         logger.info("Image name {0} ".format(img_name))
 
