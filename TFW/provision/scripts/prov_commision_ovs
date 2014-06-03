@@ -1,22 +1,20 @@
 network
   define network fabric
     bridge vs name br0 ip 192.168.100.1 netmask 255.255.255.0
-    host name x86vm0 mac 52:54:00:d7:2a:30 ip 192.168.100.128
-    host name x86vm1 mac 52:54:00:d7:2a:31 ip 192.168.100.129
   end
   start network fabric
 end
 
 domain
   define domain x86vm0 image yocto-x86 memory 524288 vcpu 2 arch i686
-  interface domain x86vm0 mac 00:16:3e:20:b0:10 dev eth0
+  host domain x86vm0 name x86vm0 mac 52:54:00:d7:2a:30 ip 192.168.100.128
   start  domain x86vm0
   resume domain x86vm0
 end
 
 domain
   define domain x86vm1 image yocto-x86 memory 524288 vcpu 2 arch i686
-  interface domain x86vm1 mac 00:16:3e:20:b0:11 dev eth0
+  host domain x86vm1 name x86vm1 mac 52:54:00:d7:2a:31 ip 192.168.100.129
   start  domain x86vm1
   resume domain x86vm1
 end

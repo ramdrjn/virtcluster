@@ -410,8 +410,6 @@ def list_storage_vol(con):
 
 '''          nwk interface'''
 def attach_interface(dom, mac, dev_name):
-#portgroup='{2}'/>\
-#    <model type='virtio'/>
     xml="\
   <interface type='direct'>\
     <mac address='{0}'/>\
@@ -419,6 +417,17 @@ def attach_interface(dom, mac, dev_name):
     <model type='virtio'/>\
   </interface>\
  ".format(mac, dev_name)
+    _def_interface(dom, xml)
+
+def attach_vs_interface(dom, mac, br_name):
+    xml="\
+  <interface type='bridge'>\
+    <mac address='{0}'/>\
+    <source bridge='{1}' />\
+    <virtualport type='openvswitch' />\
+    <model type='virtio'/>\
+  </interface>\
+ ".format(mac, br_name)
     _def_interface(dom, xml)
 
 def list_interfaces(con):

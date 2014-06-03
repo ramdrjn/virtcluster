@@ -246,6 +246,13 @@ class provCLI_domain(cli_fmwk.VCCli):
         self._con = con
 
     def _dom_xml_comp(self, val):
+        '''
+        <interface type='network'>\
+        <mac address='$fab0_dom_mac'/>\
+        <source network='$fab0_net_name'/>\
+        <model type='virtio'/>\
+        </interface>\
+        '''
         xml="\
             <domain type='kvm'>\
               <name>$domain</name>\
@@ -273,11 +280,6 @@ class provCLI_domain(cli_fmwk.VCCli):
                   <target dev='hdc' bus='ide' tray='open'/>\
                   <readonly/>\
                 </disk>\
-                <interface type='network'>\
-                  <mac address='$fab0_dom_mac'/>\
-                  <source network='$fab0_net_name'/>\
-                  <model type='virtio'/>\
-                </interface>\
                 <graphics type='vnc' port='$vnc_port' autoport='yes'/>\
               </devices>\
               <seclabel type='none'/>\
@@ -308,29 +310,6 @@ class provCLI_domain(cli_fmwk.VCCli):
             return
 
         logger.info("Domain name {0}".format(dom_name))
-
-        #Get fabric network details and update arg_d
-        j_dict={}
-
-        net_fname="{0}.net".format(dom_name)
-        net_file = os.path.join("net", net_fname)
-        logger.info("Domain network file name {0}".format(net_file))
-        with open(net_file, 'r') as f:
-            j_dict=json.load(f)
-
-        arg_d['fab0_dom_mac']=j_dict['fab0_dom_mac']
-
-        logger.info("Domain mac {0}".format(arg_d['fab0_dom_mac']))
-
-        j_dict={}
-
-        fab_fname="fab0_host.net"
-        fab_file = os.path.join("net", fab_fname)
-        logger.info("Fabric network file name {0}".format(fab_file))
-        with open(fab_file, 'r') as f:
-            j_dict=json.load(f)
-
-        arg_d['fab0_net_name']=j_dict['fab0_net_name']
 
         #Request for vnc port auto allocation
         arg_d['vnc_port']='-1'
@@ -586,6 +565,48 @@ class provCLI_domain(cli_fmwk.VCCli):
         logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         return complete_dom(text, line, begidx, endidx)
 
+    def do_host(self, args):
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+        logger.debug("Host args {0}".format(args))
+
+        arg_lst=args.split()
+        if len(arg_lst) != 8:
+            self.help_interface()
+            return
+
+        arg_d = dict(zip(arg_lst[::2], [arg_lst[i]
+                                        for i in range(1, len(arg_lst), 2)]))
+
+        dom = None
+        dom_name=arg_d['domain']
+        if dom_name:
+            dom = py_libvirt.dom_lookup(self._con, dom_name)
+            if not dom:
+                error_log_print("Domain not defined")
+                return
+        else:
+            print("Enter domain")
+            return
+
+        #Get fabric network details and update arg_d
+        j_dict={}
+
+        fab_fname="fab0_host.net"
+        fab_file = os.path.join("net", fab_fname)
+        logger.info("Fabric network file name {0}".format(fab_file))
+        with open(fab_file, 'r') as f:
+            j_dict=json.load(f)
+
+        arg_d['br']=j_dict['fab0_br_name']
+
+        _host_network_store(arg_d['name'], arg_d['ip'], arg_d['mac'])
+        py_libvirt.attach_vs_interface(dom, arg_d['mac'], arg_d['br'])
+
+    def help_host(self, args):
+        pass
+    def complete_host(self, args):
+        pass
+
     def do_interface(self, args):
         logger.debug("In Function {0}".format(inspect.stack()[0][3]))
 
@@ -708,6 +729,7 @@ class provCLI_network_define(cli_fmwk.VCCli):
         j_dict={}
         j_dict['fab0_net_name']=self.arg_d['network']
         j_dict['fab0_host_net_ip']=t_dict['ip']
+        j_dict['fab0_br_name']=self.arg_d['brname']
 
         if self.is_fabric:
             net_fname="fab0_host.net"
@@ -805,10 +827,12 @@ class provCLI_network(cli_fmwk.VCCli):
         nwk_def_cli=provCLI_network_define(arg_d)
         nwk_def_cli.cmdloop()
 
+        '''
         logger.debug("Generating network xml".format(nwk_name))
         xml = self._nwk_xml_comp(arg_d)
         logger.info(xml)
         nwk = py_libvirt.network_defineXML(self._con, xml)
+        '''
 
     def help_define(self):
         logger.debug("In Function {0}".format(inspect.stack()[0][3]))
@@ -835,12 +859,14 @@ class provCLI_network(cli_fmwk.VCCli):
             if nwk_name=='fabric':
                 nwk_name='virtcluster_fabric0'
                 logger.debug("Fabric network")
+            '''
             nwk = py_libvirt.network_lookup(self._con, nwk_name)
             if not nwk:
                 error_log_print("Network not defined")
                 return
             logger.info("Network {0} undefine".format(nwk_name))
             nwk = py_libvirt.network_undefine(nwk)
+            '''
         else:
             print("Enter network")
             return
@@ -869,12 +895,14 @@ class provCLI_network(cli_fmwk.VCCli):
             if nwk_name=='fabric':
                 nwk_name='virtcluster_fabric0'
                 logger.debug("Fabric network")
+            '''
             nwk = py_libvirt.network_lookup(self._con, nwk_name)
             if not nwk:
                 error_log_print("Network not defined")
                 return
             logger.info("Network {0} start".format(nwk_name))
             py_libvirt.network_start(nwk)
+            '''
         else:
             print("Enter network")
             return
@@ -903,12 +931,14 @@ class provCLI_network(cli_fmwk.VCCli):
             if nwk_name=='fabric':
                 nwk_name='virtcluster_fabric0'
                 logger.debug("Fabric network")
+            '''
             nwk = py_libvirt.network_lookup(self._con, nwk_name)
             if not nwk:
                 error_log_print("Network not defined")
                 return
             logger.info("Network {0} stop".format(nwk_name))
             py_libvirt.network_stop(nwk)
+            '''
         else:
             print("Enter network")
             return
