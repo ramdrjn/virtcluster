@@ -204,7 +204,8 @@ class provCLI(cli_fmwk.VCCli):
             self.help_dumpxml()
             return
 
-        comp_type=cli_fmwk.autocomp(self.def_comp_lst, arg_lst[0])
+        comp_lst=['domain', 'network', 'interface']
+        comp_type=cli_fmwk.autocomp(comp_lst, arg_lst[0])
 
         if comp_type==['domain']:
             dom_name=arg_lst[1]
@@ -222,16 +223,26 @@ class provCLI(cli_fmwk.VCCli):
                 return
             s=py_libvirt.dumpxml_network(nwk)
             print(s)
+        elif comp_type==['interface']:
+            ifc_name=arg_lst[1]
+            ifc = py_libvirt.host_interfaces_lookup(self._con, ifc_name)
+            if not ifc:
+                error_log_print("Interface not defined")
+                return
+            s=py_libvirt.dumpxml_network(nwk)
+            print(s)
         else:
-            print("Enter either domain or network")
+            print("Enter domain, network or interface")
             return
 
     def help_dumpxml(self):
         logger.debug("In Function {0}".format(inspect.stack()[0][3]))
-        print("     Dump XML of either:      ")
-        print("      domain <domain name>    ")
-        print("             or               ")
-        print("      network <network name>  ")
+        print("     Dump XML of either:          ")
+        print("      domain <domain name>        ")
+        print("             or                   ")
+        print("      network <network name>      ")
+        print("             or                   ")
+        print("      interface <interface name>  ")
 
     def complete_dumpxml(self, text, line, begidx, endidx):
         logger.debug("In Function {0}".format(inspect.stack()[0][3]))
@@ -722,6 +733,12 @@ class provCLI_network_define(cli_fmwk.VCCli):
         logger.info("Bridge name {0}, ip {1}, netmask {2}".format(
                 self.arg_d['brname'], self.arg_d['ip_addr'],
                 self.arg_d['netmask']))
+
+        #Configure the host interface.
+        py_libvirt.host_interface_up(self._con,
+                                     self.arg_d['brname'],
+                                     self.arg_d['ip_addr'],
+                                     self.arg_d['netmask'])
 
         #Store host configs in net directory
         j_dict={}

@@ -5,7 +5,7 @@ OVS_BIN_DIR=$OVS_DIR/bin/
 OVS_SBIN_DIR=$OVS_DIR/sbin/
 OVS_DEPLOY_DIR=/opt/deploy-ovs
 
-OVS_BR_NAME=br0
+OVS_BR_NAME=fabbr0
 OVS_BR_MAC=00:11:22:33:44:55
 
 export PATH=$PATH:$OVS_BIN_DIR:$OVS_SBIN_DIR
@@ -74,12 +74,12 @@ else
     log "bridge creation done"
 fi
 
-ovs-vsctl set bridge $OVS_BR_NAME other-config:hwaddr=$OVS_BR_MAC
+#ovs-vsctl set bridge $OVS_BR_NAME other-config:hwaddr=$OVS_BR_MAC
 
-if [ $? -ne 0 ]
-then
-    log "Failed setting MAC addr"
-    exit 1
-else
-    log "MAC addr set"
-fi
+# if [ $? -ne 0 ]
+# then
+#     log "Failed setting MAC addr"
+#     exit 1
+# else
+#     log "MAC addr set"
+# fi

@@ -143,6 +143,17 @@ def _hp_cdrom(dom, xml):
 def _def_interface(dom, xml, flags=0):
     dom.attachDeviceFlags(xml, flags)
 
+def _lookup_host_interfaces(con, name):
+    try:
+        ifc = con.interfaceLookupByName(name)
+    except libvirt.libvirtError as e:
+        ifc = None
+        _debug(e.get_error_message())
+    return ifc
+
+def _def_host_interface_up(con, xml, flags=0):
+    iptr=con.interfaceDefineXML(xml, flags)
+    iptr.create(0)
 
 '''               Events & Features'''
 #events
@@ -333,6 +344,23 @@ def dumpxml_domain(dom):
 
 '''               Devices'''
 
+'''          nwk interface'''
+def host_interfaces_lookup(con, name):
+    ifc = None
+    if _validate_con(con) or name:
+        ifc = _lookup_host_interfaces(con, name)
+    return ifc
+
+def host_interface_up(con, name, ip, netmask):
+    xml="\
+<interface type='bridge' name='{0}'>\
+  <protocol family='ipv4'>\
+    <ip address='{1}' netmask='{2}'/>\
+  </protocol>\
+</interface>\
+ ".format(mac, dev_name)
+    _def_host_interface_up(dom, xml)
+
 '''          vcpu'''
 def set_maxVcpu(dom, vcpus):
     dom.setVcpusFlags(vcpus, libvirt.VIR_DOMAIN_VCPU_MAXIMUM)
@@ -435,6 +463,12 @@ def list_interfaces(con):
         return ""
     return ("\nRunning Interfaces\n" + str(con.listInterfaces()) +
             "\nDefined Interfaces\n" + str(con.listDefinedInterfaces()))
+
+def dumpxml_interfaces(ifc):
+    if not ifc:
+        return ""
+    return ("\nActive domain xml\n" + ifc.XMLDesc(0) +
+            "\nInactive domain xml\n" + ifc.XMLDesc(libvirt.VIR_INTERFACE_XML_INACTIVE))
 
 '''               Other interfaces'''
 def get_vncport(dom_name):

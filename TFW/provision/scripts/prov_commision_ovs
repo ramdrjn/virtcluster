@@ -1,6 +1,6 @@
 network
   define network fabric
-    bridge vs name br0 ip 192.168.100.1 netmask 255.255.255.0
+    bridge vs name fabbr0 ip 192.168.100.1 netmask 255.255.255.0
   end
   start network fabric
 end
