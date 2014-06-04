@@ -29,6 +29,7 @@ log()
 # fi
 
 $DNSMASQ_DIR/dnsmasq -C $DNSMASQ_CONF -i $OVS_BRIDGE_NAME
+#$DNSMASQ_DIR/dnsmasq -R -h -p 0 -i $OVS_BRIDGE_NAME --dhcp-range=192.168.100.128,192.168.100.130 --dhcp-host=52:54:00:d7:2a:30,192.168.100.128 --dhcp-host=52:54:00:d7:2a:31,192.168.100.129
 
 if [ $? -ne 0 ]
 then
