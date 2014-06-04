@@ -65,6 +65,25 @@ def complete_nwk_dom(text, line, begidx, endidx):
             comp_type=['']
     return comp_type
 
+def complete_nwk_dom_ifc(text, line, begidx, endidx):
+    logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+
+    comp_type=cli_fmwk.autocomp(['domain', 'network', 'interface'], text)
+
+    args=line.split()
+    if len(args) == 2 and line[-1] == ' ':
+        #Second level.
+        if args[1]=='domain':
+            print("<domain name>")
+            comp_type=['']
+        if args[1]=='network':
+            print("<network name>")
+            comp_type=['']
+        if args[1]=='interface':
+            print("<interface name>")
+            comp_type=['']
+    return comp_type
+
 def error_log_print(msg):
     logger.error(msg)
     print(msg)
@@ -229,7 +248,7 @@ class provCLI(cli_fmwk.VCCli):
             if not ifc:
                 error_log_print("Interface not defined")
                 return
-            s=py_libvirt.dumpxml_network(nwk)
+            s=py_libvirt.dumpxml_network(ifc)
             print(s)
         else:
             print("Enter domain, network or interface")
@@ -246,7 +265,7 @@ class provCLI(cli_fmwk.VCCli):
 
     def complete_dumpxml(self, text, line, begidx, endidx):
         logger.debug("In Function {0}".format(inspect.stack()[0][3]))
-        return complete_nwk_dom(text, line, begidx, endidx)
+        return complete_nwk_dom_ifc(text, line, begidx, endidx)
 
 class provCLI_domain(cli_fmwk.VCCli):
     def __init__(self, con):
@@ -697,7 +716,7 @@ class provCLI_dhcp(cli_fmwk.VCCli):
         pass
 
 class provCLI_network_define(cli_fmwk.VCCli):
-    def __init__(self, arg_d):
+    def __init__(self, arg_d, con):
         logger.debug("Initialized {0} class".format(self.__class__))
         self.arg_d=arg_d
         cli_fmwk.VCCli.__init__(self, intro="Network define subcommands")
@@ -706,6 +725,7 @@ class provCLI_network_define(cli_fmwk.VCCli):
             self.is_fabric=True
             self.arg_d['network']='virtcluster_fabric0'
             logger.info("Fabric network define")
+        self._con=con
 
     def do_bridge(self, args):
         logger.debug("In Function {0}".format(inspect.stack()[0][3]))
@@ -839,7 +859,7 @@ class provCLI_network(cli_fmwk.VCCli):
 
         logger.info("Network {0} define".format(nwk_name))
 
-        nwk_def_cli=provCLI_network_define(arg_d)
+        nwk_def_cli=provCLI_network_define(arg_d, self._con)
         nwk_def_cli.cmdloop()
 
         '''
