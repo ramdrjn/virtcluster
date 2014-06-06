@@ -155,6 +155,18 @@ def _def_host_interface_up(con, xml, flags=0):
     iptr=con.interfaceDefineXML(xml, flags)
     iptr.create(0)
 
+'''               Migration'''
+
+def _def_migrate(dom, duri, flags=0):
+    dcon = libvirt.open(duri)
+    new_dom = dom.migrate(dcon, flags, None, None, 0)
+    dcon.close()
+    return new_dom
+
+def _def_migrate_p2p(dom, duri, flags=0):
+    new_dom = dom.migrateToURI(duri, flags, None, 0)
+    return new_dom
+
 '''               Events & Features'''
 #events
 #power management flags.
@@ -477,3 +489,19 @@ def dumpxml_interfaces(ifc):
 def get_vncport(dom_name):
     op=common.exec_cmd_op(["virsh", "vncdisplay", dom_name])
     return ("VNC port number: {0}".format(op))
+
+'''               Migration'''
+def migrate(dom, duri, p2p=False, tun=False, persist=False):
+    new_dom=None
+    flags=libvirt.VIR_MIGRATE_CHANGE_PROTECTION|libvirt.VIR_MIGRATE_UNDEFINE_SOURCE
+    if persist:
+        flags=flags|libvirt.VIR_MIGRATE_PERSIST_DEST
+    if p2p:
+        flags=flags|libvirt.VIR_MIGRATE_PEER2PEER
+    if tun:
+        flags=flags|libvirt.VIR_MIGRATE_TUNNELLED
+    if p2p:
+        new_dom = _def_migrate_p2p(dom, duri, flags)
+    else:
+        new_dom = _def_migrate(dom, duri, flags)
+    return new_dom

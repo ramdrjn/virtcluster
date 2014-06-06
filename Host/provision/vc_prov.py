@@ -667,6 +667,37 @@ class provCLI_domain(cli_fmwk.VCCli):
         logger.debug("In Function {0}".format(inspect.stack()[0][3]))
         return complete_dom(text, line, begidx, endidx)
 
+    def do_migrate(self, args):
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+
+        logger.debug("Domain migrate args {0}".format(args))
+
+        arg_lst=args.split()
+        arg_d = dict(zip(arg_lst[::2], [arg_lst[i]
+                                        for i in range(1, len(arg_lst), 2)]))
+
+        comp_type=cli_fmwk.autocomp(self.def_comp_lst, arg_lst[0])
+
+        if comp_type==['domain']:
+            dom_name=arg_d['domain']
+            dom = py_libvirt.dom_lookup(self._con, dom_name)
+            if not dom:
+                error_log_print("Domain not defined")
+                return
+            logger.info("Domain {0} started".format(dom_name))
+            py_libvirt.migrate(dom, arg_d['duri'], False, False, False)
+        else:
+            print("Enter domain")
+            return
+
+    def help_migrate(self):
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+        print("     Migrate domain <domain name>    ")
+
+    def complete_migrate(self, text, line, begidx, endidx):
+        logger.debug("In Function {0}".format(inspect.stack()[0][3]))
+        return complete_dom(text, line, begidx, endidx)
+
 class provCLI_dhcp(cli_fmwk.VCCli):
     def __init__(self, arg_d):
         logger.debug("Initialized {0} class".format(self.__class__))
