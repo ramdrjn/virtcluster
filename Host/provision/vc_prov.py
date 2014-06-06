@@ -302,7 +302,7 @@ class provCLI_domain(cli_fmwk.VCCli):
               <devices>\
                 <emulator>/usr/bin/kvm</emulator>\
                 <disk type='file' device='disk'>\
-                  <driver name='qemu' type='raw'/>\
+                  <driver name='qemu' type='raw' cache='none' />\
                   <source file='$rootfs'/>\
                   <target dev='hda' bus='ide'/>\
                 </disk>\
