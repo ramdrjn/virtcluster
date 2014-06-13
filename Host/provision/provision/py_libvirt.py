@@ -366,7 +366,7 @@ def host_interfaces_lookup(con, name):
 def host_interface_up(con, name, ip, netmask):
     xml="\
 <interface type='bridge' name='{0}'>\
-  <start mode='onboot'/>\
+  <start mode='none'/>\
   <protocol family='ipv4'>\
     <ip address='{1}' netmask='{2}'/>\
   </protocol>\
